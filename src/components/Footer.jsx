@@ -12,11 +12,6 @@ function Footer() {
           3 de febrero 85
         </p>
       </div>
-      
-      <div className="footer-credits">
-        <p>Página creada y diseñada por <strong>Rafaela Sanna</strong> <Heart size={12} style={{ display: 'inline', color: 'var(--rose-500)' }} /></p>
-      </div>
-
       <div className="footer-links">
         <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
           <Instagram size={17} />
