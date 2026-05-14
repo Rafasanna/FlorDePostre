@@ -37,7 +37,7 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
 
       <div className="hero-content">
         <div className="hero-copy">
-          <span className="eyebrow">Menu digital boutique</span>
+          <span className="eyebrow">Menu digital</span>
           <h1>Flor de Postre</h1>
           <p>Pasteleria, desayunos y momentos dulces para compartir</p>
           <div className="hero-actions">

@@ -78,7 +78,7 @@ function App() {
       .map((item) => `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}`)
       .join("\n");
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aun no agregue productos"}\n\nTotal aproximado: ${formatPrice(total)}\n\nMi nombre:\nDireccion o retiro:\nComentarios:`;
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aun no agregue productos"}\n\nTotal (sin envio): ${formatPrice(total)}\n\nMi nombre:\nDireccion o retiro:\nComentarios:`;
   }, [cartItems, total]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -207,7 +207,7 @@ function App() {
             <article>
               <strong>02</strong>
               <h3>Revisas 🧁</h3>
-              <p>Controla cantidades y total aproximado antes de enviar el mensaje.</p>
+              <p>Controla cantidades y total (sin envio) antes de enviar el mensaje.</p>
             </article>
             <article>
               <strong>03</strong>
