@@ -40,19 +40,6 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
           <span className="eyebrow">Menu digital</span>
           <h1>Flor de Postre</h1>
           <p>Pasteleria, desayunos y momentos dulces para compartir</p>
-          <div className="hero-actions">
-            <a className="primary-button" href="#menu">
-              <ArrowDown size={18} />
-              Ver menu
-            </a>
-            <a className="ghost-button" href={`${WHATSAPP_URL}?text=Hola%20Flor%20de%20postre%2C%20les%20queria%20consultar%20por..`} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} />
-              WhatsApp
-            </a>
-            <a className="rose-button" href={cateringHref} target="_blank" rel="noreferrer">
-              Catering
-            </a>
-          </div>
         </div>
 
         <div className="hero-visual" aria-label="Pasteleria Flor de Postre">
