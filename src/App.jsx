@@ -122,22 +122,7 @@ function App() {
       <Hero itemCount={itemCount} cateringHref={cateringHref} onOpenCart={() => setIsCartOpen(true)} />
 
       <main>
-        <section className="brand-strip" aria-label="Especialidades">
-          <div>
-            <Sparkles size={18} />
-            Pasteleria artesanal 🍰
-          </div>
-          <div>
-            <Gift size={18} />
-            Desayunos y regalos
-          </div>
-          <a className="catering-strip-button" href="#catering">
-            <Heart size={18} />
-            Catering
-          </a>
-        </section>
-
-        <section className="section" id="menu">
+                <section className="section" id="menu">
           <div className="section-heading">
             <span>Menu digital</span>
             <h2>Eleginos para tu mesa dulce, desayuno o evento</h2>
