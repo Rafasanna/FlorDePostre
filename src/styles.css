@@ -1136,8 +1136,14 @@ h1 {
     text-align: center;
   }
 
+  .footer-info {
+    flex: none;
+    margin-bottom: 8px;
+  }
+
   .footer-links {
     justify-content: center;
+    flex: none;
     width: 100%;
   }
 
