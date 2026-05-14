@@ -1,6 +1,17 @@
-import { Plus, Sparkle } from "lucide-react";
+import { useState } from "react";
+import { Plus, Sparkle, Check } from "lucide-react";
 
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
+  const [justAdded, setJustAdded] = useState(false);
+
+  const handleAdd = () => {
+    onAdd(product);
+    setJustAdded(true);
+    setTimeout(() => {
+      setJustAdded(false);
+    }, 3000);
+  };
+
   return (
     <article className="product-card">
       <div className={product.imagen ? "product-media" : "product-media placeholder"}>
@@ -23,10 +34,10 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
           <strong>{formatPrice(product.precio)}</strong>
           <button 
             type="button" 
-            onClick={() => onAdd(product)}
-            className={quantity > 0 ? "added" : ""}
+            onClick={handleAdd}
+            className={justAdded ? "added" : ""}
           >
-            <Plus size={17} />
+            {justAdded ? <Check size={17} /> : <Plus size={17} />}
             {quantity > 0 ? `Agregar (${quantity})` : "Agregar"}
           </button>
         </div>
