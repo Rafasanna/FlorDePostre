@@ -78,7 +78,7 @@ function App() {
       .map((item) => `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}`)
       .join("\n");
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aun no agregue productos"}\n\nTotal (sin envio): ${formatPrice(total)}\n\nMi nombre:\nDireccion o retiro:\nComentarios:`;
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aun no agregue productos"}\n\nTotal (sin envío): ${formatPrice(total)}\n\nMi nombre:\nDireccion o retiro:\nComentarios:`;
   }, [cartItems, total]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -92,7 +92,7 @@ function App() {
         <header style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
           <button onClick={() => { setIsCartOpen(false); window.scrollTo(0, 0); }} className="ghost-button" style={{ margin: 0, padding: '0.5rem 1rem' }}>
             <ArrowLeft size={18} />
-            Volver al menu
+            Volver al menú
           </button>
         </header>
         <main style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto', minHeight: 'calc(100vh - 200px)' }}>
@@ -124,7 +124,7 @@ function App() {
       <main>
                 <section className="section" id="menu">
           <div className="section-heading">
-            <span>Menu digital</span>
+            <span>Menú digital</span>
             <h2>Eleginos para tu mesa dulce, desayuno o evento</h2>
             <p>
               Selecciona productos, revisa el resumen y envia el pedido por WhatsApp con el detalle listo.
@@ -152,7 +152,7 @@ function App() {
           {hasHiddenProducts && (
             <div className="see-more-wrap">
               <button className="see-more-button" type="button" onClick={() => setShowAllProducts(true)}>
-                Ver mas productos
+                Ver más productos
               </button>
             </div>
           )}
@@ -192,7 +192,7 @@ function App() {
         <section className="how-to section" id="como-pedir">
           <div className="section-heading compact">
             <span>Como pedir</span>
-            <h2>Simple, rapido y con atencion personalizada</h2>
+            <h2>Simple, rápido y con atención personalizada</h2>
           </div>
           <div className="steps">
             <article>
@@ -207,7 +207,7 @@ function App() {
             <article>
               <strong>02</strong>
               <h3>Revisas 🧁</h3>
-              <p>Controla cantidades y total (sin envio) antes de enviar el mensaje.</p>
+              <p>Controla cantidades y total (sin envío) antes de enviar el mensaje.</p>
             </article>
             <article>
               <strong>03</strong>

@@ -50,7 +50,7 @@ function Cart({ items, total, onQuantityChange, onClear, whatsappHref, formatPri
       )}
 
       <div className="cart-total">
-        <span>Total (sin envio)</span>
+        <span>Total (sin envío)</span>
         <strong>{formatPrice(total)}</strong>
       </div>
 

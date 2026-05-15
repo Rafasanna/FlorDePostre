@@ -305,13 +305,18 @@ h1 {
 .mini-logo {
   left: -22px;
   top: 32px;
+  padding: 6px 10px;
 }
 
 .mini-logo img {
-  width: 42px;
-  height: 42px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.mini-logo span {
+  font-size: 0.8rem;
 }
 
 .mini-cart {
