@@ -30,7 +30,7 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
         <div className="nav-links">
           <a href="#menu">Menú</a>
           <a href="#catering">Catering</a>
-          <a href="#como-pedir">Como pedir</a>
+          <a href="#como-pedir">Cómo pedir</a>
           <a href="#" onClick={(e) => { e.preventDefault(); onOpenCart(); }}>Pedido</a>
         </div>
       </nav>
@@ -39,7 +39,7 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
         <div className="hero-copy">
           <span className="eyebrow">Menú digital</span>
           <h1>Flor de Postre</h1>
-          <p>Pasteleria, desayunos y momentos dulces para compartir</p>
+          <p>Pastelería, desayunos y momentos dulces para compartir</p>
         </div>
 
         <div className="hero-visual" aria-label="Pasteleria Flor de Postre">

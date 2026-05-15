@@ -75,7 +75,7 @@ export const products = [
   {
     id: "alfajor-clasico-maicena",
     nombre: "Alfajor clasico de maicena",
-    descripcion: "Alfajor artesanal con dulce de leche y coco. Precio base segun catalogo.",
+    descripcion: "Alfajor artesanal con dulce de leche y coco. Precio base según catálogo.",
     precio: 3000,
     categoria: "Alfajores",
     imagen: "/images/alfajor-maicena.jpeg"
@@ -91,7 +91,7 @@ export const products = [
   {
     id: "alfacookies",
     nombre: "Alfacookies",
-    descripcion: "Alfajor estilo cookie, disponible segun produccion del dia.",
+    descripcion: "Alfajor estilo cookie, disponible según producción del día.",
     precio: 3900,
     categoria: "Alfajores",
     imagen: ""
@@ -363,7 +363,7 @@ export const products = [
   {
     id: "pepas",
     nombre: "Pepas",
-    descripcion: "Porcion segun disponibilidad.",
+    descripcion: "Porción según disponibilidad.",
     precio: 3900,
     categoria: "Otros dulces",
     imagen: ""
@@ -387,7 +387,7 @@ export const products = [
   {
     id: "tarta-casera",
     nombre: "Tarta casera",
-    descripcion: "Opciones: caprese, jamon y queso, mix de verduras o pollo.",
+    descripcion: "Opciones: caprese, jamón y queso, mix de verduras o pollo.",
     precio: 9800,
     categoria: "Salado",
     imagen: ""
@@ -427,7 +427,7 @@ export const products = [
   {
     id: "bandeja-matera-chica",
     nombre: "Bandeja matera chica",
-    descripcion: "12 porciones. Incluye cuadraditos o porciones dulces segun stock.",
+    descripcion: "12 porciones. Incluye cuadraditos o porciones dulces según stock.",
     precio: 13900,
     categoria: "Bandejas",
     imagen: ""

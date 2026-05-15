@@ -78,7 +78,7 @@ function App() {
       .map((item) => `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}`)
       .join("\n");
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aun no agregue productos"}\n\nTotal (sin envío): ${formatPrice(total)}\n\nMi nombre:\nDireccion o retiro:\nComentarios:`;
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal (sin envío): ${formatPrice(total)}\n\nMi nombre:\nDirección o retiro:\nComentarios:`;
   }, [cartItems, total]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -100,7 +100,7 @@ function App() {
             <div className="section-heading compact">
               <span>Carrito</span>
               <h2>Tu pedido ({itemCount})</h2>
-              <p>Revisa cantidades y envia el detalle automaticamente por WhatsApp.</p>
+              <p>Revisá cantidades y enviá el detalle automáticamente por WhatsApp.</p>
             </div>
             <Cart
               items={cartItems}
@@ -127,7 +127,7 @@ function App() {
             <span>Menú digital</span>
             <h2>Eleginos para tu mesa dulce, desayuno o evento</h2>
             <p>
-              Selecciona productos, revisa el resumen y envia el pedido por WhatsApp con el detalle listo.
+              Seleccioná productos, revisá el resumen y enviá el pedido por WhatsApp con el detalle listo.
             </p>
           </div>
 
@@ -163,7 +163,7 @@ function App() {
             <span>Catering</span>
             <h2>Dulce, salado o los dos para tu evento 🧁</h2>
             <p>
-              Armamos propuestas a medida segun cantidad de personas, tipo de evento, horario y gustos. Escribinos y coordinamos una opcion pensada para tu mesa.
+              Armamos propuestas a medida según cantidad de personas, tipo de evento, horario y gustos. Escribinos y coordinamos una opción pensada para tu mesa.
             </p>
             <a className="primary-button catering-button" href={cateringHref} target="_blank" rel="noreferrer">
               <MessageCircle size={18} />
@@ -191,14 +191,14 @@ function App() {
 
         <section className="how-to section" id="como-pedir">
           <div className="section-heading compact">
-            <span>Como pedir</span>
+            <span>Cómo pedir</span>
             <h2>Simple, rápido y con atención personalizada</h2>
           </div>
           <div className="steps">
             <article>
               <strong>01</strong>
-              <h3>Elegis</h3>
-              <p>Agrega al carrito pasteleria, desayunos y opciones saladas.</p>
+              <h3>Elegís</h3>
+              <p>Agregá al carrito pastelería, desayunos y opciones saladas.</p>
               <a className="mini-whatsapp-link" href={cateringHref} target="_blank" rel="noreferrer">
                 <MessageCircle size={16} />
                 Consultar catering
@@ -206,8 +206,8 @@ function App() {
             </article>
             <article>
               <strong>02</strong>
-              <h3>Revisas 🧁</h3>
-              <p>Controla cantidades y total (sin envío) antes de enviar el mensaje.</p>
+              <h3>Revisás 🧁</h3>
+              <p>Controlá cantidades y total (sin envío) antes de enviar el mensaje.</p>
             </article>
             <article>
               <strong>03</strong>

@@ -17,7 +17,7 @@ function Cart({ items, total, onQuantityChange, onClear, whatsappHref, formatPri
 
       {items.length === 0 ? (
         <div className="empty-cart">
-          <p>Agrega productos para armar tu pedido.</p>
+          <p>Agregá productos para armar tu pedido.</p>
         </div>
       ) : (
         <div className="cart-items">
