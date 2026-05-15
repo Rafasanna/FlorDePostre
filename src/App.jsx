@@ -90,7 +90,7 @@ function App() {
     return (
       <div className="site-shell">
         <header style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
-          <button onClick={() => setIsCartOpen(false)} className="ghost-button" style={{ margin: 0, padding: '0.5rem 1rem' }}>
+          <button onClick={() => { setIsCartOpen(false); window.scrollTo(0, 0); }} className="ghost-button" style={{ margin: 0, padding: '0.5rem 1rem' }}>
             <ArrowLeft size={18} />
             Volver al menu
           </button>
@@ -119,7 +119,7 @@ function App() {
 
   return (
     <div className="site-shell">
-      <Hero itemCount={itemCount} cateringHref={cateringHref} onOpenCart={() => setIsCartOpen(true)} />
+      <Hero itemCount={itemCount} cateringHref={cateringHref} onOpenCart={() => { setIsCartOpen(true); window.scrollTo(0, 0); }} />
 
       <main>
                 <section className="section" id="menu">
