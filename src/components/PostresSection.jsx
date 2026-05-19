@@ -4,6 +4,7 @@ import { CalendarDays, MessageCircle, Sparkle } from "lucide-react";
 import { postresBase } from "../data/postresData.js";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
+import BackLink from "./BackLink.jsx";
 
 const buildPostreWhatsappHref = (postre, date) => {
   const message = `Hola Flor de Postre ✨
@@ -57,9 +58,7 @@ function PostresSection() {
             <span>Postres por encargue</span>
             <h2>No encontramos ese postre</h2>
             <p>Podés volver al catálogo y elegir otra opción.</p>
-            <Link className="ghost-button section-back-link" to="/postres">
-              Ver postres
-            </Link>
+            <BackLink to="/postres" label="Volver a postres" />
           </div>
         </section>
       );
@@ -67,9 +66,7 @@ function PostresSection() {
 
     return (
       <section className="section page-section reveal-fade" id="postres" ref={sectionRef}>
-        <button className="ghost-button postre-back-button" type="button" onClick={() => navigate("/postres")}>
-          Volver a postres
-        </button>
+        <BackLink onClick={() => navigate("/postres")} label="Volver a postres" />
 
         <article className="postre-detail">
           <div className={selectedPostre.imagen ? "postre-detail-media" : "postre-detail-media placeholder"}>
@@ -121,9 +118,7 @@ function PostresSection() {
         <p>
           Elegí tu postre favorito, seleccioná el tamaño y reservalo para tu próxima fecha especial.
         </p>
-        <Link className="ghost-button section-back-link" to="/">
-          Volver al inicio
-        </Link>
+        <BackLink to="/" label="Volver al inicio" />
       </div>
 
       <div className="postres-grid">

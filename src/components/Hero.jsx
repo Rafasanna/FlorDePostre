@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Instagram, ShoppingBag } from "lucide-react";
 import { INSTAGRAM_URL } from "../config.js";
+import BrandMark from "./BrandMark.jsx";
 
 const carouselImages = [
   "/images/carousel-1.jpg",
@@ -22,11 +23,11 @@ function Hero({ itemCount, onOpenCart }) {
 
   return (
     <header className="hero" id="inicio">
-
+      <BrandMark variant="flower" className="hero-flower-detail" />
 
       <div className="hero-content">
         <div className="hero-copy">
-          <span className="eyebrow">Menú digital</span>
+          <span className="eyebrow">Menú </span>
           <h1>Flor de Postre</h1>
           <p>Pastelería, desayunos y momentos dulces para compartir</p>
         </div>
@@ -49,7 +50,7 @@ function Hero({ itemCount, onOpenCart }) {
             />
           ))}
           <div className="hero-card mini-logo" style={{ zIndex: 10 }}>
-            <img src="/images/logo-flor-de-postre.jpeg" alt="" />
+            <BrandMark variant="circle" />
             <span>@flordepostre.ok</span>
           </div>
           <button className="hero-card mini-cart" type="button" onClick={onOpenCart} style={{ zIndex: 10 }}>

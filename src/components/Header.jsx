@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Search, Menu, ShoppingBag } from "lucide-react";
+import BrandMark from "./BrandMark.jsx";
 
 function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
   const [scrolled, setScrolled] = useState(false);
@@ -21,8 +22,7 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
       </button>
 
       <Link className="brand" to="/" aria-label="Flor de Postre inicio">
-        <img src="/images/logo-flor-de-postre.jpeg" alt="" />
-        <span>Flor de Postre</span>
+        <BrandMark variant="official" className="header-logo" />
       </Link>
 
       <div className="nav-actions">

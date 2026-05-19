@@ -120,7 +120,7 @@ function App() {
       }
     });
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal estimado (sin envío): ${formatPrice(total)}\n\nMi nombre:\nFecha de entrega/retiro:\nDirección o retiro:\nAclaraciones:\n\n¿Me confirmás disponibilidad?`;
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal estimado (sin envío): ${formatPrice(total)}\n\nMi nombre:\nRetiro o envío:\nDirección (si es envío):\nAclaraciones:\n\n¿Me confirmás disponibilidad?`;
   }, [cartItems, total]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;

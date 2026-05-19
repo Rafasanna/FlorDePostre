@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import CakeConfigurator from "./CakeConfigurator.jsx";
+import BackLink from "./BackLink.jsx";
 
 function TortasSection({ onAddToCart }) {
   const sectionRef = useIntersectionObserver();
@@ -15,9 +15,7 @@ function TortasSection({ onAddToCart }) {
         <p>
           Diseñá tu torta a medida. Elegí el tamaño, la cobertura, los rellenos y los extras para tu evento.
         </p>
-        <Link className="ghost-button section-back-link" to="/">
-          Volver al inicio
-        </Link>
+        <BackLink to="/" label="Volver al inicio" />
       </div>
 
       <div className="tortas-intro">

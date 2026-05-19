@@ -1,3 +1,5 @@
+import BackLink from "../components/BackLink.jsx";
+
 function ComoPedirPage() {
   return (
     <section className="section page-section">
@@ -7,12 +9,13 @@ function ComoPedirPage() {
         <p>
           Armá tu pedido desde el menú digital y envianos la consulta por WhatsApp para confirmar disponibilidad, tiempos y entrega.
         </p>
+        <BackLink to="/" label="Volver al inicio" />
       </div>
 
       <div className="steps page-steps">
         <article>
           <strong>01</strong>
-          <h3>Menú diario</h3>
+          <h3>Menú</h3>
           <p>Agregá al carrito pastelería, opciones saladas y enviá tu pedido al instante.</p>
         </article>
         <article>

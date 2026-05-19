@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { Building2, Home, MessageCircle, Send, Sparkles, WheatOff } from "lucide-react";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
+import BackLink from "./BackLink.jsx";
 
 const makeWhatsappHref = (message) => `${WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
 
@@ -127,9 +127,7 @@ function CateringSection() {
           <p>
             Elegí el tipo de consulta y revisá una guía simple para saber qué podemos armar.
           </p>
-          <Link className="ghost-button section-back-link" to="/">
-            Volver al inicio
-          </Link>
+          <BackLink to="/" label="Volver al inicio" />
         </div>
       </div>
 

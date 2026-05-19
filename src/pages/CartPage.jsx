@@ -1,4 +1,5 @@
 import { Minus, Plus, Send, Trash2 } from "lucide-react";
+import BackLink from "../components/BackLink.jsx";
 
 function CartPage({ items, total, onQuantityChange, onRemoveItem, onClear, whatsappHref, formatPrice }) {
   const renderConfigDetails = (item) => {
@@ -25,6 +26,7 @@ function CartPage({ items, total, onQuantityChange, onRemoveItem, onClear, whats
         <span>Resumen</span>
         <h2>Mi pedido</h2>
         <p>Revisá cantidades y enviá el pedido por WhatsApp para confirmar disponibilidad.</p>
+        <BackLink to="/" label="Volver al inicio" />
       </div>
 
       <div className="page-cart">
