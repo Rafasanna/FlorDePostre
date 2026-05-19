@@ -12,7 +12,7 @@ function DailyMenuSection({ cart, addToCart, formatPrice, isLoading }) {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const sectionRef = useIntersectionObserver();
   const visibleCatalog = useMemo(() => getVisibleProducts(dailyProducts), []);
-  const featuredProducts = useMemo(() => getFeaturedProducts(dailyProducts).slice(0, 3), []);
+  const featuredProducts = useMemo(() => getFeaturedProducts(dailyProducts).slice(0, 4), []);
 
   const categoryProducts = useMemo(() => {
     if (activeCategory === "Todos") return visibleCatalog;
