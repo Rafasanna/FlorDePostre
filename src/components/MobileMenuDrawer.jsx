@@ -57,7 +57,9 @@ function MobileMenuDrawer({ isOpen, onClose }) {
         <div className="cart-header">
           <div>
             <span>Flor de Postre</span>
-            <h2>Menú</h2>
+            <Link className="mobile-menu-title-link" to="/" onClick={onClose}>
+              <h2>Menú</h2>
+            </Link>
           </div>
           <button className="icon-button close-btn" type="button" onClick={onClose} aria-label="Cerrar menú">
             <X size={20} />

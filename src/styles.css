@@ -1622,6 +1622,11 @@ h1 {
   z-index: 1;
 }
 
+.mobile-menu-title-link {
+  color: inherit;
+  display: contents;
+}
+
 .cart-drawer .cart-items {
   flex: 1;
   overflow-y: auto;
