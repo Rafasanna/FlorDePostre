@@ -1,12 +1,23 @@
-import { useMemo, useState } from "react";
-import { ArrowLeft, CakeSlice, Gift, Heart, Instagram, MessageCircle, ShoppingBag, Sparkles } from "lucide-react";
-import { categories, products } from "./data/products.js";
-import { INSTAGRAM_URL, WHATSAPP_URL } from "./config.js";
+import { useMemo, useState, useEffect } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { ShoppingBag } from "lucide-react";
+import { WHATSAPP_URL } from "./config.js";
+import { campaigns } from "./data/campaigns.js";
+import { getActiveCampaigns, getEffectivePrice } from "./utils/seasonal.js";
+import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
-import CategoryFilter from "./components/CategoryFilter.jsx";
-import ProductCard from "./components/ProductCard.jsx";
-import Cart from "./components/Cart.jsx";
+import CampaignBanner from "./components/CampaignBanner.jsx";
+import MobileMenuDrawer from "./components/MobileMenuDrawer.jsx";
+import DailyMenuSection from "./components/DailyMenuSection.jsx";
+import PostresSection from "./components/PostresSection.jsx";
+import TortasSection from "./components/TortasSection.jsx";
+import CateringSection from "./components/CateringSection.jsx";
+import AboutSection from "./components/AboutSection.jsx";
+import CartDrawer from "./components/CartDrawer.jsx";
 import Footer from "./components/Footer.jsx";
+import ProductSearchModal from "./components/ProductSearchModal.jsx";
+import ComoPedirPage from "./pages/ComoPedirPage.jsx";
+import CartPage from "./pages/CartPage.jsx";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -16,214 +27,227 @@ const formatPrice = (value) =>
   }).format(value);
 
 function App() {
-  const [activeCategory, setActiveCategory] = useState("Todos");
-  const [showAllProducts, setShowAllProducts] = useState(false);
-  const [cart, setCart] = useState({});
+  const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [shouldScrollToMenu, setShouldScrollToMenu] = useState(false);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const activeCampaign = useMemo(() => getActiveCampaigns(campaigns)[0] || null, []);
 
-  const categoryProducts = useMemo(() => {
-    if (activeCategory === "Todos") return products;
-    return products.filter((product) => product.categoria === activeCategory);
-  }, [activeCategory]);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const visibleProducts = useMemo(() => {
-    if (activeCategory !== "Todos" || showAllProducts) return categoryProducts;
-    return categoryProducts.filter((product) => product.categoria === "Alfajores").slice(0, 4);
-  }, [activeCategory, categoryProducts, showAllProducts]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
 
-  const hasHiddenProducts = activeCategory === "Todos" && categoryProducts.length > visibleProducts.length;
+  useEffect(() => {
+    if (!shouldScrollToMenu || pathname !== "/") return;
 
-  const handleCategoryChange = (category) => {
-    setActiveCategory(category);
-    setShowAllProducts(false);
-  };
+    const timer = setTimeout(() => {
+      document.getElementById("menu-diario")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setShouldScrollToMenu(false);
+    }, 80);
 
-  const cartItems = useMemo(
-    () =>
-      Object.entries(cart)
-        .map(([id, quantity]) => {
-          const product = products.find((item) => item.id === id);
-          return product ? { ...product, quantity } : null;
-        })
-        .filter(Boolean),
-    [cart]
-  );
+    return () => clearTimeout(timer);
+  }, [pathname, shouldScrollToMenu]);
 
   const total = cartItems.reduce((sum, item) => sum + item.precio * item.quantity, 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const addToCart = (product) => {
-    setCart((current) => ({
-      ...current,
-      [product.id]: (current[product.id] || 0) + 1
-    }));
+  const addToCart = (productObj) => {
+    setCartItems((prev) => {
+      // Si es menú diario, intentar agrupar
+      if (productObj.type === 'daily') {
+        const existing = prev.find(item => item.product.id === productObj.product.id && item.type === 'daily');
+        if (existing) {
+          return prev.map(item => 
+            item.cartItemId === existing.cartItemId 
+              ? { ...item, quantity: item.quantity + 1 } 
+              : item
+          );
+        }
+      }
+      
+      // Si no es diario o no existe, agregarlo como nuevo item con cartItemId unico
+      return [...prev, { 
+        ...productObj, 
+        cartItemId: crypto.randomUUID() 
+      }];
+    });
+    
+    // Abrir carrito opcionalmente o mostrar notificacion
+    setIsCartOpen(true);
   };
 
-  const changeQuantity = (id, quantity) => {
-    setCart((current) => {
-      const next = { ...current };
+  const changeQuantity = (cartItemId, quantity) => {
+    setCartItems((prev) => {
       if (quantity <= 0) {
-        delete next[id];
-      } else {
-        next[id] = quantity;
+        return prev.filter(item => item.cartItemId !== cartItemId);
       }
-      return next;
+      return prev.map(item => 
+        item.cartItemId === cartItemId 
+          ? { ...item, quantity } 
+          : item
+      );
     });
   };
 
-  const clearCart = () => setCart({});
+  const removeItem = (cartItemId) => {
+    setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
+  };
+
+  const clearCart = () => setCartItems([]);
 
   const whatsappMessage = useMemo(() => {
-    const detail = cartItems
-      .map((item) => `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}`)
-      .join("\n");
+    let detail = "";
+    
+    cartItems.forEach(item => {
+      detail += `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}\n`;
+      if (item.type !== 'daily' && item.configuracion) {
+        const c = item.configuracion;
+        if (c.sizeName) detail += `  • Tamaño: ${c.sizeName}\n`;
+        if (c.coberturaName) detail += `  • Cobertura: ${c.coberturaName}\n`;
+        if (c.rellenos && c.rellenos.length > 0) detail += `  • Rellenos: ${c.rellenos.map(r => r.nombre).join(', ')}\n`;
+        if (c.extras && c.extras.length > 0) detail += `  • Extras: ${c.extras.map(e => e.nombre).join(', ')}\n`;
+        if (c.date) detail += `  • Fecha deseada: ${c.date}\n`;
+        if (c.comments) detail += `  • Detalles: ${c.comments}\n`;
+      }
+    });
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal (sin envío): ${formatPrice(total)}\n\nMi nombre:\nDirección o retiro:\nComentarios:`;
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal estimado (sin envío): ${formatPrice(total)}\n\nMi nombre:\nFecha de entrega/retiro:\nDirección o retiro:\nAclaraciones:\n\n¿Me confirmás disponibilidad?`;
   }, [cartItems, total]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
+  
   const cateringHref = `${WHATSAPP_URL}?text=${encodeURIComponent(
-    "Hola Flor de Postre! Quiero consultar por catering para un evento.\n\nFecha:\nCantidad de personas:\nTipo de evento:\nHorario:\nComentarios:"
+    "Hola Flor de Postre ✨\nQuiero consultar por catering / desayunos.\n\nTipo de propuesta:\nCantidad aproximada de personas:\nFecha:\nIdea general:"
   )}`;
 
-  if (isCartOpen) {
-    return (
-      <div className="site-shell">
-        <header style={{ padding: '1rem', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
-          <button onClick={() => { setIsCartOpen(false); window.scrollTo(0, 0); }} className="ghost-button" style={{ margin: 0, padding: '0.5rem 1rem' }}>
-            <ArrowLeft size={18} />
-            Volver al menú
-          </button>
-        </header>
-        <main style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto', minHeight: 'calc(100vh - 200px)' }}>
-          <section className="section order-section" id="pedido" style={{ marginTop: 0 }}>
-            <div className="section-heading compact">
-              <span>Carrito</span>
-              <h2>Tu pedido ({itemCount})</h2>
-              <p>Revisá cantidades y enviá el detalle automáticamente por WhatsApp.</p>
-            </div>
-            <Cart
-              items={cartItems}
-              total={total}
-              onQuantityChange={changeQuantity}
-              onClear={clearCart}
-              whatsappHref={whatsappHref}
-              formatPrice={formatPrice}
-            />
-          </section>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const handleSearchResult = (result) => {
+    setIsSearchOpen(false);
+    if (result.type === 'daily') {
+      setShouldScrollToMenu(true);
+      navigate("/");
+    } else if (result.type === 'postre') {
+      navigate("/postres");
+    } else if (result.type === 'torta') {
+      navigate("/tortas-personalizadas");
+    }
+  };
+
+  // Convert old cart logic format to new format for DailyMenuSection
+  // DailyMenuSection expects addToCart(product) and cart object with quantities
+  const dailyCartState = cartItems.filter(i => i.type === 'daily').reduce((acc, item) => {
+    acc[item.product.id] = item.quantity;
+    return acc;
+  }, {});
+
+  const handleDailyAddToCart = (product) => {
+    addToCart({ type: 'daily', product, nombre: product.nombre, precio: getEffectivePrice(product), quantity: 1 });
+  };
+
+  const goToMenu = () => {
+    setShouldScrollToMenu(true);
+    navigate("/");
+  };
 
   return (
     <div className="site-shell">
-      <Hero itemCount={itemCount} cateringHref={cateringHref} onOpenCart={() => { setIsCartOpen(true); window.scrollTo(0, 0); }} />
+      <Header 
+        onOpenSearch={() => setIsSearchOpen(true)} 
+        onOpenMenu={() => setIsMobileMenuOpen(true)}
+        onOpenDailyMenu={goToMenu}
+        itemCount={itemCount}
+      />
+
+      <CampaignBanner campaign={activeCampaign} />
 
       <main>
-                <section className="section" id="menu">
-          <div className="section-heading">
-            <span>Menú digital</span>
-            <h2>Eleginos para tu mesa dulce, desayuno o evento</h2>
-            <p>
-              Seleccioná productos, revisá el resumen y enviá el pedido por WhatsApp con el detalle listo.
-            </p>
-          </div>
-
-          <CategoryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onChange={handleCategoryChange}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Hero
+                  itemCount={itemCount}
+                  onOpenCart={() => setIsCartOpen(true)}
+                />
+                <DailyMenuSection
+                  cart={dailyCartState}
+                  addToCart={handleDailyAddToCart}
+                  formatPrice={formatPrice}
+                  isLoading={isLoading}
+                />
+              </>
+            }
           />
-
-          <div className="products-grid" aria-live="polite">
-            {visibleProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                quantity={cart[product.id] || 0}
-                onAdd={addToCart}
+          <Route path="/menu" element={<Navigate to="/" replace />} />
+          <Route
+            path="/pedido"
+            element={
+              <CartPage
+                items={cartItems}
+                total={total}
+                onQuantityChange={changeQuantity}
+                onRemoveItem={removeItem}
+                onClear={clearCart}
+                whatsappHref={whatsappHref}
                 formatPrice={formatPrice}
               />
-            ))}
-          </div>
-
-          {hasHiddenProducts && (
-            <div className="see-more-wrap">
-              <button className="see-more-button" type="button" onClick={() => setShowAllProducts(true)}>
-                Ver más productos
-              </button>
-            </div>
-          )}
-        </section>
-
-        <section className="catering-section" id="catering">
-          <div className="catering-copy">
-            <span>Catering</span>
-            <h2>Dulce, salado o los dos para tu evento 🧁</h2>
-            <p>
-              Armamos propuestas a medida según cantidad de personas, tipo de evento, horario y gustos. Escribinos y coordinamos una opción pensada para tu mesa.
-            </p>
-            <a className="primary-button catering-button" href={cateringHref} target="_blank" rel="noreferrer">
-              <MessageCircle size={18} />
-              Consultar por WhatsApp
-            </a>
-          </div>
-          <div className="catering-notes" aria-label="Informacion de catering">
-            <article>
-              <CakeSlice size={20} />
-              <strong>Mesas dulces</strong>
-              <p>Postres, tortas, alfajores, budines y bandejas materas.</p>
-            </article>
-            <article>
-              <Gift size={20} />
-              <strong>Opciones saladas</strong>
-              <p>Sandwiches, tartas, ensaladas y propuestas para reuniones.</p>
-            </article>
-            <article>
-              <Sparkles size={20} />
-              <strong>A medida</strong>
-              <p>Nos adaptamos al evento para que solo tengas que disfrutar.</p>
-            </article>
-          </div>
-        </section>
-
-        <section className="how-to section" id="como-pedir">
-          <div className="section-heading compact">
-            <span>Cómo pedir</span>
-            <h2>Simple, rápido y con atención personalizada</h2>
-          </div>
-          <div className="steps">
-            <article>
-              <strong>01</strong>
-              <h3>Elegís</h3>
-              <p>Agregá al carrito pastelería, desayunos y opciones saladas.</p>
-              <a className="mini-whatsapp-link" href={cateringHref} target="_blank" rel="noreferrer">
-                <MessageCircle size={16} />
-                Consultar catering
-              </a>
-            </article>
-            <article>
-              <strong>02</strong>
-              <h3>Revisás 🧁</h3>
-              <p>Controlá cantidades y total (sin envío) antes de enviar el mensaje.</p>
-            </article>
-            <article>
-              <strong>03</strong>
-              <h3>Coordinamos</h3>
-              <p>El pedido llega a WhatsApp y se define entrega, retiro o detalles del evento.</p>
-            </article>
-          </div>
-        </section>
+            }
+          />
+          <Route path="/como-pedir" element={<ComoPedirPage />} />
+          <Route path="/catering" element={<CateringSection cateringHref={cateringHref} />} />
+          <Route path="/tortas-personalizadas" element={<TortasSection onAddToCart={addToCart} />} />
+          <Route path="/postres" element={<PostresSection onAddToCart={addToCart} />} />
+          <Route path="/sobre" element={<AboutSection />} />
+          <Route
+            path="*"
+            element={
+              <Hero
+                itemCount={itemCount}
+                onOpenCart={() => setIsCartOpen(true)}
+              />
+            }
+          />
+        </Routes>
       </main>
 
-      <button className="floating-cart" onClick={() => setIsCartOpen(true)} aria-label="Ver carrito" style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
+      <button className="floating-cart" onClick={() => navigate("/pedido")} aria-label="Ver carrito" style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
         <ShoppingBag size={18} />
-        <span>Carrito {itemCount}</span>
+        <span>Mi pedido {itemCount > 0 && `(${itemCount})`}</span>
       </button>
 
       <Footer />
+
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        items={cartItems}
+        total={total}
+        onQuantityChange={changeQuantity}
+        onRemoveItem={removeItem}
+        onClear={clearCart}
+        whatsappHref={whatsappHref}
+        formatPrice={formatPrice}
+      />
+
+      <ProductSearchModal 
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelectResult={handleSearchResult}
+      />
+
+      <MobileMenuDrawer 
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
     </div>
   );
 }

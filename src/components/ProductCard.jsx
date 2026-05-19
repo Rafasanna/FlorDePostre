@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { Plus, Sparkle, Check } from "lucide-react";
+import ProductBadge from "./ProductBadge.jsx";
+import PromoBadge from "./PromoBadge.jsx";
+import { getProductBadges, hasActiveOffer } from "../utils/seasonal.js";
 
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const [justAdded, setJustAdded] = useState(false);
+  const badges = getProductBadges(product);
 
   const handleAdd = () => {
     onAdd(product);
@@ -24,6 +28,13 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
           </div>
         )}
         <span className="product-category">{product.categoria}</span>
+        {badges.length > 0 && (
+          <div className="product-badges" aria-label="Etiquetas de producto">
+            {badges.map((badge) => (
+              <ProductBadge key={`${badge.type}-${badge.label}`} label={badge.label} type={badge.type} />
+            ))}
+          </div>
+        )}
       </div>
       <div className="product-info">
         <div>
@@ -31,7 +42,8 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
           <p>{product.descripcion}</p>
         </div>
         <div className="product-footer">
-          <strong>{formatPrice(product.precio)}</strong>
+          <PromoBadge product={product} formatPrice={formatPrice} />
+          {!hasActiveOffer(product) && <strong>{formatPrice(product.precio)}</strong>}
           <button 
             type="button" 
             onClick={handleAdd}

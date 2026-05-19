@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ArrowDown, Instagram, MessageCircle, ShoppingBag } from "lucide-react";
-import { INSTAGRAM_URL, WHATSAPP_URL } from "../config.js";
+import { Instagram, ShoppingBag } from "lucide-react";
+import { INSTAGRAM_URL } from "../config.js";
 
 const carouselImages = [
   "/images/carousel-1.jpg",
@@ -10,7 +10,7 @@ const carouselImages = [
   "/images/carousel-5.jpg"
 ];
 
-function Hero({ itemCount, cateringHref, onOpenCart }) {
+function Hero({ itemCount, onOpenCart }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -22,18 +22,7 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
 
   return (
     <header className="hero" id="inicio">
-      <nav className="nav">
-        <a className="brand" href="#inicio" aria-label="Flor de Postre inicio">
-          <img src="/images/logo-flor-de-postre.jpeg" alt="" />
-          <span>Flor de Postre</span>
-        </a>
-        <div className="nav-links">
-          <a href="#menu">Menú</a>
-          <a href="#catering">Catering</a>
-          <a href="#como-pedir">Cómo pedir</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); onOpenCart(); }}>Pedido</a>
-        </div>
-      </nav>
+
 
       <div className="hero-content">
         <div className="hero-copy">
@@ -63,10 +52,10 @@ function Hero({ itemCount, cateringHref, onOpenCart }) {
             <img src="/images/logo-flor-de-postre.jpeg" alt="" />
             <span>@flordepostre.ok</span>
           </div>
-          <a className="hero-card mini-cart" href="#" onClick={(e) => { e.preventDefault(); onOpenCart(); }} style={{ zIndex: 10 }}>
+          <button className="hero-card mini-cart" type="button" onClick={onOpenCart} style={{ zIndex: 10 }}>
             <ShoppingBag size={18} />
             <span>Carrito {itemCount}</span>
-          </a>
+          </button>
         </div>
       </div>
 
