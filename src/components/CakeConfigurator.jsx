@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, ArrowRight } from "lucide-react";
 import { coberturas, tortaSizes, rellenos, tortaExtras } from "../data/tortasData.js";
 import CakeSummary from "./CakeSummary.jsx";
@@ -59,10 +60,13 @@ function CakeConfigurator({ onClose, onAddToCart }) {
   };
 
   if (step === 6) {
-    return <CakeSummary config={config} onClose={onClose} onEdit={() => setStep(1)} formatPrice={formatPrice} onAddToCart={onAddToCart} />;
+    return createPortal(
+      <CakeSummary config={config} onClose={onClose} onEdit={() => setStep(1)} formatPrice={formatPrice} onAddToCart={onAddToCart} />,
+      document.body
+    );
   }
 
-  return (
+  return createPortal(
     <>
       <div className="cart-overlay open" onClick={onClose} />
       <aside className="cart-drawer open configurator-drawer cake-configurator">
@@ -210,7 +214,8 @@ function CakeConfigurator({ onClose, onAddToCart }) {
           </button>
         </div>
       </aside>
-    </>
+    </>,
+    document.body
   );
 }
 

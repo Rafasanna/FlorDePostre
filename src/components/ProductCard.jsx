@@ -27,7 +27,6 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
             <span>Flor de Postre</span>
           </div>
         )}
-        <span className="product-category">{product.categoria}</span>
         {badges.length > 0 && (
           <div className="product-badges" aria-label="Etiquetas de producto">
             {badges.map((badge) => (

@@ -135,7 +135,7 @@ function App() {
       setShouldScrollToMenu(true);
       navigate("/");
     } else if (result.type === 'postre') {
-      navigate("/postres");
+      navigate(`/postres/${result.id}`);
     } else if (result.type === 'torta') {
       navigate("/tortas-personalizadas");
     }
@@ -205,7 +205,8 @@ function App() {
           <Route path="/como-pedir" element={<ComoPedirPage />} />
           <Route path="/catering" element={<CateringSection cateringHref={cateringHref} />} />
           <Route path="/tortas-personalizadas" element={<TortasSection onAddToCart={addToCart} />} />
-          <Route path="/postres" element={<PostresSection onAddToCart={addToCart} />} />
+          <Route path="/postres" element={<PostresSection />} />
+          <Route path="/postres/:postreId" element={<PostresSection />} />
           <Route path="/sobre" element={<AboutSection />} />
           <Route
             path="*"

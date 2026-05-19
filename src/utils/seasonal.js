@@ -27,11 +27,10 @@ export const getEffectivePrice = (product, referenceDate = today()) =>
 export const getProductBadges = (product, referenceDate = today()) => {
   const badges = [];
 
-  if (product?.destacado) badges.push({ label: "Destacado", type: "featured" });
-  if (product?.sinTacc) badges.push({ label: "Sin TACC", type: "sin-tacc" });
-  if (product?.esLimitado) badges.push({ label: product.etiqueta || "Edición limitada", type: "limited" });
   if (hasActiveOffer(product, referenceDate)) badges.push({ label: product.tipoOferta || "Oferta", type: "offer" });
-  if (product?.etiqueta && !product?.esLimitado) badges.push({ label: product.etiqueta, type: "default" });
+  if ((product?.esLimitado || product?.etiqueta) && (product?.fechaInicio || product?.fechaFin) && isProductVisible(product, referenceDate)) {
+    badges.push({ label: product.etiqueta || "Edición limitada", type: "limited" });
+  }
 
   return badges;
 };

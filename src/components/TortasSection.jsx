@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import CakeConfigurator from "./CakeConfigurator.jsx";
 
@@ -14,6 +15,9 @@ function TortasSection({ onAddToCart }) {
         <p>
           Diseñá tu torta a medida. Elegí el tamaño, la cobertura, los rellenos y los extras para tu evento.
         </p>
+        <Link className="ghost-button section-back-link" to="/">
+          Volver al inicio
+        </Link>
       </div>
 
       <div className="tortas-intro">

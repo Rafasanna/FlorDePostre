@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { X, Send } from "lucide-react";
+import { createPortal } from "react-dom";
+import { X, ShoppingBag } from "lucide-react";
 import { postresSizes } from "../data/postresData.js";
-import { WHATSAPP_URL } from "../config.js";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -51,7 +51,7 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
 
   const isFormValid = selectedSize && date;
 
-  return (
+  return createPortal(
     <>
       <div className="cart-overlay open" onClick={onClose} />
       <aside className="cart-drawer open configurator-drawer">
@@ -118,7 +118,8 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
           </button>
         </div>
       </aside>
-    </>
+    </>,
+    document.body
   );
 }
 

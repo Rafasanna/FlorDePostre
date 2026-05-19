@@ -1,8 +1,119 @@
-import { Coffee, MessageCircle, Send, Sparkles, WheatOff } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { Building2, Home, MessageCircle, Send, Sparkles, WheatOff } from "lucide-react";
+import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 
-function CateringSection({ cateringHref }) {
+const makeWhatsappHref = (message) => `${WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
+
+const cateringTabs = [
+  {
+    id: "informal",
+    label: "Catering Informal",
+    eyebrow: "Encuentros chicos",
+    title: "Catering Informal",
+    icon: Sparkles,
+    cta: "Consultar por WhatsApp",
+    message:
+      "Hola Flor de Postre! Quiero consultar por Catering Informal.\n\nTipo de encuentro:\nCantidad aproximada de personas:\nFecha:\nIdea general:\n\n¿Me pasan opciones disponibles?",
+    content: {
+      intro: [
+        "Propuestas pensadas para cumpleaños, bautismos, reuniones tranquilas, encuentros familiares y espacios laborales.",
+        "Predominan las opciones finas, delicadas y pensadas para compartir."
+      ],
+      note: [
+        "No trabajamos eventos grandes ni servicio tradicional de eventos.",
+        "Cada propuesta se diseña de forma personalizada."
+      ],
+      cards: [
+        {
+          title: "Para picar / Entradas",
+          text: "Ideal cuando ya existe un plato principal y se busca sumar una propuesta salada para acompañar o recibir invitados."
+        },
+        {
+          title: "Propuesta más completa",
+          text: "Pensada para quienes buscan una opción salada más amplia."
+        }
+      ],
+      smallNote: "Los servicios salados se realizan para propuestas de hasta 60 personas."
+    }
+  },
+  {
+    id: "sin-tacc",
+    label: "Línea Especial Sin TACC",
+    eyebrow: "Línea especial",
+    title: "Línea Especial Sin TACC",
+    icon: WheatOff,
+    cta: "Consultar opciones",
+    message:
+      "Hola Flor de Postre! Quiero consultar por la Línea Especial Sin TACC.\n\nTipo de pedido o propuesta:\nCantidad aproximada:\nFecha:\n\n¿Me cuentan qué opciones tienen disponibles?",
+    content: {
+      intro: [
+        "Contamos con línea propia de productos Sin TACC para incorporar dentro de propuestas personalizadas, catering informal y pedidos especiales.",
+        "Armamos cada consulta con el mismo cuidado artesanal, manteniendo una presentación delicada y pensada para compartir."
+      ]
+    }
+  },
+  {
+    id: "empresas",
+    label: "Desayunos para Empresas",
+    eyebrow: "Empresas y equipos",
+    title: "Desayunos para Empresas",
+    icon: Building2,
+    cta: "Consultar propuesta",
+    message:
+      "Hola Flor de Postre! Quiero consultar por Desayunos para Empresas.\n\nEmpresa / equipo:\nCantidad aproximada de personas:\nFecha:\nLugar de entrega:\nIdea o necesidad:\n\n¿Me pasan una propuesta?",
+    content: {
+      intro: [
+        "Diseñamos desayunos personalizados para oficinas, reuniones laborales, equipos de trabajo, celebraciones corporativas y fechas especiales."
+      ],
+      note: [
+        "Podemos trabajar propuestas de hasta 150 personas.",
+        "Cada desayuno se diseña según las necesidades del cliente."
+      ]
+    }
+  },
+  {
+    id: "domicilio",
+    label: "Desayunos a Domicilio",
+    eyebrow: "A domicilio",
+    title: "Desayunos a Domicilio",
+    icon: Home,
+    cta: "Personalizar por WhatsApp",
+    message:
+      "Hola Flor de Postre! Quiero consultar por un Desayuno a Domicilio.\n\nFecha:\nDirección de entrega:\nCantidad:\nQuiero personalizarlo así:\n\n¿Me ayudan a armarlo?",
+    content: {
+      intro: [
+        "Una propuesta base pensada para regalar o compartir, con opciones dulces, saladas y bebidas."
+      ],
+      breakfast: [
+        "1 bebida a elección (café, jugo exprimido o saquitos de té)",
+        "1 yogurt artesanal con frutas y granola",
+        "1 tartita o lingote según stock del día",
+        "1 scon de queso",
+        "1 sándwich de miga",
+        "2 medialunas con jamón y queso",
+        "1 alfajor o 1 dona",
+        "1 tortita de coco, pastafrola o cuadrado de brownie/limón"
+      ],
+      price: "$31.500 + envío",
+      note: [
+        "Esta propuesta puede personalizarse.",
+        "Podés agregar opciones, sacar productos o adaptar el contenido según lo que estés buscando.",
+        "Si querés modificar algo, lo charlamos por WhatsApp."
+      ]
+    }
+  }
+];
+
+function CateringSection() {
   const sectionRef = useIntersectionObserver();
+  const [activeTabId, setActiveTabId] = useState(cateringTabs[0].id);
+  const activeTab = useMemo(
+    () => cateringTabs.find((tab) => tab.id === activeTabId) || cateringTabs[0],
+    [activeTabId]
+  );
+  const ActiveIcon = activeTab.icon;
 
   return (
     <section className="catering-page section page-section reveal-fade" id="catering" ref={sectionRef}>
@@ -11,105 +122,118 @@ function CateringSection({ cateringHref }) {
           <span>Propuestas personalizadas</span>
           <h2>Nuestro Catering</h2>
           <p>
-            Propuestas dulces y saladas pensadas para encuentros especiales, reuniones de trabajo, cumpleaños, bautismos y momentos para compartir.
+            Propuestas dulces y saladas pensadas para encuentros especiales, desayunos, reuniones y momentos para compartir.
           </p>
           <p>
-            En Flor de Postre trabajamos propuestas personalizadas, cuidando la presentación, el detalle y la experiencia de cada cliente.
+            Elegí el tipo de consulta y revisá una guía simple para saber qué podemos armar.
           </p>
+          <Link className="ghost-button section-back-link" to="/">
+            Volver al inicio
+          </Link>
         </div>
-
-        <div className="catering-note">
-          <Sparkles size={20} />
-          <p>
-            No realizamos eventos grandes ni servicio tradicional de eventos. Cada propuesta se arma según las necesidades de cada cliente.
-          </p>
-        </div>
-
-        <a className="primary-button whatsapp-button catering-main-cta" href={cateringHref} target="_blank" rel="noreferrer">
-          <Send size={18} />
-          Consultar por WhatsApp
-        </a>
       </div>
 
-      <div className="catering-page-block">
-        <div className="section-heading compact">
-          <span>Encuentros chicos</span>
-          <h2>Catering informal</h2>
-          <p>
-            Opciones pensadas para cumpleaños, bautismos, reuniones familiares, encuentros tranquilos o espacios laborales donde predominan las propuestas finas, delicadas y para compartir.
-          </p>
-        </div>
+      <div className="catering-tabs" role="tablist" aria-label="Tipos de catering">
+        {cateringTabs.map((tab) => {
+          const TabIcon = tab.icon;
+          const isActive = tab.id === activeTab.id;
 
-        <div className="catering-grid two-columns">
-          <article className="catering-card">
-            <h3>Para picar / Entradas</h3>
-            <p>Ideal cuando ya existe un plato principal y se busca sumar una propuesta salada para acompañar, compartir o recibir invitados.</p>
-          </article>
-          <article className="catering-card">
-            <h3>Propuesta más completa</h3>
-            <p>Pensada para quienes buscan una opción salada más amplia o completa.</p>
-          </article>
-        </div>
-
-        <p className="catering-small-note">Los servicios salados se realizan para propuestas de hasta 60 personas.</p>
+          return (
+            <button
+              key={tab.id}
+              className={isActive ? "active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`catering-panel-${tab.id}`}
+              id={`catering-tab-${tab.id}`}
+              onClick={() => setActiveTabId(tab.id)}
+            >
+              <TabIcon size={17} />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="catering-page-block catering-feature-card">
-        <Coffee size={22} />
-        <div>
-          <div className="section-heading compact">
-            <span>Empresas y equipos</span>
-            <h2>Desayunos para empresas</h2>
-            <p>
-              Diseñamos desayunos personalizados para reuniones laborales, equipos de trabajo, oficinas, celebraciones corporativas y fechas especiales.
-            </p>
+      <article
+        className="catering-panel"
+        id={`catering-panel-${activeTab.id}`}
+        role="tabpanel"
+        aria-labelledby={`catering-tab-${activeTab.id}`}
+      >
+        <div className="catering-panel-header">
+          <div className="catering-panel-icon">
+            <ActiveIcon size={22} />
           </div>
-          <p className="catering-small-note">Podemos preparar propuestas para hasta 150 personas. Cada desayuno se diseña de forma personalizada según las necesidades de cada cliente.</p>
-          <a className="primary-button whatsapp-button" href={cateringHref} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
-            Consultar propuesta
-          </a>
-        </div>
-      </div>
-
-      <div className="catering-page-block sin-tacc-block">
-        <WheatOff size={22} />
-        <div className="section-heading compact">
-          <span>Línea especial</span>
-          <h2>Opciones Sin TACC</h2>
-          <p>
-            Contamos con línea propia de productos Sin TACC para incorporar dentro de propuestas personalizadas, eventos pequeños y pedidos especiales.
-          </p>
-        </div>
-      </div>
-
-      <div className="catering-page-block catering-feature-card">
-        <Coffee size={22} />
-        <div>
-          <div className="section-heading compact">
-            <span>A domicilio</span>
-            <h2>Desayunos a domicilio</h2>
-            <p>
-              Ofrecemos desayunos a domicilio con propuestas predeterminadas donde cada cliente puede elegir qué incluir dentro de las opciones disponibles.
-            </p>
+          <div className="section-heading">
+            <span>{activeTab.eyebrow}</span>
+            <h2>{activeTab.title}</h2>
+            {activeTab.content.intro.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
-          <p className="catering-small-note">También es posible agregar, sacar o modificar opciones. Si querés algo diferente, podemos charlarlo por WhatsApp.</p>
-          <a className="primary-button whatsapp-button" href={cateringHref} target="_blank" rel="noreferrer">
-            <MessageCircle size={18} />
-            Personalizar por WhatsApp
-          </a>
         </div>
-      </div>
 
-      <div className="catering-final-cta">
-        <span>Consulta personalizada</span>
-        <h2>¿Charlamos tu idea?</h2>
-        <p>Cada propuesta se diseña según la ocasión, la cantidad de personas y lo que estés buscando.</p>
-        <a className="primary-button whatsapp-button" href={cateringHref} target="_blank" rel="noreferrer">
-          <Send size={18} />
-          Consultar por WhatsApp
+        {activeTab.content.note && activeTab.id !== "domicilio" && (
+          <div className="catering-note">
+            <Sparkles size={20} />
+            <div>
+              {activeTab.content.note.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab.content.cards && (
+          <div className="catering-grid two-columns">
+            {activeTab.content.cards.map((card) => (
+              <article className="catering-card" key={card.title}>
+                <h3>{card.title}</h3>
+                <p>{card.text}</p>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {activeTab.content.smallNote && (
+          <p className="catering-small-note">{activeTab.content.smallNote}</p>
+        )}
+
+        {activeTab.content.breakfast && (
+          <div className="breakfast-box">
+            <div>
+              <span>Propuesta estándar</span>
+              <h3>Incluye</h3>
+            </div>
+            <ul>
+              {activeTab.content.breakfast.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <strong className="breakfast-price">{activeTab.content.price}</strong>
+          </div>
+        )}
+
+        {activeTab.id === "domicilio" && activeTab.content.note && (
+          <div className="catering-personalize-note">
+            {activeTab.content.note.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+        )}
+
+        <a
+          className="primary-button whatsapp-button catering-panel-cta"
+          href={makeWhatsappHref(activeTab.message)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {activeTab.id === "domicilio" ? <MessageCircle size={18} /> : <Send size={18} />}
+          {activeTab.cta}
         </a>
-      </div>
+      </article>
     </section>
   );
 }
