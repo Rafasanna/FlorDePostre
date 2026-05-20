@@ -1,22 +1,25 @@
-import { Link } from "react-router-dom";
-
-function CampaignBanner({ campaign }) {
+function CampaignBanner({ campaign, onOpenSpecial }) {
   if (!campaign) return null;
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    onOpenSpecial?.();
+  };
 
   return (
     <section className={`campaign-banner campaign-banner-${campaign.temaVisual || "rose"}`}>
       <div className="campaign-banner-copy">
-        <span>Especial por tiempo limitado</span>
-        <h2>{campaign.titulo}</h2>
-        <p>{campaign.descripcion}</p>
-        {campaign.textoBoton && campaign.linkBoton && (
-          <Link className="primary-button" to={campaign.linkBoton}>
-            {campaign.textoBoton}
-          </Link>
-        )}
+        <span aria-hidden="true">🇦🇷</span>
+        <p>
+          <strong>{campaign.titulo}</strong>
+          <span aria-hidden="true">•</span>
+          {campaign.descripcion}
+        </p>
       </div>
-      {campaign.imagen && (
-        <img src={campaign.imagen} alt="" aria-hidden="true" />
+      {campaign.textoBoton && campaign.linkBoton && (
+        <a className="campaign-banner-link" href={campaign.linkBoton} onClick={handleClick}>
+          {campaign.textoBoton}
+        </a>
       )}
     </section>
   );

@@ -33,9 +33,11 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [shouldScrollToMenu, setShouldScrollToMenu] = useState(false);
+  const [menuCategoryRequest, setMenuCategoryRequest] = useState(null);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const activeCampaign = useMemo(() => getActiveCampaigns(campaigns)[0] || null, []);
+  const homeCampaign = pathname === "/" ? activeCampaign : null;
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1000);
@@ -157,6 +159,12 @@ function App() {
     navigate("/");
   };
 
+  const goToCampaignSpecial = () => {
+    setMenuCategoryRequest({ category: "Especial", nonce: Date.now() });
+    setShouldScrollToMenu(true);
+    navigate("/");
+  };
+
   return (
     <div className="site-shell">
       <Header 
@@ -166,7 +174,7 @@ function App() {
         itemCount={itemCount}
       />
 
-      <CampaignBanner campaign={activeCampaign} />
+      <CampaignBanner campaign={homeCampaign} onOpenSpecial={goToCampaignSpecial} />
 
       <main>
         <Routes>
@@ -183,6 +191,8 @@ function App() {
                   addToCart={handleDailyAddToCart}
                   formatPrice={formatPrice}
                   isLoading={isLoading}
+                  campaign={homeCampaign}
+                  categoryRequest={menuCategoryRequest}
                 />
               </>
             }

@@ -2,14 +2,23 @@ export const campaigns = [
   {
     id: "mock-25-mayo",
     titulo: "Especial 25 de Mayo",
-    descripcion: "Banner preparado para activar productos patrios y propuestas por tiempo limitado.",
-    imagen: "/images/carousel-1.jpg",
-    activa: false,
+    descripcion: "sabores patrios disponibles por tiempo limitado",
+    active: false,
     fechaInicio: "2026-05-20",
     fechaFin: "2026-05-25",
     textoBoton: "Ver especial",
-    linkBoton: "/",
-    temaVisual: "patrio"
+    linkBoton: "#menu-diario",
+    temaVisual: "patrio-sutil",
+    productosEspeciales: [
+      {
+        id: "campana-caja-patria",
+        nombre: "Caja Patria",
+        descripcion: "Selección especial para compartir en fechas patrias.",
+        precio: 18900,
+        categoria: "Especial",
+        imagen: ""
+      }
+    ]
   },
   {
     id: "mock-aniversario",

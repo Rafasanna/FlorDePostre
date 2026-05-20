@@ -13,7 +13,7 @@ export const isWithinDateRange = (item, referenceDate = today()) => {
 };
 
 export const isCampaignActive = (campaign, referenceDate = today()) =>
-  Boolean(campaign?.activa) && isWithinDateRange(campaign, referenceDate);
+  Boolean(campaign?.active ?? campaign?.activa) && isWithinDateRange(campaign, referenceDate);
 
 export const isProductVisible = (product, referenceDate = today()) =>
   product?.disponible !== false && isWithinDateRange(product, referenceDate);

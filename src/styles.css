@@ -2296,54 +2296,69 @@ h1 {
 /* Campaigns and monthly maintenance */
 .campaign-banner {
   align-items: center;
-  background: rgba(255, 254, 253, 0.86);
-  border: 1px solid rgba(240, 187, 220, 0.34);
-  border-radius: 28px;
-  box-shadow: var(--shadow-soft);
-  display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  margin: 118px auto 0;
-  max-width: 1180px;
+  background: #CFEAF7;
+  border-block: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  left: 0;
+  margin: 0;
+  min-height: 38px;
   overflow: hidden;
-  padding: 24px;
+  padding: 5px clamp(18px, 5vw, 68px);
+  position: fixed;
+  right: 0;
+  top: 90px;
+  z-index: 900;
 }
 
-.campaign-banner-copy span {
-  color: var(--rose-500);
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.campaign-banner-copy h2 {
-  color: var(--cocoa);
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  font-weight: 400;
-  line-height: 1;
-  margin: 10px 0 12px;
+.campaign-banner-copy {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  min-width: 0;
 }
 
 .campaign-banner-copy p {
-  color: var(--cocoa-soft);
-  line-height: 1.65;
-  margin-bottom: 18px;
-  max-width: 620px;
+  align-items: center;
+  color: var(--cocoa);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+  gap: 7px;
+  line-height: 1.35;
+  margin: 0;
 }
 
-.campaign-banner img {
-  aspect-ratio: 1;
-  border-radius: 22px;
-  height: 100%;
-  object-fit: cover;
-  width: 100%;
+.campaign-banner-copy strong {
+  color: var(--cocoa);
+  font-weight: 800;
 }
 
-.campaign-banner-patrio {
-  background: linear-gradient(135deg, rgba(226, 241, 229, 0.9), rgba(255, 254, 253, 0.92));
+.campaign-banner-link {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(127, 183, 217, 0.48);
+  border-radius: 999px;
+  color: var(--cocoa);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.84rem;
+  font-weight: 800;
+  min-height: 28px;
+  padding: 0 12px;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.campaign-banner-link:hover {
+  background: rgba(177, 186, 149, 0.16);
+  transform: translateY(-1px);
+}
+
+.campaign-banner-patrio-sutil {
+  background: #CFEAF7;
 }
 
 .featured-products {
@@ -2928,8 +2943,27 @@ h1 {
 
 @media (max-width: 768px) {
   .campaign-banner {
-    grid-template-columns: 1fr;
-    margin: 104px 18px 0;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    min-height: 36px;
+    padding: 5px 12px;
+    top: 66px;
+  }
+
+  .campaign-banner-copy {
+    gap: 6px;
+  }
+
+  .campaign-banner-copy p {
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+
+  .campaign-banner-link {
+    font-size: 0.78rem;
+    min-height: 28px;
+    padding: 0 10px;
   }
 
   .values-grid {

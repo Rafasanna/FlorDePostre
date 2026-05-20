@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapPin } from "lucide-react";
 import { categories, dailyProducts } from "../data/dailyProducts.js";
 import CategoryFilter from "./CategoryFilter.jsx";
@@ -8,18 +8,31 @@ import FeaturedProductsSection from "./FeaturedProductsSection.jsx";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import { getFeaturedProducts, getVisibleProducts } from "../utils/seasonal.js";
 
-function DailyMenuSection({ cart, addToCart, formatPrice, isLoading }) {
+function DailyMenuSection({ cart, addToCart, formatPrice, isLoading, campaign, categoryRequest }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [showAllProducts, setShowAllProducts] = useState(false);
   const sectionRef = useIntersectionObserver();
   const visibleCatalog = useMemo(() => getVisibleProducts(dailyProducts), []);
   const featuredProducts = useMemo(() => getFeaturedProducts(dailyProducts).slice(0, 4), []);
+  const specialProducts = campaign?.productosEspeciales || [];
+  const menuCategories = useMemo(
+    () => (specialProducts.length > 0 ? ["Especial", ...categories] : categories),
+    [specialProducts.length]
+  );
+
+  useEffect(() => {
+    if (categoryRequest?.category) {
+      setActiveCategory(categoryRequest.category);
+      setShowAllProducts(false);
+    }
+  }, [categoryRequest]);
 
   const categoryProducts = useMemo(() => {
+    if (activeCategory === "Especial") return specialProducts;
     if (activeCategory === "Todos") return visibleCatalog;
     if (activeCategory === "Sin TACC") return visibleCatalog.filter((product) => product.sinTacc);
     return visibleCatalog.filter((product) => product.categoria === activeCategory);
-  }, [activeCategory, visibleCatalog]);
+  }, [activeCategory, specialProducts, visibleCatalog]);
 
   const visibleProducts = useMemo(() => {
     if (activeCategory !== "Todos" || showAllProducts) return categoryProducts;
@@ -46,7 +59,7 @@ function DailyMenuSection({ cart, addToCart, formatPrice, isLoading }) {
       </div>
 
       <CategoryFilter
-        categories={categories}
+        categories={menuCategories}
         activeCategory={activeCategory}
         onChange={handleCategoryChange}
       />
