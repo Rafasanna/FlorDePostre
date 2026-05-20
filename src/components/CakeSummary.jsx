@@ -90,7 +90,7 @@ function CakeSummary({ config, onClose, onEdit, formatPrice, onAddToCart }) {
           </div>
 
           <div className="summary-disclaimer">
-            <p><strong>Importante:</strong> El precio final puede variar según la complejidad del diseño, la decoración específica solicitada y la disponibilidad de la fecha.</p>
+            <p><strong>Importante:</strong> Las tortas se piden con 5 días de anticipación y no se preparan para domingos. El precio final puede variar según la complejidad del diseño, la decoración específica solicitada y la disponibilidad de la fecha.</p>
           </div>
         </div>
 

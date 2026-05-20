@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { X, ChevronRight } from "lucide-react";
+import BrandMark from "./BrandMark.jsx";
 
 function MobileMenuDrawer({ isOpen, onClose }) {
   useEffect(() => {
@@ -55,10 +56,13 @@ function MobileMenuDrawer({ isOpen, onClose }) {
 
       <aside className={`cart-drawer mobile-menu-drawer ${isOpen ? 'open' : ''}`} style={{ zIndex: 1250 }} role="dialog" aria-label="Menú principal">
         <div className="cart-header">
-          <div>
+          <div className="mobile-menu-heading">
             <span>Flor de Postre</span>
             <Link className="mobile-menu-title-link" to="/" onClick={onClose}>
-              <h2>Menú</h2>
+              <h2 className="mobile-menu-title">
+                Menú
+                <BrandMark variant="flower" className="mobile-menu-title-flower" />
+              </h2>
             </Link>
           </div>
           <button className="icon-button close-btn" type="button" onClick={onClose} aria-label="Cerrar menú">

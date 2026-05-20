@@ -147,36 +147,11 @@ img {
   line-height: 1;
 }
 
-.brand-mark-text {
-  display: grid;
-  font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 0.76;
-}
-
-.brand-mark-text span:nth-child(1),
-.brand-mark-text span:nth-child(3) {
-  font-size: 1.42em;
-}
-
-.brand-mark-text span:nth-child(2) {
-  font-size: 1em;
-  margin-left: 0.78em;
-  margin-top: -0.1em;
-}
-
-.brand-flower-svg {
+.brand-mark-img {
   display: block;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 6;
-}
-
-.brand-mark .brand-flower-svg {
-  color: inherit;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
 }
 
 .brand-mark-horizontal {
@@ -185,81 +160,23 @@ img {
   text-shadow: 0 1px 0 rgba(77, 56, 47, 0.06);
 }
 
-.brand-mark-horizontal .brand-flower-svg {
-  height: 44px;
-  width: 44px;
-}
-
 .brand-mark-official {
-  color: var(--rose-pastel);
-  height: 64px;
+  height: 58px;
   justify-content: center;
   position: relative;
-  width: 126px;
-}
-
-.brand-mark-official .brand-mark-text {
-  font-size: 0.96rem;
-  left: 10px;
-  position: absolute;
-  top: 11px;
-}
-
-.brand-mark-official .brand-mark-text span:nth-child(1),
-.brand-mark-official .brand-mark-text span:nth-child(3) {
-  font-size: 2.2em;
-}
-
-.brand-mark-official .brand-mark-text span:nth-child(2) {
-  font-size: 1.55em;
-  margin-left: 1.28em;
-  margin-top: -0.23em;
-}
-
-.brand-mark-official .brand-mark-text span:nth-child(3) {
-  margin-top: -0.2em;
-}
-
-.brand-mark-official .brand-flower-svg {
-  height: 40px;
-  position: absolute;
-  right: 8px;
-  top: 17px;
-  width: 40px;
+  width: 142px;
 }
 
 .brand-mark-circle {
-  background: var(--rose-pastel);
   border-radius: 50%;
   box-shadow: var(--shadow-soft);
-  color: var(--white);
   height: 52px;
   justify-content: center;
-  padding: 9px;
   position: relative;
   width: 52px;
 }
 
-.brand-mark-circle .brand-mark-text {
-  font-size: 0.56rem;
-  position: relative;
-  z-index: 1;
-}
-
-.brand-mark-circle .brand-mark-text span:nth-child(2) {
-  margin-left: 0.82em;
-}
-
-.brand-mark-circle .brand-flower-svg {
-  height: 21px;
-  position: absolute;
-  right: 7px;
-  top: 14px;
-  width: 21px;
-  z-index: 2;
-}
-
-.brand-mark-flower .brand-flower-svg {
+.brand-mark-flower {
   height: 100%;
   width: 100%;
 }
@@ -482,18 +399,6 @@ h1 {
 .mini-logo .brand-mark-circle {
   height: 32px;
   width: 32px;
-  padding: 6px;
-}
-
-.mini-logo .brand-mark-circle .brand-mark-text {
-  font-size: 0.36rem;
-}
-
-.mini-logo .brand-mark-circle .brand-flower-svg {
-  height: 13px;
-  right: 4px;
-  top: 9px;
-  width: 13px;
 }
 
 .mini-logo span {
@@ -501,9 +406,9 @@ h1 {
 }
 
 .hero-flower-detail {
-  color: rgba(177, 186, 149, 0.48);
   height: clamp(120px, 16vw, 220px);
-  opacity: 0.85;
+  filter: brightness(0) saturate(100%) invert(74%) sepia(13%) saturate(497%) hue-rotate(34deg) brightness(92%) contrast(84%);
+  opacity: 0.45;
   pointer-events: none;
   position: absolute;
   right: clamp(16px, 7vw, 112px);
@@ -1010,6 +915,38 @@ h1 {
   margin-top: 6px;
 }
 
+.mobile-menu-heading {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-title {
+  align-items: center;
+  background: rgba(255, 207, 237, 0.36);
+  border: 1px solid rgba(240, 187, 220, 0.54);
+  border-radius: 999px;
+  color: var(--cocoa);
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 12px 8px 14px;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  width: fit-content;
+}
+
+.mobile-menu-title:hover {
+  background: rgba(255, 207, 237, 0.52);
+  border-color: rgba(201, 109, 158, 0.36);
+  transform: translateY(-1px);
+}
+
+.mobile-menu-title-flower {
+  flex: 0 0 auto;
+  height: 24px;
+  width: 24px;
+}
+
 .icon-button,
 .quantity-control button {
   align-items: center;
@@ -1191,9 +1128,10 @@ h1 {
 }
 
 .footer-flower-detail {
-  color: rgba(177, 186, 149, 0.72);
+  filter: brightness(0) saturate(100%) invert(74%) sepia(13%) saturate(497%) hue-rotate(34deg) brightness(92%) contrast(84%);
   height: 54px;
   margin-bottom: 8px;
+  opacity: 0.88;
   width: 54px;
 }
 
@@ -1911,6 +1849,137 @@ h1 {
   gap: 40px;
   align-items: center;
   margin-top: 40px;
+}
+
+.cake-order-note,
+.cake-date-note {
+  background: rgba(255, 229, 238, 0.7);
+  border: 1px solid rgba(240, 187, 220, 0.48);
+  border-radius: 16px;
+  color: var(--cocoa-soft);
+  line-height: 1.55;
+  margin: 14px 0 18px;
+  padding: 14px 16px;
+}
+
+.cake-date-note {
+  font-size: 0.92rem;
+  margin-top: 0;
+}
+
+.cake-calendar {
+  background: rgba(255, 250, 252, 0.82);
+  border: 1px solid rgba(240, 187, 220, 0.46);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.cake-calendar-header {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 38px 1fr 38px;
+  margin-bottom: 12px;
+}
+
+.cake-calendar-header strong {
+  color: var(--cocoa);
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  font-weight: 400;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.cake-calendar-header button,
+.cake-calendar-day {
+  align-items: center;
+  border: 1px solid rgba(240, 187, 220, 0.42);
+  display: inline-flex;
+  font: inherit;
+  justify-content: center;
+}
+
+.cake-calendar-header button {
+  background: var(--rose-50);
+  border-radius: 999px;
+  color: var(--cocoa);
+  height: 38px;
+  line-height: 1;
+  width: 38px;
+}
+
+.cake-calendar-header button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.cake-calendar-weekdays,
+.cake-calendar-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.cake-calendar-weekdays {
+  color: var(--cocoa-soft);
+  font-size: 0.74rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.cake-calendar-day {
+  aspect-ratio: 1;
+  background: var(--white);
+  border-radius: 12px;
+  color: var(--cocoa);
+  min-width: 0;
+  padding: 0;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.cake-calendar-day:hover:not(:disabled) {
+  background: var(--rose-50);
+  border-color: var(--rose-500);
+  transform: translateY(-1px);
+}
+
+.cake-calendar-day.selected {
+  background: var(--rose-500);
+  border-color: var(--rose-500);
+  color: var(--white);
+  font-weight: 800;
+}
+
+.cake-calendar-day.outside-month:not(:disabled) {
+  background: rgba(255, 250, 252, 0.78);
+  color: var(--cocoa-soft);
+}
+
+.cake-calendar-day.outside-month:hover:not(:disabled) {
+  background: var(--rose-50);
+  color: var(--cocoa);
+}
+
+.cake-calendar-day:disabled {
+  background: rgba(232, 215, 198, 0.18);
+  border-color: rgba(232, 215, 198, 0.34);
+  color: rgba(128, 102, 93, 0.38);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.cake-calendar-day.sunday:disabled {
+  background: rgba(240, 187, 220, 0.16);
+  color: rgba(201, 109, 158, 0.5);
+}
+
+.cake-calendar-help {
+  color: var(--cocoa-soft);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin: 12px 0 0;
 }
 
 @media (max-width: 768px) {
@@ -2800,21 +2869,8 @@ h1 {
   }
 
   .brand-mark-official {
-    height: 50px;
-    width: 92px;
-  }
-
-  .brand-mark-official .brand-mark-text {
-    font-size: 0.68rem;
-    left: 6px;
-    top: 8px;
-  }
-
-  .brand-mark-official .brand-flower-svg {
-    height: 29px;
-    right: 3px;
-    top: 13px;
-    width: 29px;
+    height: 46px;
+    width: 112px;
   }
 
   .nav {
@@ -2853,17 +2909,8 @@ h1 {
   }
 
   .brand-mark-official {
-    height: 46px;
-    width: 82px;
-  }
-
-  .brand-mark-official .brand-mark-text {
-    font-size: 0.6rem;
-  }
-
-  .brand-mark-official .brand-flower-svg {
-    height: 25px;
-    width: 25px;
+    height: 42px;
+    width: 98px;
   }
 
   .search-trigger {
@@ -3143,8 +3190,8 @@ h1 {
   }
 
   .brand-mark-official {
-    height: 46px;
-    width: 82px;
+    height: 44px;
+    width: 104px;
   }
 
   .section-heading p {

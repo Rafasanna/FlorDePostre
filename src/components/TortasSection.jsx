@@ -24,6 +24,9 @@ function TortasSection({ onAddToCart }) {
         </div>
         <div className="tortas-copy">
           <h3>Armá tu torta en 5 simples pasos</h3>
+          <p className="cake-order-note">
+            Las tortas se piden con 5 días de anticipación. Si la necesitás antes, consultanos igual porque a veces podemos resolverlo según disponibilidad.
+          </p>
           <ul className="pasos-lista">
             <li><strong>1.</strong> Cobertura</li>
             <li><strong>2.</strong> Tamaño</li>

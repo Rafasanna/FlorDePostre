@@ -11,6 +11,21 @@ const formatPrice = (value) =>
     maximumFractionDigits: 0
   }).format(value);
 
+const WEEKDAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
+const monthFormatter = new Intl.DateTimeFormat("es-AR", {
+  month: "long",
+  year: "numeric"
+});
+
+const toDateInputValue = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const parseDateValue = (dateValue) => new Date(`${dateValue}T12:00:00`);
+
 function CakeConfigurator({ onClose, onAddToCart }) {
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState({
@@ -25,8 +40,12 @@ function CakeConfigurator({ onClose, onAddToCart }) {
   const minDate = (() => {
     const d = new Date();
     d.setDate(d.getDate() + 5);
-    return d.toISOString().split('T')[0];
+    return toDateInputValue(d);
   })();
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const min = parseDateValue(minDate);
+    return new Date(min.getFullYear(), min.getMonth(), 1);
+  });
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -35,6 +54,59 @@ function CakeConfigurator({ onClose, onAddToCart }) {
 
   const handleNext = () => setStep(s => s + 1);
   const handlePrev = () => setStep(s => s - 1);
+
+  const isSunday = (dateValue) => {
+    if (!dateValue) return false;
+    return parseDateValue(dateValue).getDay() === 0;
+  };
+
+  const handleDateChange = (dateValue) => {
+    setConfig(prev => ({ ...prev, date: dateValue }));
+  };
+
+  const calendarDays = (() => {
+    const firstDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
+    const gridStartOffset = (firstDay.getDay() + 6) % 7;
+    const gridStart = new Date(firstDay);
+    gridStart.setDate(firstDay.getDate() - gridStartOffset);
+
+    return Array.from({ length: 42 }, (_, index) => {
+      const date = new Date(gridStart);
+      date.setDate(gridStart.getDate() + index);
+      const value = toDateInputValue(date);
+      const isCurrentMonth = date.getMonth() === calendarMonth.getMonth();
+      const isDisabled = value < minDate || date.getDay() === 0;
+
+      return {
+        date,
+        value,
+        isCurrentMonth,
+        isDisabled,
+        isSunday: date.getDay() === 0
+      };
+    });
+  })();
+
+  const canGoPrevMonth = (() => {
+    const min = parseDateValue(minDate);
+    return calendarMonth.getFullYear() > min.getFullYear() || calendarMonth.getMonth() > min.getMonth();
+  })();
+
+  const goToPreviousMonth = () => {
+    if (!canGoPrevMonth) return;
+    setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const selectCalendarDate = (day) => {
+    if (!day.isCurrentMonth) {
+      setCalendarMonth(new Date(day.date.getFullYear(), day.date.getMonth(), 1));
+    }
+    handleDateChange(day.value);
+  };
 
   const toggleRelleno = (id) => {
     setConfig(prev => {
@@ -172,14 +244,41 @@ function CakeConfigurator({ onClose, onAddToCart }) {
 
           {step === 5 && (
             <div className="form-group slide-in">
-              <label>¿Para qué fecha la necesitás? (Mínimo 5 días) *</label>
-              <input 
-                type="date" 
-                className="form-input" 
-                value={config.date} 
-                min={minDate}
-                onChange={(e) => setConfig({...config, date: e.target.value})} 
-              />
+              <label>¿Para qué fecha la necesitás? *</label>
+              <p className="cake-date-note">
+                Las tortas se piden con 5 días de anticipación. Consultanos igual si la necesitás antes, porque a veces podemos resolverlo según disponibilidad.
+              </p>
+              <div className="cake-calendar" aria-label="Seleccionar fecha para la torta">
+                <div className="cake-calendar-header">
+                  <button type="button" onClick={goToPreviousMonth} disabled={!canGoPrevMonth} aria-label="Mes anterior">
+                    ‹
+                  </button>
+                  <strong>{monthFormatter.format(calendarMonth)}</strong>
+                  <button type="button" onClick={goToNextMonth} aria-label="Mes siguiente">
+                    ›
+                  </button>
+                </div>
+                <div className="cake-calendar-weekdays" aria-hidden="true">
+                  {WEEKDAY_LABELS.map((day, index) => (
+                    <span key={`${day}-${index}`}>{day}</span>
+                  ))}
+                </div>
+                <div className="cake-calendar-grid">
+                  {calendarDays.map((day) => (
+                    <button
+                      key={day.value}
+                      type="button"
+                      className={`cake-calendar-day ${config.date === day.value ? "selected" : ""} ${!day.isCurrentMonth ? "outside-month" : ""} ${day.isSunday ? "sunday" : ""}`}
+                      disabled={day.isDisabled}
+                      onClick={() => selectCalendarDate(day)}
+                      aria-label={`${day.date.getDate()} de ${monthFormatter.format(day.date)}`}
+                    >
+                      {day.date.getDate()}
+                    </button>
+                  ))}
+                </div>
+                <p className="cake-calendar-help">Los domingos el local permanece cerrado.</p>
+              </div>
               
               <label style={{ marginTop: '24px' }}>Diseño y Comentarios</label>
               <textarea 
@@ -206,7 +305,7 @@ function CakeConfigurator({ onClose, onAddToCart }) {
             disabled={
               (step === 1 && !config.cobertura) || 
               (step === 2 && !config.size) || 
-              (step === 5 && !config.date)
+              (step === 5 && (!config.date || isSunday(config.date)))
             }
           >
             {step === 5 ? "Ver Resumen" : "Siguiente"}

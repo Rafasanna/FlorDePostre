@@ -13,7 +13,7 @@ function Footer() {
         <p>Pastelería, desayunos y catering artesanal.</p>
         <a className="footer-address" href={MAPS_URL} target="_blank" rel="noreferrer">
           <MapPin size={15} />
-          <span>3 de Febrero 75</span>
+          <span>3 de Febrero 85</span>
         </a>
       </div>
 
