@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { MapPin } from "lucide-react";
 import { categories, dailyProducts } from "../data/dailyProducts.js";
 import CategoryFilter from "./CategoryFilter.jsx";
 import ProductCard from "./ProductCard.jsx";
@@ -32,6 +33,8 @@ function DailyMenuSection({ cart, addToCart, formatPrice, isLoading }) {
     setShowAllProducts(false);
   };
 
+  const sinTaccMapsUrl = "https://www.google.com/maps/search/?api=1&query=Sarmiento%20y%20Republica%20de%20Chile";
+
   return (
     <section className="section page-section reveal-fade" id="menu-diario" ref={sectionRef}>
       <div className="section-heading">
@@ -55,6 +58,29 @@ function DailyMenuSection({ cart, addToCart, formatPrice, isLoading }) {
           addToCart={addToCart}
           formatPrice={formatPrice}
         />
+      )}
+
+      {activeCategory === "Sin TACC" && (
+        <div className="sin-tacc-intro">
+          <div>
+            <h3>Flor de Postre Sin TACC</h3>
+            <p>
+              En el local contamos con algunos productos seleccionados de nuestra marca exclusiva
+              para celíacos Flor de Postre Sin TACC.
+            </p>
+            <p>
+              Para más variedad y opciones, nuestro local libre de gluten está ubicado en{" "}
+              <a href={sinTaccMapsUrl} target="_blank" rel="noreferrer">
+                Sarmiento y República de Chile
+              </a>
+              .
+            </p>
+          </div>
+          <a className="sin-tacc-location-link" href={sinTaccMapsUrl} target="_blank" rel="noreferrer">
+            <MapPin size={17} />
+            Ver ubicación
+          </a>
+        </div>
       )}
 
       <div className="products-grid" aria-live="polite">

@@ -3,6 +3,7 @@ import { INSTAGRAM_URL, WHATSAPP_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
 const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2075";
+const RAFAELA_WHATSAPP_URL = "https://wa.me/5493446608118?text=Hola%20Rafa!%20Estoy%20interesado%20en%20una%20pagina%20web%20para%20mi%20negocio..";
 
 function Footer() {
   return (
@@ -46,6 +47,13 @@ function Footer() {
           WhatsApp
         </a>
       </div>
+
+      <p className="footer-credits">
+        Pagina diseñada y desarrollada por{" "}
+        <a href={RAFAELA_WHATSAPP_URL} target="_blank" rel="noreferrer">
+          Rafaela Sanna
+        </a>
+      </p>
     </footer>
   );
 }
