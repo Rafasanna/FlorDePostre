@@ -1,10 +1,16 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X, ChevronRight } from "lucide-react";
-import { dailyProducts } from "../data/dailyProducts.js";
-import { postresBase } from "../data/postresData.js";
+import { dailyProducts as fallbackDailyProducts } from "../data/dailyProducts.js";
+import { postresBase as fallbackPostres } from "../data/postresData.js";
 import { getVisibleProducts } from "../utils/seasonal.js";
 
-function ProductSearchModal({ isOpen, onClose, onSelectResult }) {
+function ProductSearchModal({
+  isOpen,
+  onClose,
+  onSelectResult,
+  dailyProducts = fallbackDailyProducts,
+  postres = fallbackPostres
+}) {
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
 
@@ -30,7 +36,7 @@ function ProductSearchModal({ isOpen, onClose, onSelectResult }) {
       .filter(p => matches(p.nombre) || matches(p.descripcion) || matches(p.categoria) || (p.sinTacc && matches("Sin TACC")) || matches(p.etiqueta))
       .map(p => ({ ...p, type: 'daily', label: 'Menú Diario' }));
 
-    const postresMatches = postresBase.filter(p => matches(p.nombre) || matches(p.descripcion))
+    const postresMatches = postres.filter(p => matches(p.nombre) || matches(p.descripcion))
       .map(p => ({ ...p, type: 'postre', label: 'Postre por Encargue' }));
 
     // Simular búsqueda de tortas
@@ -41,7 +47,7 @@ function ProductSearchModal({ isOpen, onClose, onSelectResult }) {
       : [];
 
     return [...dailyMatches, ...postresMatches, ...tortasMatches];
-  }, [query]);
+  }, [dailyProducts, postres, query]);
 
   if (!isOpen) return null;
 

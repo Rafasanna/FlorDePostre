@@ -1,8 +1,23 @@
 import { X, ShoppingBag, Edit2 } from "lucide-react";
-import { coberturas, tortaSizes, rellenos, tortaExtras } from "../data/tortasData.js";
+import {
+  coberturas as fallbackCoberturas,
+  tortaSizes as fallbackTortaSizes,
+  rellenos as fallbackRellenos,
+  tortaExtras as fallbackTortaExtras
+} from "../data/tortasData.js";
 import { WHATSAPP_URL } from "../config.js";
 
-function CakeSummary({ config, onClose, onEdit, formatPrice, onAddToCart }) {
+function CakeSummary({
+  config,
+  onClose,
+  onEdit,
+  formatPrice,
+  onAddToCart,
+  tortaSizes = fallbackTortaSizes,
+  coberturas = fallbackCoberturas,
+  rellenos = fallbackRellenos,
+  tortaExtras = fallbackTortaExtras
+}) {
   const getCobertura = (id) => coberturas.find(c => c.id === id);
   const getSize = (id) => tortaSizes.find(s => s.id === id);
   const getRellenos = (ids) => ids.map(id => rellenos.find(r => r.id === id)).filter(Boolean);

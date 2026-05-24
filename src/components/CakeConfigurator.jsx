@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight } from "lucide-react";
-import { coberturas, tortaSizes, rellenos, tortaExtras } from "../data/tortasData.js";
+import {
+  coberturas as fallbackCoberturas,
+  tortaSizes as fallbackTortaSizes,
+  rellenos as fallbackRellenos,
+  tortaExtras as fallbackTortaExtras
+} from "../data/tortasData.js";
 import CakeSummary from "./CakeSummary.jsx";
 
 const formatPrice = (value) =>
@@ -26,7 +31,14 @@ const toDateInputValue = (date) => {
 
 const parseDateValue = (dateValue) => new Date(`${dateValue}T12:00:00`);
 
-function CakeConfigurator({ onClose, onAddToCart }) {
+function CakeConfigurator({
+  onClose,
+  onAddToCart,
+  tortaSizes = fallbackTortaSizes,
+  coberturas = fallbackCoberturas,
+  rellenos = fallbackRellenos,
+  tortaExtras = fallbackTortaExtras
+}) {
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState({
     cobertura: null,
@@ -133,7 +145,17 @@ function CakeConfigurator({ onClose, onAddToCart }) {
 
   if (step === 6) {
     return createPortal(
-      <CakeSummary config={config} onClose={onClose} onEdit={() => setStep(1)} formatPrice={formatPrice} onAddToCart={onAddToCart} />,
+      <CakeSummary
+        config={config}
+        onClose={onClose}
+        onEdit={() => setStep(1)}
+        formatPrice={formatPrice}
+        onAddToCart={onAddToCart}
+        tortaSizes={tortaSizes}
+        coberturas={coberturas}
+        rellenos={rellenos}
+        tortaExtras={tortaExtras}
+      />,
       document.body
     );
   }

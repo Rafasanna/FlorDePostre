@@ -3347,3 +3347,9 @@ h1 {
     width: 40px;
   }
 }
+
+@media (min-width: 961px) {
+  .products-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

@@ -8,16 +8,37 @@ import FeaturedProductsSection from "./FeaturedProductsSection.jsx";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import { getFeaturedProducts, getVisibleProducts } from "../utils/seasonal.js";
 
-function DailyMenuSection({ cart, addToCart, formatPrice, isLoading, campaign, categoryRequest }) {
+function DailyMenuSection({
+  cart,
+  addToCart,
+  formatPrice,
+  isLoading,
+  campaign,
+  categoryRequest,
+  products = dailyProducts,
+  isUsingSheetProducts = false
+}) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [showAllProducts, setShowAllProducts] = useState(false);
+  const menuProducts = products;
   const sectionRef = useIntersectionObserver();
-  const visibleCatalog = useMemo(() => getVisibleProducts(dailyProducts), []);
-  const featuredProducts = useMemo(() => getFeaturedProducts(dailyProducts).slice(0, 4), []);
+  const visibleCatalog = useMemo(() => getVisibleProducts(menuProducts), [menuProducts]);
+  const featuredProducts = useMemo(() => getFeaturedProducts(menuProducts).slice(0, 4), [menuProducts]);
   const specialProducts = campaign?.productosEspeciales || [];
+  const baseCategories = useMemo(() => {
+    if (!isUsingSheetProducts) return categories;
+
+    const sheetCategories = menuProducts
+      .map((product) => product.categoria)
+      .filter((category) => category && category !== "Todos" && category !== "Sin TACC");
+    const knownCategories = categories.filter((category) => sheetCategories.includes(category));
+    const newCategories = sheetCategories.filter((category) => !categories.includes(category));
+
+    return ["Todos", "Sin TACC", ...new Set([...knownCategories, ...newCategories])];
+  }, [isUsingSheetProducts, menuProducts]);
   const menuCategories = useMemo(
-    () => (specialProducts.length > 0 ? ["Especial", ...categories] : categories),
-    [specialProducts.length]
+    () => (specialProducts.length > 0 ? ["Especial", ...baseCategories] : baseCategories),
+    [baseCategories, specialProducts.length]
   );
 
   useEffect(() => {
@@ -30,7 +51,9 @@ function DailyMenuSection({ cart, addToCart, formatPrice, isLoading, campaign, c
   const categoryProducts = useMemo(() => {
     if (activeCategory === "Especial") return specialProducts;
     if (activeCategory === "Todos") return visibleCatalog;
-    if (activeCategory === "Sin TACC") return visibleCatalog.filter((product) => product.sinTacc);
+    if (activeCategory === "Sin TACC") {
+      return visibleCatalog.filter((product) => product.sinTacc || product.categoria === "Sin TACC");
+    }
     return visibleCatalog.filter((product) => product.categoria === activeCategory);
   }, [activeCategory, specialProducts, visibleCatalog]);
 

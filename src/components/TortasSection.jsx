@@ -3,7 +3,7 @@ import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import CakeConfigurator from "./CakeConfigurator.jsx";
 import BackLink from "./BackLink.jsx";
 
-function TortasSection({ onAddToCart }) {
+function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExtras }) {
   const sectionRef = useIntersectionObserver();
   const [isConfiguring, setIsConfiguring] = useState(false);
 
@@ -48,6 +48,10 @@ function TortasSection({ onAddToCart }) {
         <CakeConfigurator 
           onClose={() => setIsConfiguring(false)} 
           onAddToCart={onAddToCart}
+          tortaSizes={tortaSizes}
+          coberturas={coberturas}
+          rellenos={rellenos}
+          tortaExtras={tortaExtras}
         />
       )}
     </section>
