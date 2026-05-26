@@ -1,11 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import CakeConfigurator from "./CakeConfigurator.jsx";
 import BackLink from "./BackLink.jsx";
 
+const tortasCarouselImages = [
+  "/images/tortas-carousel/portada.jpg",
+  "/images/tortas-carousel/torta-1.jpg",
+  "/images/tortas-carousel/torta-2.jpg",
+  "/images/tortas-carousel/torta-3.jpg",
+  "/images/tortas-carousel/torta-4.jpg"
+];
+
 function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExtras }) {
   const sectionRef = useIntersectionObserver();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [failedImages, setFailedImages] = useState([]);
+  const availableImages = tortasCarouselImages.filter((image) => !failedImages.includes(image));
+  const normalizedImageIndex = availableImages.length
+    ? ((activeImageIndex % availableImages.length) + availableImages.length) % availableImages.length
+    : 0;
+  const activeImage = availableImages[normalizedImageIndex];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveImageIndex((index) => index + 1);
+    }, 4000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const goToPreviousImage = () => {
+    setActiveImageIndex((index) => index - 1 + availableImages.length);
+  };
+
+  const goToNextImage = () => {
+    setActiveImageIndex((index) => index + 1);
+  };
+
+  const handleImageError = (image) => {
+    setFailedImages((current) => (current.includes(image) ? current : [...current, image]));
+  };
 
   return (
     <section className="section page-section reveal-fade" id="tortas" ref={sectionRef}>
@@ -20,7 +55,38 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
 
       <div className="tortas-intro">
         <div className="tortas-visual">
-          <div className="torta-placeholder skeleton-pulse" style={{ height: '300px', borderRadius: '24px' }}></div>
+          <div className={`tortas-carousel ${availableImages.length === 0 ? "torta-placeholder" : ""}`}>
+            {activeImage && (
+              <img
+                key={activeImage}
+                src={activeImage}
+                alt=""
+                aria-hidden="true"
+                onError={() => handleImageError(activeImage)}
+              />
+            )}
+            {availableImages.length > 1 && (
+              <>
+                <button className="tortas-carousel-control previous" type="button" onClick={goToPreviousImage} aria-label="Imagen anterior">
+                  ‹
+                </button>
+                <button className="tortas-carousel-control next" type="button" onClick={goToNextImage} aria-label="Imagen siguiente">
+                  ›
+                </button>
+                <div className="tortas-carousel-dots" aria-hidden="true">
+                  {availableImages.map((image, index) => (
+                    <button
+                      key={image}
+                      className={index === normalizedImageIndex ? "active" : ""}
+                      type="button"
+                      tabIndex={-1}
+                      onClick={() => setActiveImageIndex(index)}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
         <div className="tortas-copy">
           <h3>Armá tu torta en 5 simples pasos</h3>

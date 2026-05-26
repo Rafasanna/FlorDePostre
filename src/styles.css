@@ -1926,6 +1926,84 @@ h1 {
   margin-top: 40px;
 }
 
+.tortas-carousel {
+  aspect-ratio: 4 / 5;
+  background: linear-gradient(120deg, var(--cream), rgba(255, 245, 232, 0.8));
+  border-radius: 24px;
+  height: auto;
+  max-width: 420px;
+  overflow: hidden;
+  position: relative;
+  width: min(100%, 420px);
+}
+
+.tortas-carousel img {
+  animation: carouselFade 500ms ease;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  width: 100%;
+}
+
+.tortas-carousel-control {
+  align-items: center;
+  background: rgba(255, 250, 252, 0.82);
+  border: 1px solid rgba(240, 187, 220, 0.45);
+  border-radius: 999px;
+  color: var(--cocoa);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  height: 34px;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+}
+
+.tortas-carousel-control.previous {
+  left: 12px;
+}
+
+.tortas-carousel-control.next {
+  right: 12px;
+}
+
+.tortas-carousel-dots {
+  bottom: 12px;
+  display: flex;
+  gap: 7px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.tortas-carousel-dots button {
+  background: rgba(255, 255, 255, 0.72);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 7px;
+  padding: 0;
+  width: 7px;
+}
+
+.tortas-carousel-dots button.active {
+  background: var(--rose-old);
+}
+
+@keyframes carouselFade {
+  from {
+    opacity: 0.72;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 .cake-order-note,
 .cake-date-note {
   background: rgba(255, 229, 238, 0.7);
@@ -2060,6 +2138,11 @@ h1 {
 @media (max-width: 768px) {
   .tortas-intro {
     grid-template-columns: 1fr;
+  }
+
+  .tortas-carousel {
+    max-width: 460px;
+    width: 100%;
   }
 }
 
