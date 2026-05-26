@@ -52,20 +52,32 @@ ${date || "A definir"}
 
 function PostreImage({ postre, large = false }) {
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const hasImage = Boolean(postre.imagen) && !imageFailed;
 
   useEffect(() => {
     setImageFailed(false);
+    setImageLoaded(false);
   }, [postre.imagen]);
 
   if (hasImage) {
     return (
-      <img
-        src={postre.imagen}
-        alt={postre.nombre}
-        loading={large ? "eager" : "lazy"}
-        onError={() => setImageFailed(true)}
-      />
+      <>
+        <img
+          src={postre.imagen}
+          alt={postre.nombre}
+          loading={large ? "eager" : "lazy"}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageFailed(true)}
+          style={{ display: imageLoaded ? 'block' : 'none' }}
+        />
+        {!imageLoaded && (
+          <div className="postre-placeholder">
+            <Sparkle size={large ? 30 : 24} />
+            <span>Flor de Postre</span>
+          </div>
+        )}
+      </>
     );
   }
 

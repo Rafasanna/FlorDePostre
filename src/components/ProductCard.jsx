@@ -12,11 +12,13 @@ const isProductOrderable = (product) => {
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const [justAdded, setJustAdded] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const badges = getProductBadges(product);
   const hasImage = Boolean(product.imagen) && !imageFailed;
 
   useEffect(() => {
     setImageFailed(false);
+    setImageLoaded(false);
   }, [product.imagen]);
 
   const handleAdd = () => {
@@ -31,10 +33,17 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
 
   return (
     <article className="product-card">
-      <div className={hasImage ? "product-media" : "product-media placeholder"}>
-        {hasImage ? (
-          <img src={product.imagen} alt={product.nombre} onError={() => setImageFailed(true)} />
-        ) : (
+      <div className={hasImage && imageLoaded ? "product-media" : "product-media placeholder"}>
+        {hasImage && (
+          <img 
+            src={product.imagen} 
+            alt={product.nombre} 
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageFailed(true)} 
+            style={{ display: imageLoaded ? 'block' : 'none' }}
+          />
+        )}
+        {(!hasImage || !imageLoaded) && (
           <div className="placeholder-content">
             <Sparkle size={26} />
             <span>Flor de Postre</span>
