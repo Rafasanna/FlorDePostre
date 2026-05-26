@@ -1,8 +1,11 @@
+import { useState } from "react";
+import { Sparkle } from "lucide-react";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import LocationsSection from "./LocationsSection.jsx";
 
 function AboutSection() {
   const sectionRef = useIntersectionObserver();
+  const [imageFailed, setImageFailed] = useState(false);
 
   return (
     <section className="about section page-section reveal-fade" id="sobre-nosotras" ref={sectionRef}>
@@ -13,7 +16,19 @@ function AboutSection() {
 
       <div className="about-content">
         <div className="about-image skeleton-pulse">
-          <img src="/images/carousel-5.jpg" alt="Flor de Postre" style={{ width: '100%', borderRadius: '24px', objectFit: 'cover', height: '100%' }} />
+          {!imageFailed ? (
+            <img 
+              src="/images/sobre-flor.jpg" 
+              alt="Flor de Postre" 
+              onError={() => setImageFailed(true)} 
+              style={{ width: '100%', borderRadius: '24px', objectFit: 'cover', height: '100%' }} 
+            />
+          ) : (
+            <div className="about-image-placeholder" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 237, 245, 0.5)', height: '100%', minHeight: '300px', borderRadius: '24px', color: 'var(--rose-500)', border: '1px dashed var(--rose-old)' }}>
+              <Sparkle size={48} style={{ marginBottom: '12px' }} />
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Flor de Postre</span>
+            </div>
+          )}
         </div>
         <div className="about-text">
           <p>

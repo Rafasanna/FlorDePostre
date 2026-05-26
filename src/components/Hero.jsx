@@ -4,11 +4,21 @@ import { INSTAGRAM_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
 const carouselImages = [
-  "/images/carousel-1.jpg",
-  "/images/carousel-2.jpg",
-  "/images/carousel-3.jpg",
-  "/images/carousel-4.jpg",
-  "/images/carousel-5.jpg"
+  "/images/home-carousel/home-1.jpg",
+  "/images/home-carousel/home-2.jpg",
+  "/images/home-carousel/home-3.jpg",
+  "/images/home-carousel/home-4.jpg",
+  "/images/home-carousel/home-5.jpg",
+  "/images/home-carousel/home-6.jpg",
+  "/images/home-carousel/home-7.jpg",
+  "/images/home-carousel/home-8.jpg",
+  "/images/home-carousel/home-9.jpg",
+  "/images/home-carousel/home-10.jpg",
+  "/images/home-carousel/home-11.jpg",
+  "/images/home-carousel/home-12.jpg",
+  "/images/home-carousel/home-13.jpg",
+  "/images/home-carousel/home-14.jpg",
+  "/images/home-carousel/home-15.jpg"
 ];
 
 function Hero({ itemCount, onOpenCart }) {

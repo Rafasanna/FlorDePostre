@@ -16,7 +16,7 @@ function ComoPedirPage() {
         <article>
           <strong>01</strong>
           <h3>Menú</h3>
-          <p>Agregá al carrito pastelería, opciones saladas y enviá tu pedido al instante.</p>
+          <p>Agregá al carrito pastelería, opciones saladas y envianos tu pedido por WhatsApp para confirmar disponibilidad.</p>
         </article>
         <article>
           <strong>02</strong>
@@ -28,6 +28,11 @@ function ComoPedirPage() {
           <h3>Tortas a medida</h3>
           <p>Armá tu torta paso a paso y te confirmamos disponibilidad por WhatsApp.</p>
         </article>
+      </div>
+
+      <div className="como-pedir-note">
+        <h4>Confirmación del pedido</h4>
+        <p>Todos los pedidos se coordinan y confirman personalmente por WhatsApp según disponibilidad, fecha y detalles del encargo.</p>
       </div>
     </section>
   );

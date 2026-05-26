@@ -4,7 +4,6 @@ import { categories, dailyProducts } from "../data/dailyProducts.js";
 import CategoryFilter from "./CategoryFilter.jsx";
 import ProductCard from "./ProductCard.jsx";
 import ProductSkeleton from "./ProductSkeleton.jsx";
-import FeaturedProductsSection from "./FeaturedProductsSection.jsx";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import { getFeaturedProducts, getVisibleProducts } from "../utils/seasonal.js";
 
@@ -60,10 +59,29 @@ function DailyMenuSection({
 
   const visibleProducts = useMemo(() => {
     if (activeCategory !== "Todos" || showAllProducts) return categoryProducts;
-    return categoryProducts.filter((product) => product.categoria === "Alfajores").slice(0, 4);
+    return categoryProducts.slice(0, 8);
   }, [activeCategory, categoryProducts, showAllProducts]);
 
-  const hasHiddenProducts = activeCategory === "Todos" && categoryProducts.length > visibleProducts.length;
+  const unifiedProducts = useMemo(() => {
+    if (activeCategory !== "Todos") return visibleProducts;
+
+    const featured = visibleCatalog.filter((p) => p.destacado);
+    const rest = visibleCatalog.filter((p) => !p.destacado);
+    const allUnified = [...featured, ...rest];
+
+    if (showAllProducts) {
+      return allUnified;
+    } else {
+      return allUnified.slice(0, 8);
+    }
+  }, [activeCategory, visibleCatalog, visibleProducts, showAllProducts]);
+
+  const hasHiddenProducts = useMemo(() => {
+    if (activeCategory === "Todos") {
+      return visibleCatalog.length > unifiedProducts.length;
+    }
+    return categoryProducts.length > visibleProducts.length;
+  }, [activeCategory, visibleCatalog.length, unifiedProducts.length, categoryProducts.length, visibleProducts.length]);
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
@@ -88,15 +106,6 @@ function DailyMenuSection({
         activeCategory={activeCategory}
         onChange={handleCategoryChange}
       />
-
-      {activeCategory === "Todos" && (
-        <FeaturedProductsSection
-          products={featuredProducts}
-          cart={cart}
-          addToCart={addToCart}
-          formatPrice={formatPrice}
-        />
-      )}
 
       {activeCategory === "Sin TACC" && (
         <div className="sin-tacc-intro">
@@ -124,7 +133,7 @@ function DailyMenuSection({
       <div className="products-grid" aria-live="polite">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
-          : visibleProducts.map((product) => (
+          : unifiedProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -142,6 +151,10 @@ function DailyMenuSection({
           </button>
         </div>
       )}
+
+      <p className="product-disclaimer">
+        Las imágenes son ilustrativas. Al tratarse de productos artesanales, pueden existir pequeñas variaciones en presentación, decoración o detalles. 🌸
+      </p>
     </section>
   );
 }

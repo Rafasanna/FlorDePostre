@@ -81,7 +81,7 @@ const cateringTabs = [
     icon: Home,
     cta: "Personalizar por WhatsApp",
     message:
-      "Hola Flor de Postre! Quiero consultar por un Desayuno a Domicilio.\n\nFecha:\nDirección de entrega:\nCantidad:\nQuiero personalizarlo así:\n\n¿Me ayudan a armarlo?",
+      "Hola! Me gustaría consultar por un desayuno personalizado u otras opciones disponibles.",
     content: {
       intro: [
         "Una propuesta base pensada para regalar o compartir, con opciones dulces, saladas y bebidas."
@@ -210,7 +210,18 @@ function CateringSection() {
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            <strong className="breakfast-price">{activeTab.content.price}</strong>
+            {activeTab.id === "domicilio" ? (
+              <a
+                className="breakfast-price"
+                href={makeWhatsappHref("Hola! Quiero consultar por el desayuno de $31.500 + envío.")}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {activeTab.content.price}
+              </a>
+            ) : (
+              <strong className="breakfast-price">{activeTab.content.price}</strong>
+            )}
           </div>
         )}
 
