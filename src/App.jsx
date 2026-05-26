@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { WHATSAPP_URL } from "./config.js";
@@ -53,6 +53,15 @@ const dedupeProductsById = (products) => {
     seen.add(product.id);
     return true;
   });
+};
+
+const getProductStock = (product) => (Number.isFinite(product?.stock) ? product.stock : null);
+
+const isProductOrderable = (product, quantity = 1) => {
+  if (!product || product.disponible === false || product.reservado === true) return false;
+
+  const stock = getProductStock(product);
+  return stock === null || stock >= quantity;
 };
 
 const withSpecialProducts = (campaignItems, specialProducts) =>
@@ -121,6 +130,8 @@ const resolvePostresWithSizes = (postres, tamanos, configs) => {
 };
 
 const SHEETS_CACHE_PREFIX = "florDePostre:sheets:";
+const SHEETS_NOTICE =
+  "Algunos datos pueden estar desactualizados. Confirmamos disponibilidad por WhatsApp.";
 
 const getCachedDataset = (key) => {
   if (typeof window === "undefined") return null;
@@ -172,6 +183,7 @@ function App() {
   const [isUsingSheetProducts, setIsUsingSheetProducts] = useState(
     () => Boolean(getCachedDataset("menuDiario") || getCachedDataset("sinTacc"))
   );
+  const [sheetsNotice, setSheetsNotice] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const campaignsWithSpecials = useMemo(
@@ -190,17 +202,17 @@ function App() {
     let isMounted = true;
 
     const resources = [
-      { key: "menuDiario", label: "menú diario", fetcher: fetchDailyProductsFromSheet, setter: setMenuDiarioProducts },
-      { key: "sinTacc", label: "Sin TACC", fetcher: fetchSinTaccProductsFromSheet, setter: setSinTaccProducts },
-      { key: "postres", label: "Postres", fetcher: fetchPostresFromSheet, setter: setPostresProducts },
-      { key: "postresTamanos", label: "tamaños postres", fetcher: fetchPostresTamanosFromSheet, setter: setPostresTamanos },
-      { key: "postresConfig", label: "configuraciones postres", fetcher: fetchPostresConfigFromSheet, setter: setPostresConfig },
+      { key: "menuDiario", label: "menú diario", fetcher: fetchDailyProductsFromSheet, setter: setMenuDiarioProducts, showNoticeOnFallback: true },
+      { key: "sinTacc", label: "Sin TACC", fetcher: fetchSinTaccProductsFromSheet, setter: setSinTaccProducts, showNoticeOnFallback: true },
+      { key: "postres", label: "Postres", fetcher: fetchPostresFromSheet, setter: setPostresProducts, showNoticeOnFallback: true },
+      { key: "postresTamanos", label: "tamaños postres", fetcher: fetchPostresTamanosFromSheet, setter: setPostresTamanos, showNoticeOnFallback: true },
+      { key: "postresConfig", label: "configuraciones postres", fetcher: fetchPostresConfigFromSheet, setter: setPostresConfig, showNoticeOnFallback: true },
       { key: "campaigns", label: "campañas", fetcher: fetchCampaignsFromSheet, setter: setCampaignsData },
       { key: "specialProducts", label: "productos especiales", fetcher: fetchSpecialProductsFromSheet, setter: setSpecialProducts },
-      { key: "tortaTamanos", label: "tamaños de tortas", fetcher: fetchTortaTamanosFromSheet, setter: setTortaTamanos },
-      { key: "tortaCoberturas", label: "coberturas de tortas", fetcher: fetchTortaCoberturasFromSheet, setter: setTortaCoberturas },
-      { key: "tortaRellenos", label: "rellenos de tortas", fetcher: fetchTortaRellenosFromSheet, setter: setTortaRellenos },
-      { key: "tortaExtras", label: "extras de tortas", fetcher: fetchTortaExtrasFromSheet, setter: setTortaExtrasData }
+      { key: "tortaTamanos", label: "tamaños de tortas", fetcher: fetchTortaTamanosFromSheet, setter: setTortaTamanos, showNoticeOnFallback: true },
+      { key: "tortaCoberturas", label: "coberturas de tortas", fetcher: fetchTortaCoberturasFromSheet, setter: setTortaCoberturas, showNoticeOnFallback: true },
+      { key: "tortaRellenos", label: "rellenos de tortas", fetcher: fetchTortaRellenosFromSheet, setter: setTortaRellenos, showNoticeOnFallback: true },
+      { key: "tortaExtras", label: "extras de tortas", fetcher: fetchTortaExtrasFromSheet, setter: setTortaExtrasData, showNoticeOnFallback: true }
     ];
 
     Promise.allSettled(
@@ -213,10 +225,13 @@ function App() {
     ).then((results) => {
       if (!isMounted) return;
 
+      let shouldShowSheetsNotice = false;
+
       results.forEach((result, index) => {
         const resource = resources[index];
 
         if (result.status === "rejected") {
+          shouldShowSheetsNotice = shouldShowSheetsNotice || resource.showNoticeOnFallback;
           if (import.meta.env.DEV) {
             console.info(`[Google Sheets] error en ${resource.label}; se conserva el estado actual.`, result.reason);
           }
@@ -236,12 +251,15 @@ function App() {
           return;
         }
 
+        shouldShowSheetsNotice = shouldShowSheetsNotice || resource.showNoticeOnFallback;
         if (import.meta.env.DEV) {
           const hasCachedData = Boolean(getCachedDataset(resource.key));
           const fallbackMessage = hasCachedData ? "se conserva cache previa" : "usando fallback local";
           console.info(`[Google Sheets] ${resource.label} sin datos válidos; ${fallbackMessage}.`);
         }
       });
+
+      setSheetsNotice(shouldShowSheetsNotice ? SHEETS_NOTICE : "");
     });
 
     return () => {
@@ -274,10 +292,120 @@ function App() {
     return () => clearTimeout(timer);
   }, [pathname, shouldScrollToMenu]);
 
-  const total = cartItems.reduce((sum, item) => sum + item.precio * item.quantity, 0);
+  const total = cartItems.reduce((sum, item) => {
+    const itemTotal = item.precio * item.quantity;
+    return Number.isFinite(itemTotal) ? sum + itemTotal : sum;
+  }, 0);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const [cartValidationMessage, setCartValidationMessage] = useState("");
+
+  const cartCatalog = useMemo(() => {
+    const dailyById = new Map(
+      [...dailyMenuProductsFinal, ...specialProducts]
+        .filter(Boolean)
+        .map((product) => [product.id, product])
+    );
+    const postresById = new Map(
+      postresProductsFinal
+        .filter(Boolean)
+        .map((postre) => [postre.id, postre])
+    );
+
+    return { dailyById, postresById };
+  }, [dailyMenuProductsFinal, postresProductsFinal, specialProducts]);
+
+  const getValidatedCartItem = useCallback((item) => {
+    if (!item || !Number.isFinite(item.quantity) || item.quantity <= 0) return null;
+
+    if (item.type === "daily") {
+      const currentProduct = cartCatalog.dailyById.get(item.product?.id);
+      if (!isProductOrderable(currentProduct, item.quantity)) return null;
+
+      const currentPrice = getEffectivePrice(currentProduct);
+      if (!Number.isFinite(currentPrice)) return null;
+
+      return {
+        ...item,
+        product: currentProduct,
+        nombre: currentProduct.nombre,
+        precio: currentPrice
+      };
+    }
+
+    if (item.type === "postre") {
+      const currentPostre = cartCatalog.postresById.get(item.product?.id);
+      if (!currentPostre || currentPostre.disponible === false) return null;
+
+      const currentSize = currentPostre.sizes?.find((size) => size.id === item.configuracion?.sizeId);
+      if (!currentSize || currentSize.disponible === false || !Number.isFinite(currentSize.precio)) return null;
+
+      return {
+        ...item,
+        product: currentPostre,
+        nombre: currentPostre.nombre,
+        precio: currentSize.precio,
+        configuracion: {
+          ...item.configuracion,
+          sizeName: currentSize.nombre,
+          porciones: currentSize.porciones
+        }
+      };
+    }
+
+    if (!Number.isFinite(item.precio)) return null;
+    return item;
+  }, [cartCatalog]);
+
+  const validateCartItems = useCallback((items) => {
+    const nextItems = [];
+    let hasChanges = false;
+
+    for (const item of items) {
+      const validatedItem = getValidatedCartItem(item);
+      if (!validatedItem) {
+        return {
+          isValid: false,
+          hasChanges: false,
+          items,
+          message: "Revisá el carrito porque hubo cambios en disponibilidad o precio."
+        };
+      }
+
+      if (validatedItem.nombre !== item.nombre || validatedItem.precio !== item.precio) {
+        hasChanges = true;
+      }
+
+      nextItems.push(validatedItem);
+    }
+
+    return {
+      isValid: true,
+      hasChanges,
+      items: nextItems,
+      message: hasChanges ? "Revisá el carrito porque hubo cambios en disponibilidad o precio." : ""
+    };
+  }, [getValidatedCartItem]);
 
   const addToCart = (productObj) => {
+    if (productObj.type === "daily" && !isProductOrderable(productObj.product)) {
+      setCartValidationMessage("Este producto no está disponible para agregar al carrito.");
+      return;
+    }
+
+    if (productObj.type === "postre" && !isProductOrderable(productObj.product)) {
+      setCartValidationMessage("Este producto no está disponible para agregar al carrito.");
+      return;
+    }
+
+    if (productObj.type === "daily") {
+      const existing = cartItems.find(item => item.product.id === productObj.product.id && item.type === "daily");
+      if (existing && !isProductOrderable(productObj.product, existing.quantity + 1)) {
+        setCartValidationMessage("Este producto no está disponible para agregar al carrito.");
+        return;
+      }
+    }
+
+    setCartValidationMessage("");
     setCartItems((prev) => {
       // Si es menú diario, intentar agrupar
       if (productObj.type === 'daily') {
@@ -317,14 +445,18 @@ function App() {
 
   const removeItem = (cartItemId) => {
     setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
+    setCartValidationMessage("");
   };
 
-  const clearCart = () => setCartItems([]);
+  const clearCart = () => {
+    setCartItems([]);
+    setCartValidationMessage("");
+  };
 
-  const whatsappMessage = useMemo(() => {
+  const buildWhatsappMessage = useCallback((items, totalValue, aclaraciones = "") => {
     let detail = "";
     
-    cartItems.forEach(item => {
+    items.forEach(item => {
       detail += `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}\n`;
       if (item.type !== 'daily' && item.configuracion) {
         const c = item.configuracion;
@@ -337,8 +469,30 @@ function App() {
       }
     });
 
-    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal estimado (sin envío): ${formatPrice(total)}\n\nMi nombre:\nRetiro o envío:\nDirección (si es envío):\nAclaraciones:\n\n¿Me confirmás disponibilidad?`;
-  }, [cartItems, total]);
+    const aclaracionesText = aclaraciones.trim();
+
+    return `Hola Flor de Postre! Quiero hacer este pedido:\n\n${detail || "- Aún no agregué productos"}\n\nTotal estimado (sin envío): ${formatPrice(totalValue)}\n\nMi nombre:\nRetiro o envío:\nDirección (si es envío):\nAclaraciones:${aclaracionesText ? ` ${aclaracionesText}` : ""}\n\n¿Me confirmás disponibilidad?`;
+  }, []);
+
+  const whatsappMessage = useMemo(() => buildWhatsappMessage(cartItems, total), [buildWhatsappMessage, cartItems, total]);
+
+  const getWhatsappHref = useCallback((aclaraciones = "") => {
+    if (cartItems.length === 0) return null;
+
+    const validation = validateCartItems(cartItems);
+    if (!validation.isValid || validation.hasChanges) {
+      if (validation.hasChanges) {
+        setCartItems(validation.items);
+      }
+      setCartValidationMessage(validation.message);
+      return null;
+    }
+
+    setCartValidationMessage("");
+    const validatedTotal = validation.items.reduce((sum, item) => sum + item.precio * item.quantity, 0);
+    const message = buildWhatsappMessage(validation.items, validatedTotal, aclaraciones);
+    return `${WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
+  }, [buildWhatsappMessage, cartItems, validateCartItems]);
 
   const whatsappHref = `${WHATSAPP_URL}?text=${encodeURIComponent(whatsappMessage)}`;
   
@@ -410,6 +564,7 @@ function App() {
                   categoryRequest={menuCategoryRequest}
                   products={dailyMenuProductsFinal}
                   isUsingSheetProducts={isUsingSheetProducts}
+                  sheetsNotice={sheetsNotice}
                 />
               </>
             }
@@ -425,6 +580,8 @@ function App() {
                 onRemoveItem={removeItem}
                 onClear={clearCart}
                 whatsappHref={whatsappHref}
+                getWhatsappHref={getWhatsappHref}
+                validationMessage={cartValidationMessage}
                 formatPrice={formatPrice}
               />
             }
@@ -480,6 +637,8 @@ function App() {
         onRemoveItem={removeItem}
         onClear={clearCart}
         whatsappHref={whatsappHref}
+        getWhatsappHref={getWhatsappHref}
+        validationMessage={cartValidationMessage}
         formatPrice={formatPrice}
       />
 

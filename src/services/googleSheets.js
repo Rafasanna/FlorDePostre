@@ -1,5 +1,5 @@
-const FALSE_VALUES = new Set(["false", "no", "0", "agotado", "no disponible"]);
-const TRUE_VALUES = new Set(["true", "si", "sí", "1", "x", "destacado", "sin tacc"]);
+const FALSE_VALUES = new Set(["false", "no", "0", "agotado", "no disponible", "reservado"]);
+const TRUE_VALUES = new Set(["true", "si", "sí", "1", "x", "destacado", "sin tacc", "disponible"]);
 
 const normalizeHeader = (value) => value.trim().toLowerCase();
 
@@ -60,6 +60,11 @@ const parseBoolean = (value, defaultValue = false) => {
 };
 
 const parseAvailability = (value) => !FALSE_VALUES.has(normalizeText(value).toLowerCase());
+
+const parseStock = (value) => {
+  const stock = parseNumber(value);
+  return stock === null ? null : stock;
+};
 
 const REQUIRED_DAILY_HEADERS = [
   "ID interno (no tocar)",
@@ -253,7 +258,9 @@ export const normalizeDailyProduct = (row) => {
     precio,
     categoria,
     imagen: normalizeText(getCell(row, "Imagen", "imagen")),
-    disponible: parseAvailability(getCell(row, "Disponible", "disponible")),
+    disponible: parseAvailability(getCell(row, "Disponible", "disponible", "Estado", "estado")),
+    stock: parseStock(getCell(row, "Stock", "stock")),
+    reservado: parseBoolean(getCell(row, "Reservado", "reservado")),
     destacado: parseBoolean(getCell(row, "Destacado", "destacado")),
     sinTacc,
     esLimitado: parseBoolean(getCell(row, "esLimitado", "es limitado", "es_limitado")),
@@ -279,7 +286,9 @@ export const normalizeSinTaccProduct = (row) => {
     precio,
     categoria: "Sin TACC",
     imagen: normalizeText(getCell(row, "Imagen", "imagen")),
-    disponible: true,
+    disponible: parseAvailability(getCell(row, "Disponible", "disponible", "Estado", "estado")),
+    stock: parseStock(getCell(row, "Stock", "stock")),
+    reservado: parseBoolean(getCell(row, "Reservado", "reservado")),
     destacado: false,
     sinTacc: true,
     esLimitado: false,
@@ -302,7 +311,7 @@ export const normalizePostre = (row) => {
     nombre,
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     imagen: normalizeText(getCell(row, "Imagen", "imagen")),
-    disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
+    disponible: parseBoolean(getCell(row, "Disponible", "disponible", "Estado", "estado"), true),
     destacado: parseBoolean(getCell(row, "Destacado", "destacado")),
     etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta")),
     notas: normalizeText(getCell(row, "Notas", "notas"))
@@ -320,7 +329,7 @@ export const normalizePostreTamano = (row) => {
     nombre,
     porciones: normalizeText(getCell(row, "Porciones", "porciones")),
     precioEstimado,
-    disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
+    disponible: parseBoolean(getCell(row, "Disponible", "disponible", "Estado", "estado"), true),
     notas: normalizeText(getCell(row, "Notas", "notas"))
   };
 };
@@ -386,7 +395,9 @@ export const normalizeSpecialProduct = (row) => {
     precio,
     categoria: "Especial",
     imagen: normalizeText(getCell(row, "Imagen", "imagen")),
-    disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
+    disponible: parseBoolean(getCell(row, "Disponible", "disponible", "Estado", "estado"), true),
+    stock: parseStock(getCell(row, "Stock", "stock")),
+    reservado: parseBoolean(getCell(row, "Reservado", "reservado")),
     destacado: false,
     sinTacc: false,
     esLimitado: true,

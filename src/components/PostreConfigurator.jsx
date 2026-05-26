@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { X, ShoppingBag } from "lucide-react";
 import { postresSizes } from "../data/postresData.js";
 
+// Componente legado no montado actualmente; PostresSection usa los tamaños resueltos desde App.
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-AR", {
     style: "currency",

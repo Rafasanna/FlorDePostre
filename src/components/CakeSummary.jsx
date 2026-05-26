@@ -18,21 +18,36 @@ function CakeSummary({
   rellenos = fallbackRellenos,
   tortaExtras = fallbackTortaExtras
 }) {
-  const getCobertura = (id) => coberturas.find(c => c.id === id);
-  const getSize = (id) => tortaSizes.find(s => s.id === id);
-  const getRellenos = (ids) => ids.map(id => rellenos.find(r => r.id === id)).filter(Boolean);
-  const getExtras = (ids) => ids.map(id => tortaExtras.find(e => e.id === id)).filter(Boolean);
+  const safeConfig = config || {};
+  const safeCoberturas = Array.isArray(coberturas) ? coberturas : [];
+  const safeTortaSizes = Array.isArray(tortaSizes) ? tortaSizes : [];
+  const safeRellenos = Array.isArray(rellenos) ? rellenos : [];
+  const safeTortaExtras = Array.isArray(tortaExtras) ? tortaExtras : [];
+  const selectedRellenos = Array.isArray(safeConfig.rellenosSeleccionados) ? safeConfig.rellenosSeleccionados : [];
+  const selectedExtras = Array.isArray(safeConfig.extrasSeleccionados) ? safeConfig.extrasSeleccionados : [];
 
-  const cobertura = getCobertura(config.cobertura);
-  const size = getSize(config.size);
-  const rellenosList = getRellenos(config.rellenosSeleccionados);
-  const extrasList = getExtras(config.extrasSeleccionados);
+  const getCobertura = (id) => safeCoberturas.find(c => c.id === id);
+  const getSize = (id) => safeTortaSizes.find(s => s.id === id);
+  const getRellenos = (ids) => ids.map(id => safeRellenos.find(r => r.id === id)).filter(Boolean);
+  const getExtras = (ids) => ids.map(id => safeTortaExtras.find(e => e.id === id)).filter(Boolean);
 
-  let precioEstimado = size.precioBaseEstimado;
-  rellenosList.forEach(r => precioEstimado += r.precioExtra);
-  extrasList.forEach(e => precioEstimado += e.precioExtra);
+  const cobertura = getCobertura(safeConfig.cobertura);
+  const size = getSize(safeConfig.size);
+  const rellenosList = getRellenos(selectedRellenos);
+  const extrasList = getExtras(selectedExtras);
+
+  let precioEstimado = Number.isFinite(size?.precioBaseEstimado) ? size.precioBaseEstimado : 0;
+  rellenosList.forEach(r => {
+    precioEstimado += Number.isFinite(r.precioExtra) ? r.precioExtra : 0;
+  });
+  extrasList.forEach(e => {
+    precioEstimado += Number.isFinite(e.precioExtra) ? e.precioExtra : 0;
+  });
+  const canAddToCart = Boolean(size && cobertura && Number.isFinite(precioEstimado));
 
   const handleSend = () => {
+    if (!canAddToCart) return;
+
     const cartItem = {
       type: 'torta',
       product: { id: 'torta-personalizada' },
@@ -46,8 +61,8 @@ function CakeSummary({
         sizeName: size.nombre,
         rellenos: rellenosList,
         extras: extrasList,
-        date: config.date,
-        comments: config.comments
+        date: safeConfig.date,
+        comments: safeConfig.comments
       }
     };
 
@@ -73,11 +88,11 @@ function CakeSummary({
           <div className="summary-card">
             <div className="summary-row">
               <span className="summary-label">Cobertura</span>
-              <span className="summary-value">{cobertura?.nombre}</span>
+              <span className="summary-value">{cobertura?.nombre || ""}</span>
             </div>
             <div className="summary-row">
               <span className="summary-label">Tamaño</span>
-              <span className="summary-value">{size?.nombre}</span>
+              <span className="summary-value">{size?.nombre || ""}</span>
             </div>
             
             {rellenosList.length > 0 && (
@@ -100,7 +115,7 @@ function CakeSummary({
 
             <div className="summary-row">
               <span className="summary-label">Fecha</span>
-              <span className="summary-value">{config.date}</span>
+              <span className="summary-value">{safeConfig.date || ""}</span>
             </div>
           </div>
 
@@ -119,7 +134,7 @@ function CakeSummary({
             <button className="secondary-button" onClick={onEdit} style={{ flex: 'none', padding: '12px' }}>
               <Edit2 size={18} />
             </button>
-            <button className="primary-button whatsapp-button" onClick={handleSend} style={{ flex: 1 }}>
+            <button className="primary-button whatsapp-button" onClick={handleSend} disabled={!canAddToCart} style={{ flex: 1 }}>
               <ShoppingBag size={18} />
               Agregar a Mi pedido
             </button>

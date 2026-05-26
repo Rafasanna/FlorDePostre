@@ -1,7 +1,19 @@
 import { useEffect } from "react";
 import { Minus, Plus, Send, Trash2, X } from "lucide-react";
 
-function CartDrawer({ isOpen, onClose, items, total, onQuantityChange, onRemoveItem, onClear, whatsappHref, formatPrice }) {
+function CartDrawer({
+  isOpen,
+  onClose,
+  items,
+  total,
+  onQuantityChange,
+  onRemoveItem,
+  onClear,
+  whatsappHref,
+  getWhatsappHref,
+  validationMessage,
+  formatPrice
+}) {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -142,16 +154,22 @@ function CartDrawer({ isOpen, onClose, items, total, onQuantityChange, onRemoveI
                 e.preventDefault();
                 return;
               }
-              // Intercept click to append aclaraciones to href
               const aclaraciones = document.getElementById('cart-aclaraciones')?.value || '';
-              if (aclaraciones) {
-                e.currentTarget.href = whatsappHref.replace('Aclaraciones:', `Aclaraciones: ${encodeURIComponent(aclaraciones)}`);
+              const href = getWhatsappHref?.(aclaraciones) || null;
+              if (!href) {
+                e.preventDefault();
+                return;
               }
+              e.preventDefault();
+              window.open(href, "_blank", "noopener,noreferrer");
             }}
           >
             <Send size={18} />
             Pedir por WhatsApp
           </a>
+          {validationMessage && (
+            <p className="help-text">{validationMessage}</p>
+          )}
         </div>
       </aside>
     </>

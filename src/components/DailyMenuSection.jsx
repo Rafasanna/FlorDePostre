@@ -16,7 +16,8 @@ function DailyMenuSection({
   campaign,
   categoryRequest,
   products = dailyProducts,
-  isUsingSheetProducts = false
+  isUsingSheetProducts = false,
+  sheetsNotice = ""
 }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [showAllProducts, setShowAllProducts] = useState(false);
@@ -79,6 +80,7 @@ function DailyMenuSection({
         <p>
           Seleccioná productos de stock diario, revisá el resumen y enviá el pedido por WhatsApp.
         </p>
+        {sheetsNotice && <p className="help-text">{sheetsNotice}</p>}
       </div>
 
       <CategoryFilter

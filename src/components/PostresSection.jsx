@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CalendarDays, MessageCircle, ShoppingBag, Sparkle } from "lucide-react";
 import { postresBase } from "../data/postresData.js";
@@ -51,12 +51,20 @@ ${date || "A definir"}
 };
 
 function PostreImage({ postre, large = false }) {
-  if (postre.imagen) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasImage = Boolean(postre.imagen) && !imageFailed;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [postre.imagen]);
+
+  if (hasImage) {
     return (
       <img
         src={postre.imagen}
         alt={postre.nombre}
         loading={large ? "eager" : "lazy"}
+        onError={() => setImageFailed(true)}
       />
     );
   }

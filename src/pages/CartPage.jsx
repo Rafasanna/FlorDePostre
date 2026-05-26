@@ -1,7 +1,17 @@
 import { Minus, Plus, Send, Trash2 } from "lucide-react";
 import BackLink from "../components/BackLink.jsx";
 
-function CartPage({ items, total, onQuantityChange, onRemoveItem, onClear, whatsappHref, formatPrice }) {
+function CartPage({
+  items,
+  total,
+  onQuantityChange,
+  onRemoveItem,
+  onClear,
+  whatsappHref,
+  getWhatsappHref,
+  validationMessage,
+  formatPrice
+}) {
   const renderConfigDetails = (item) => {
     if (item.type === "daily" || !item.configuracion) return null;
 
@@ -96,12 +106,27 @@ function CartPage({ items, total, onQuantityChange, onRemoveItem, onClear, whats
             rel="noreferrer"
             aria-disabled={items.length === 0}
             onClick={(event) => {
-              if (items.length === 0) event.preventDefault();
+              if (items.length === 0) {
+                event.preventDefault();
+                return;
+              }
+
+              const href = getWhatsappHref?.() || null;
+              if (!href) {
+                event.preventDefault();
+                return;
+              }
+
+              event.preventDefault();
+              window.open(href, "_blank", "noopener,noreferrer");
             }}
           >
             <Send size={18} />
             Pedir por WhatsApp
           </a>
+          {validationMessage && (
+            <p className="help-text">{validationMessage}</p>
+          )}
         </div>
       </div>
     </section>

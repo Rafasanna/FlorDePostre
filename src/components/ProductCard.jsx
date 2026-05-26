@@ -1,14 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Sparkle, Check } from "lucide-react";
 import ProductBadge from "./ProductBadge.jsx";
 import PromoBadge from "./PromoBadge.jsx";
 import { getProductBadges, hasActiveOffer } from "../utils/seasonal.js";
 
+const isProductOrderable = (product) => {
+  const stock = Number.isFinite(product?.stock) ? product.stock : null;
+  return product?.disponible !== false && product?.reservado !== true && (stock === null || stock > 0);
+};
+
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const [justAdded, setJustAdded] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const badges = getProductBadges(product);
+  const hasImage = Boolean(product.imagen) && !imageFailed;
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [product.imagen]);
 
   const handleAdd = () => {
+    if (!isProductOrderable(product)) return;
+
     onAdd(product);
     setJustAdded(true);
     setTimeout(() => {
@@ -18,9 +31,9 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
 
   return (
     <article className="product-card">
-      <div className={product.imagen ? "product-media" : "product-media placeholder"}>
-        {product.imagen ? (
-          <img src={product.imagen} alt={product.nombre} />
+      <div className={hasImage ? "product-media" : "product-media placeholder"}>
+        {hasImage ? (
+          <img src={product.imagen} alt={product.nombre} onError={() => setImageFailed(true)} />
         ) : (
           <div className="placeholder-content">
             <Sparkle size={26} />
