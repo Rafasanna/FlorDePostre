@@ -92,7 +92,7 @@ function CartDrawer({
               <div className="cart-item" key={item.cartItemId} style={{ alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, paddingRight: '12px' }}>
                   <h3>{item.nombre}</h3>
-                  <p>{formatPrice(item.precio)} c/u</p>
+                  <p>{formatPrice(item.precio)}{item.type === 'daily' ? ' c/u' : ''}</p>
                   {renderConfigDetails(item)}
                 </div>
                 {item.type === 'daily' ? (

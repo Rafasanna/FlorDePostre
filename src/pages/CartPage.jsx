@@ -51,7 +51,7 @@ function CartPage({
                 <article className="cart-item page-cart-item" key={item.cartItemId}>
                   <div>
                     <h3>{item.nombre}</h3>
-                    <p>{formatPrice(item.precio)} c/u</p>
+                    <p>{formatPrice(item.precio)}{item.type === "daily" ? " c/u" : ""}</p>
                     {renderConfigDetails(item)}
                   </div>
 
@@ -87,9 +87,11 @@ function CartPage({
               ))}
             </div>
 
-            <button className="secondary-button" type="button" onClick={onClear}>
-              Vaciar pedido
-            </button>
+            <div className="cart-page-actions">
+              <button className="secondary-button" type="button" onClick={onClear}>
+                Vaciar pedido
+              </button>
+            </div>
           </>
         )}
 
