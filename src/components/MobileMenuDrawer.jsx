@@ -29,7 +29,7 @@ function MobileMenuDrawer({ isOpen, onClose }) {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 0',
+    padding: '14px 12px',
     borderBottom: '1px solid rgba(232, 215, 198, 0.3)',
     color: 'var(--cocoa)',
     textDecoration: 'none',
@@ -73,9 +73,9 @@ function MobileMenuDrawer({ isOpen, onClose }) {
         <div className="cart-items" style={{ padding: '16px 24px' }}>
           <nav style={{ display: 'flex', flexDirection: 'column' }}>
             {navItems.map((item) => (
-              <Link key={item.to} style={navItemStyle} to={item.to} onClick={onClose}>
+              <Link className="mobile-menu-nav-item" key={item.to} style={navItemStyle} to={item.to} onClick={onClose}>
                 <span>{item.label}</span>
-                <ChevronRight size={18} color="var(--rose-500)" />
+                <ChevronRight size={18} />
               </Link>
             ))}
           </nav>

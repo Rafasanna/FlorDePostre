@@ -220,9 +220,6 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
           </div>
         </article>
 
-        <p className="product-disclaimer">
-          Las imágenes son ilustrativas. Al tratarse de productos artesanales, pueden existir pequeñas variaciones en presentación, decoración o detalles. 🌸
-        </p>
       </section>
     );
   }
@@ -278,9 +275,6 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
         ))}
       </div>
 
-      <p className="product-disclaimer">
-        Las imágenes son ilustrativas. Al tratarse de productos artesanales, pueden existir pequeñas variaciones en presentación, decoración o detalles. 🌸
-      </p>
     </section>
   );
 }

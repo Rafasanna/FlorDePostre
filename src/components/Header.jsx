@@ -27,10 +27,11 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
 
       <div className="nav-actions">
         <div className="nav-links">
-          <button type="button" onClick={onOpenDailyMenu}>Menú</button>
-          <NavLink to="/pedido">
+          <button className="daily-menu-link" type="button" onClick={onOpenDailyMenu}>Menú</button>
+          <NavLink className="cart-link" to="/pedido">
             <ShoppingBag size={16} />
-            Mi pedido {itemCount > 0 && <span>({itemCount})</span>}
+            <span className="cart-label">Mi pedido</span>
+            {itemCount > 0 && <span className="cart-count">({itemCount})</span>}
           </NavLink>
         </div>
         

@@ -152,9 +152,6 @@ function DailyMenuSection({
         </div>
       )}
 
-      <p className="product-disclaimer">
-        Las imágenes son ilustrativas. Al tratarse de productos artesanales, pueden existir pequeñas variaciones en presentación, decoración o detalles. 🌸
-      </p>
     </section>
   );
 }

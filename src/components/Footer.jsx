@@ -1,9 +1,11 @@
 import { Clock, Instagram, MapPin, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import { INSTAGRAM_URL, WHATSAPP_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
 const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2075";
-const RAFAELA_WHATSAPP_URL = "https://wa.me/5493446608118?text=Hola%20Rafa!%20Estoy%20interesado%20en%20una%20pagina%20web%20para%20mi%20negocio..";
+const RAFAELA_WHATSAPP_MESSAGE = "¡Hola Rafaela! Vi tu trabajo en Flor de Postre y me gustaría consultarte por una página web 😊";
+const RAFAELA_WHATSAPP_URL = `https://wa.me/54344660818?text=${encodeURIComponent(RAFAELA_WHATSAPP_MESSAGE)}`;
 
 function Footer() {
   return (
@@ -48,9 +50,15 @@ function Footer() {
         </a>
       </div>
 
+      <nav className="footer-legal" aria-label="Enlaces legales">
+        <Link to="/terminos-y-condiciones">Términos y condiciones</Link>
+        <span aria-hidden="true">·</span>
+        <Link to="/politicas-de-privacidad">Políticas de privacidad</Link>
+      </nav>
+
       <p className="footer-credits">
-        Pagina diseñada y desarrollada por{" "}
-        <a href={RAFAELA_WHATSAPP_URL} target="_blank" rel="noreferrer">
+        Diseño & desarrollo web ·{" "}
+        <a href={RAFAELA_WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
           Rafaela Sanna
         </a>
       </p>

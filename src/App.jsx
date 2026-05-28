@@ -34,6 +34,7 @@ import Footer from "./components/Footer.jsx";
 import ProductSearchModal from "./components/ProductSearchModal.jsx";
 import ComoPedirPage from "./pages/ComoPedirPage.jsx";
 import CartPage from "./pages/CartPage.jsx";
+import LegalPage from "./pages/LegalPage.jsx";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -609,6 +610,8 @@ function App() {
             element={<PostresSection postres={postresProductsFinal} formatPrice={formatPrice} onAddToCart={addToCart} />}
           />
           <Route path="/sobre" element={<AboutSection />} />
+          <Route path="/terminos-y-condiciones" element={<LegalPage title="Términos y condiciones" />} />
+          <Route path="/politicas-de-privacidad" element={<LegalPage title="Políticas de privacidad" />} />
           <Route
             path="*"
             element={
