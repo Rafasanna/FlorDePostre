@@ -216,6 +216,33 @@ img {
   color: var(--cocoa);
 }
 
+.mobile-header-actions {
+  display: none;
+}
+
+.mobile-cart-link {
+  position: relative;
+}
+
+.mobile-cart-count {
+  align-items: center;
+  background: var(--rose-500);
+  border: 1px solid var(--white);
+  border-radius: 999px;
+  color: var(--white);
+  display: inline-flex;
+  font-size: 0.68rem;
+  font-weight: 800;
+  height: 17px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 17px;
+  padding: 0 4px;
+  position: absolute;
+  right: -2px;
+  top: -3px;
+}
+
 .hero-content {
   align-items: center;
   display: grid;
@@ -2448,10 +2475,11 @@ h1 {
 /* Campaigns and monthly maintenance */
 .campaign-banner {
   align-items: center;
-  background: #CFEAF7;
-  border-block: 1px solid rgba(255, 255, 255, 0.72);
+  background: var(--campaign-background, var(--rose-soft));
+  border-block: 1px solid var(--campaign-accent, var(--rose-old));
   border-radius: 0;
   box-shadow: none;
+  color: var(--campaign-text, var(--cocoa));
   display: flex;
   gap: 14px;
   justify-content: space-between;
@@ -2473,9 +2501,21 @@ h1 {
   min-width: 0;
 }
 
+.campaign-banner-copy > span {
+  align-items: center;
+  background: var(--campaign-badge, var(--rose-pastel));
+  border: 1px solid var(--campaign-accent, var(--rose-old));
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
 .campaign-banner-copy p {
   align-items: center;
-  color: var(--cocoa);
+  color: var(--campaign-text, var(--cocoa));
   display: flex;
   flex-wrap: wrap;
   font-size: 0.88rem;
@@ -2485,16 +2525,16 @@ h1 {
 }
 
 .campaign-banner-copy strong {
-  color: var(--cocoa);
+  color: var(--campaign-text, var(--cocoa));
   font-weight: 800;
 }
 
 .campaign-banner-link {
   align-items: center;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(127, 183, 217, 0.48);
+  background: var(--campaign-badge, var(--rose-pastel));
+  border: 1px solid var(--campaign-accent, var(--rose-old));
   border-radius: 999px;
-  color: var(--cocoa);
+  color: var(--campaign-text, var(--cocoa));
   display: inline-flex;
   flex: 0 0 auto;
   font-size: 0.84rem;
@@ -2505,12 +2545,12 @@ h1 {
 }
 
 .campaign-banner-link:hover {
-  background: rgba(177, 186, 149, 0.16);
+  background: var(--campaign-accent, var(--rose-old));
   transform: translateY(-1px);
 }
 
 .campaign-banner-patrio-sutil {
-  background: #CFEAF7;
+  background: var(--campaign-background, var(--rose-soft));
 }
 
 .featured-products {
@@ -3208,6 +3248,24 @@ a.breakfast-price:active {
     justify-self: end;
   }
 
+  .desktop-header-actions {
+    display: none;
+  }
+
+  .mobile-header-actions {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+    justify-self: end;
+  }
+
+  .mobile-search-trigger,
+  .mobile-cart-link {
+    height: 42px;
+    min-height: 42px;
+    width: 42px;
+  }
+
   .nav-links {
     gap: 4px;
     padding: 4px;
@@ -3485,6 +3543,20 @@ a.breakfast-price:active {
     gap: 4px;
     margin-left: auto;
     z-index: 3;
+  }
+
+  .mobile-header-actions {
+    flex: 0 0 auto;
+    gap: 4px;
+    margin-left: auto;
+    z-index: 3;
+  }
+
+  .mobile-search-trigger,
+  .mobile-cart-link {
+    height: 40px;
+    min-height: 40px;
+    width: 40px;
   }
 
   .search-trigger {

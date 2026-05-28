@@ -25,7 +25,7 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
         <BrandMark variant="official" className="header-logo" />
       </Link>
 
-      <div className="nav-actions">
+      <div className="nav-actions desktop-header-actions">
         <div className="nav-links">
           <button className="daily-menu-link" type="button" onClick={onOpenDailyMenu}>Menú</button>
           <NavLink className="cart-link" to="/pedido">
@@ -38,6 +38,16 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
         <button className="icon-button search-trigger" type="button" onClick={onOpenSearch} aria-label="Buscar productos">
           <Search size={18} />
         </button>
+      </div>
+
+      <div className="mobile-header-actions">
+        <button className="icon-button mobile-search-trigger" type="button" onClick={onOpenSearch} aria-label="Buscar productos">
+          <Search size={18} />
+        </button>
+        <NavLink className="icon-button mobile-cart-link" to="/pedido" aria-label="Ver mi pedido">
+          <ShoppingBag size={18} />
+          {itemCount > 0 && <span className="mobile-cart-count">{itemCount}</span>}
+        </NavLink>
       </div>
     </nav>
   );

@@ -66,6 +66,22 @@ const parseStock = (value) => {
   return stock === null ? null : stock;
 };
 
+const CAMPAIGN_COLOR_FALLBACKS = {
+  fondo: "#FFE5EE",
+  texto: "#4B342F",
+  acento: "#F0BBDC",
+  badge: "#FFCFED"
+};
+
+const parseHexColor = (value, fallback) => {
+  const normalized = normalizeText(value);
+  const match = normalized.match(/^#([0-9a-f]{6})$/i);
+
+  if (!match) return fallback;
+
+  return normalized.toUpperCase();
+};
+
 const REQUIRED_DAILY_HEADERS = [
   "ID interno (no tocar)",
   "Categoría",
@@ -359,6 +375,12 @@ export const normalizeCampaign = (row) => {
   const descripcion = normalizeText(getCell(row, "Descripción", "descripcion")) || bannerText;
   const color = normalizeText(getCell(row, "Color sugerido", "color"));
   const decoracion = normalizeText(getCell(row, "Decoración", "decoracion"));
+  const colors = {
+    fondo: parseHexColor(getCell(row, "Color fondo HEX", "Color fondo", "colorFondoHex", "color_fondo_hex"), CAMPAIGN_COLOR_FALLBACKS.fondo),
+    texto: parseHexColor(getCell(row, "Color texto HEX", "Color texto", "colorTextoHex", "color_texto_hex"), CAMPAIGN_COLOR_FALLBACKS.texto),
+    acento: parseHexColor(getCell(row, "Color acento HEX", "Color acento", "colorAcentoHex", "color_acento_hex"), CAMPAIGN_COLOR_FALLBACKS.acento),
+    badge: parseHexColor(getCell(row, "Color badge HEX", "Color badge", "colorBadgeHex", "color_badge_hex"), CAMPAIGN_COLOR_FALLBACKS.badge)
+  };
 
   return {
     id: slugify(evento),
@@ -371,6 +393,7 @@ export const normalizeCampaign = (row) => {
     titulo,
     descripcion,
     color,
+    colors,
     decoracion,
     notas: normalizeText(getCell(row, "Notas", "notas")),
     textoBoton: "",
