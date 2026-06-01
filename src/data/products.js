@@ -22,7 +22,7 @@ export const products = [
     descripcion: "Alfajor tradicional santafesino relleno de dulce de leche, bañado en glasé.",
     precio: 4500,
     categoria: "Alfajores",
-    imagen: "/images/carousel-1.jpg"
+    imagen: "/images/home-carousel/home-1.jpg"
   },
   {
     id: "alfa-triple-brownie",
@@ -30,7 +30,7 @@ export const products = [
     descripcion: "Relleno de dulce de leche y café.",
     precio: 4900,
     categoria: "Alfajores",
-    imagen: "/images/carousel-2.jpg"
+    imagen: "/images/home-carousel/home-2.jpg"
   },
   {
     id: "alfajor-pistacho",
@@ -38,7 +38,7 @@ export const products = [
     descripcion: "Chocolate blanco y frutos rojos.",
     precio: 5200,
     categoria: "Alfajores",
-    imagen: "/images/carousel-3.jpg"
+    imagen: "/images/home-carousel/home-3.jpg"
   },
   {
     id: "alfajor-nutella-mani",
@@ -46,7 +46,7 @@ export const products = [
     descripcion: "Alfajor de cacao, relleno con Nutella y cubierto con trozos de maní.",
     precio: 5000,
     categoria: "Alfajores",
-    imagen: "/images/carousel-4.jpg"
+    imagen: "/images/home-carousel/home-4.jpg"
   },
   {
     id: "alfajor-coco-dulce-leche",
@@ -54,7 +54,7 @@ export const products = [
     descripcion: "Alfajor artesanal con masa de coco y dulce de leche.",
     precio: 4900,
     categoria: "Alfajores",
-    imagen: "/images/carousel-5.jpg"
+    imagen: "/images/home-carousel/home-5.jpg"
   },
   {
     id: "cookie-chips-chocolate",

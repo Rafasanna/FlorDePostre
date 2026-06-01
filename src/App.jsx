@@ -57,14 +57,8 @@ const dedupeProductsById = (products) => {
   });
 };
 
-const getProductStock = (product) => (Number.isFinite(product?.stock) ? product.stock : null);
-
-const isProductOrderable = (product, quantity = 1) => {
-  if (!product || product.disponible === false || product.reservado === true) return false;
-
-  const stock = getProductStock(product);
-  return stock === null || stock >= quantity;
-};
+const isProductOrderable = (product) =>
+  Boolean(product) && product.disponible !== false && product.reservado !== true;
 
 const withSpecialProducts = (campaignItems, specialProducts) =>
   campaignItems.map((campaign) => {
@@ -321,7 +315,7 @@ function App() {
 
     if (item.type === "daily") {
       const currentProduct = cartCatalog.dailyById.get(item.product?.id);
-      if (!isProductOrderable(currentProduct, item.quantity)) return null;
+      if (!isProductOrderable(currentProduct)) return null;
 
       const currentPrice = getEffectivePrice(currentProduct);
       if (!Number.isFinite(currentPrice)) return null;
@@ -399,14 +393,6 @@ function App() {
     if (productObj.type === "postre" && !isProductOrderable(productObj.product)) {
       setCartValidationMessage("Este producto no está disponible para agregar al carrito.");
       return;
-    }
-
-    if (productObj.type === "daily") {
-      const existing = cartItems.find(item => item.product.id === productObj.product.id && item.type === "daily");
-      if (existing && !isProductOrderable(productObj.product, existing.quantity + 1)) {
-        setCartValidationMessage("Este producto no está disponible para agregar al carrito.");
-        return;
-      }
     }
 
     setCartValidationMessage("");

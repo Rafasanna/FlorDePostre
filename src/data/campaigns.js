@@ -24,7 +24,7 @@ export const campaigns = [
     id: "mock-aniversario",
     titulo: "Aniversario Flor de Postre",
     descripcion: "Espacio listo para comunicar promociones, lanzamientos o regalos especiales.",
-    imagen: "/images/carousel-5.jpg",
+    imagen: "/images/home-carousel/home-5.jpg",
     activa: false,
     fechaInicio: "2026-08-01",
     fechaFin: "2026-08-15",

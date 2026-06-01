@@ -7,10 +7,8 @@ import { getProductImages } from "../utils/productImages.js";
 
 const SLIDESHOW_INTERVAL_MS = 4000;
 
-const isProductOrderable = (product) => {
-  const stock = Number.isFinite(product?.stock) ? product.stock : null;
-  return product?.disponible !== false && product?.reservado !== true && (stock === null || stock > 0);
-};
+const isProductOrderable = (product) =>
+  Boolean(product) && product.disponible !== false && product.reservado !== true;
 
 const preloadProductImage = (src) =>
   new Promise((resolve, reject) => {

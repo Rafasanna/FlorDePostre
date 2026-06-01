@@ -25,11 +25,11 @@ const productDefaults = {
 };
 
 const baseDailyProducts = [
-  { id: "alfajor-santafesino", nombre: "Alfajor santafesino", descripcion: "Alfajor tradicional santafesino relleno de dulce de leche, bañado en glasé.", precio: 4500, categoria: "Alfajores", imagen: "/images/carousel-1.jpg", destacado: true },
-  { id: "alfa-triple-brownie", nombre: "Alfa triple brownie", descripcion: "Relleno de dulce de leche y café.", precio: 4900, categoria: "Alfajores", imagen: "/images/carousel-2.jpg", precioAnterior: 5600, precioOferta: 4900, tipoOferta: "Precio especial", destacado: true },
-  { id: "alfajor-pistacho", nombre: "Alfajor de pistacho", descripcion: "Chocolate blanco y frutos rojos.", precio: 5200, categoria: "Alfajores", imagen: "/images/carousel-3.jpg", destacado: true, esLimitado: true, etiqueta: "Edición limitada" },
-  { id: "alfajor-nutella-mani", nombre: "Alfajor Nutella y maní", descripcion: "Alfajor de cacao, relleno con Nutella y cubierto con trozos de maní.", precio: 5000, categoria: "Alfajores", imagen: "/images/carousel-4.jpg" },
-  { id: "alfajor-coco-dulce-leche", nombre: "Alfajor de coco y dulce de leche", descripcion: "Alfajor artesanal con masa de coco y dulce de leche.", precio: 4900, categoria: "Alfajores", imagen: "/images/carousel-5.jpg", etiqueta: "Nuevo" },
+  { id: "alfajor-santafesino", nombre: "Alfajor santafesino", descripcion: "Alfajor tradicional santafesino relleno de dulce de leche, bañado en glasé.", precio: 4500, categoria: "Alfajores", imagen: "/images/home-carousel/home-1.jpg", destacado: true },
+  { id: "alfa-triple-brownie", nombre: "Alfa triple brownie", descripcion: "Relleno de dulce de leche y café.", precio: 4900, categoria: "Alfajores", imagen: "/images/home-carousel/home-2.jpg", precioAnterior: 5600, precioOferta: 4900, tipoOferta: "Precio especial", destacado: true },
+  { id: "alfajor-pistacho", nombre: "Alfajor de pistacho", descripcion: "Chocolate blanco y frutos rojos.", precio: 5200, categoria: "Alfajores", imagen: "/images/home-carousel/home-3.jpg", destacado: true, esLimitado: true, etiqueta: "Edición limitada" },
+  { id: "alfajor-nutella-mani", nombre: "Alfajor Nutella y maní", descripcion: "Alfajor de cacao, relleno con Nutella y cubierto con trozos de maní.", precio: 5000, categoria: "Alfajores", imagen: "/images/home-carousel/home-4.jpg" },
+  { id: "alfajor-coco-dulce-leche", nombre: "Alfajor de coco y dulce de leche", descripcion: "Alfajor artesanal con masa de coco y dulce de leche.", precio: 4900, categoria: "Alfajores", imagen: "/images/home-carousel/home-5.jpg", etiqueta: "Nuevo" },
   { id: "brownie-sin-tacc", nombre: "Brownie Sin TACC", descripcion: "Producto preparado para el catálogo Sin TACC. Confirmar disponibilidad del día.", precio: 5200, categoria: "Otros dulces", imagen: "", sinTacc: true, destacado: true, etiqueta: "Sin TACC" },
   { id: "cookie-chips-chocolate", nombre: "Cookie chips de chocolate", descripcion: "Galleta clásica estilo New York con abundantes chips de chocolate.", precio: 3500, categoria: "Cookies", imagen: "" },
   { id: "cookie-red-velvet", nombre: "Cookie Red Velvet", descripcion: "Cookie roja aterciopelada con centro de chocolate blanco.", precio: 3800, categoria: "Cookies", imagen: "" },

@@ -13,17 +13,26 @@ function ProductSearchModal({
 }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
+  const focusTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // Pequeño delay para asegurar que el modal renderizó
-      setTimeout(() => inputRef.current?.focus(), 100);
+      focusTimeoutRef.current = window.setTimeout(() => {
+        inputRef.current?.focus();
+        focusTimeoutRef.current = null;
+      }, 100);
     } else {
       document.body.style.overflow = '';
       setQuery("");
     }
-    return () => { document.body.style.overflow = ''; }
+    return () => {
+      if (focusTimeoutRef.current) {
+        window.clearTimeout(focusTimeoutRef.current);
+        focusTimeoutRef.current = null;
+      }
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   const results = useMemo(() => {
@@ -80,12 +89,14 @@ function ProductSearchModal({
           {results.length > 0 && (
             <ul className="search-list">
               {results.map((result, idx) => (
-                <li key={idx} onClick={() => onSelectResult(result)}>
-                  <div className="result-info">
-                    <strong>{result.nombre}</strong>
-                    <small>{result.label} • {result.descripcion}</small>
-                  </div>
-                  <ChevronRight size={18} className="result-arrow" />
+                <li key={idx}>
+                  <button type="button" onClick={() => onSelectResult(result)}>
+                    <div className="result-info">
+                      <strong>{result.nombre}</strong>
+                      <small>{result.label} • {result.descripcion}</small>
+                    </div>
+                    <ChevronRight size={18} className="result-arrow" />
+                  </button>
                 </li>
               ))}
             </ul>
