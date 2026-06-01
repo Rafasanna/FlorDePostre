@@ -2704,6 +2704,38 @@ h1 {
   line-height: 1.6;
 }
 
+.legal-content {
+  display: grid;
+  gap: 14px;
+  margin: 0 auto;
+  max-width: 860px;
+}
+
+.legal-block {
+  background: rgba(255, 254, 253, 0.84);
+  border: 1px solid rgba(240, 187, 220, 0.34);
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  padding: clamp(18px, 3vw, 24px);
+}
+
+.legal-block h3 {
+  color: var(--cocoa);
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 2vw, 1.35rem);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.legal-block p {
+  color: var(--cocoa-soft);
+  font-size: 0.96rem;
+  line-height: 1.68;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .page-cart {
   margin: 0 auto;
   max-width: 780px;
