@@ -856,6 +856,35 @@ h1 {
   transform: scale(1.04);
 }
 
+.product-image-dots {
+  align-items: center;
+  background: rgba(255, 254, 253, 0.78);
+  border: 1px solid rgba(240, 187, 220, 0.42);
+  border-radius: 999px;
+  bottom: 12px;
+  box-shadow: 0 8px 18px rgba(77, 56, 47, 0.1);
+  display: flex;
+  gap: 5px;
+  padding: 6px 8px;
+  position: absolute;
+  right: 12px;
+  z-index: 2;
+}
+
+.product-image-dots span {
+  background: rgba(77, 56, 47, 0.26);
+  border-radius: 50%;
+  display: block;
+  height: 6px;
+  transition: background 180ms ease, transform 180ms ease;
+  width: 6px;
+}
+
+.product-image-dots span.active {
+  background: var(--rose-500);
+  transform: scale(1.25);
+}
+
 .product-media.placeholder {
   align-items: center;
   background:

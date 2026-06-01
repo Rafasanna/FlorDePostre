@@ -32,7 +32,7 @@ function ComoPedirPage() {
 
       <div className="como-pedir-note">
         <h4>Confirmación del pedido</h4>
-        <p>Todos los pedidos se coordinan y confirman personalmente por WhatsApp según disponibilidad, fecha y detalles del encargo.</p>
+        <p>Todos los pedidos se coordinan y confirman por WhatsApp o de manera presencial en el local, según disponibilidad, fecha y detalles del encargo.</p>
       </div>
     </section>
   );
