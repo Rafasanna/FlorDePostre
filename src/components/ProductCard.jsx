@@ -12,31 +12,51 @@ const isProductOrderable = (product) => {
   return product?.disponible !== false && product?.reservado !== true && (stock === null || stock > 0);
 };
 
+const preloadProductImage = (src) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      if (typeof image.decode === "function") {
+        image.decode().then(resolve).catch(resolve);
+        return;
+      }
+
+      resolve();
+    };
+    image.onerror = reject;
+    image.src = src;
+  });
+
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const cardRef = useRef(null);
   const addFeedbackTimeoutRef = useRef(null);
+  const isPreloadingNextImageRef = useRef(false);
   const [justAdded, setJustAdded] = useState(false);
-  const [imageFailed, setImageFailed] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [failedImages, setFailedImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isCardVisible, setIsCardVisible] = useState(false);
   const badges = getProductBadges(product);
   const productImages = useMemo(() => getProductImages(product), [product]);
   const imagesKey = productImages.join("|");
-  const hasMultipleImages = productImages.length > 1;
-  const activeImage = productImages[activeImageIndex] || productImages[0] || "";
-  const hasImage = Boolean(activeImage) && !imageFailed;
-
-  useEffect(() => {
-    setImageFailed(false);
-    setImageLoaded(false);
-  }, [activeImage]);
+  const failedImagesKey = failedImages.join("|");
+  const availableImages = useMemo(
+    () => productImages.filter((image) => !failedImages.includes(image)),
+    [failedImages, productImages]
+  );
+  const hasMultipleImages = availableImages.length > 1;
+  const activeImage = availableImages[activeImageIndex] || availableImages[0] || "";
+  const hasImage = Boolean(activeImage);
 
   useEffect(() => {
     setActiveImageIndex(0);
-    setImageFailed(false);
-    setImageLoaded(false);
+    setFailedImages([]);
   }, [imagesKey]);
+
+  useEffect(() => {
+    if (activeImageIndex >= availableImages.length) {
+      setActiveImageIndex(0);
+    }
+  }, [activeImageIndex, availableImages.length]);
 
   useEffect(() => {
     if (!hasMultipleImages) {
@@ -71,16 +91,60 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
   }, [hasMultipleImages, imagesKey]);
 
   useEffect(() => {
-    if (!hasMultipleImages || !isCardVisible || imageFailed) return undefined;
+    if (!hasMultipleImages || !isCardVisible) return undefined;
+
+    let isCancelled = false;
 
     const intervalId = window.setInterval(() => {
-      setActiveImageIndex((currentIndex) => (currentIndex + 1) % productImages.length);
+      if (isPreloadingNextImageRef.current) return;
+
+      const nextIndex = (activeImageIndex + 1) % availableImages.length;
+      const nextImage = availableImages[nextIndex];
+
+      if (!nextImage) return;
+
+      isPreloadingNextImageRef.current = true;
+      preloadProductImage(nextImage)
+        .then(() => {
+          if (!isCancelled) {
+            setActiveImageIndex(nextIndex);
+          }
+        })
+        .catch(() => {
+          if (isCancelled) return;
+
+          setFailedImages((currentImages) =>
+            currentImages.includes(nextImage) ? currentImages : [...currentImages, nextImage]
+          );
+        })
+        .finally(() => {
+          isPreloadingNextImageRef.current = false;
+        });
     }, SLIDESHOW_INTERVAL_MS);
 
     return () => {
+      isCancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [hasMultipleImages, imageFailed, isCardVisible, productImages.length]);
+  }, [activeImageIndex, availableImages, failedImagesKey, hasMultipleImages, isCardVisible]);
+
+  useEffect(() => {
+    if (!activeImage) return undefined;
+
+    let isCancelled = false;
+
+    preloadProductImage(activeImage).catch(() => {
+      if (!isCancelled) {
+        setFailedImages((currentImages) =>
+          currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
+        );
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeImage]);
 
   useEffect(() => () => {
     if (addFeedbackTimeoutRef.current) {
@@ -104,19 +168,21 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
 
   return (
     <article className="product-card" ref={cardRef}>
-      <div className={hasImage && imageLoaded ? "product-media" : "product-media placeholder"}>
+      <div className={hasImage ? "product-media" : "product-media placeholder"}>
         {hasImage && (
           <img 
             src={activeImage} 
             alt={product.nombre} 
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageFailed(true)} 
-            style={{ display: imageLoaded ? 'block' : 'none' }}
+            onError={() => {
+              setFailedImages((currentImages) =>
+                currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
+              );
+            }} 
           />
         )}
         {hasMultipleImages && hasImage && (
-          <div className="product-image-dots" aria-label={`${productImages.length} imágenes disponibles`}>
-            {productImages.map((image, index) => (
+          <div className="product-image-dots" aria-label={`${availableImages.length} imágenes disponibles`}>
+            {availableImages.map((image, index) => (
               <span
                 key={`${image}-${index}`}
                 className={index === activeImageIndex ? "active" : ""}
@@ -125,7 +191,7 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
             ))}
           </div>
         )}
-        {(!hasImage || !imageLoaded) && (
+        {!hasImage && (
           <div className="placeholder-content">
             <Sparkle size={26} />
             <span>Flor de Postre</span>
