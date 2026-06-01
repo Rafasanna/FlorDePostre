@@ -3,6 +3,7 @@ import { Plus, Sparkle, Check } from "lucide-react";
 import ProductBadge from "./ProductBadge.jsx";
 import PromoBadge from "./PromoBadge.jsx";
 import { getProductBadges, hasActiveOffer } from "../utils/seasonal.js";
+import { getPrimaryProductImage } from "../utils/productImages.js";
 
 const isProductOrderable = (product) => {
   const stock = Number.isFinite(product?.stock) ? product.stock : null;
@@ -14,12 +15,13 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const badges = getProductBadges(product);
-  const hasImage = Boolean(product.imagen) && !imageFailed;
+  const primaryImage = getPrimaryProductImage(product);
+  const hasImage = Boolean(primaryImage) && !imageFailed;
 
   useEffect(() => {
     setImageFailed(false);
     setImageLoaded(false);
-  }, [product.imagen]);
+  }, [primaryImage]);
 
   const handleAdd = () => {
     if (!isProductOrderable(product)) return;
@@ -36,7 +38,7 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
       <div className={hasImage && imageLoaded ? "product-media" : "product-media placeholder"}>
         {hasImage && (
           <img 
-            src={product.imagen} 
+            src={primaryImage} 
             alt={product.nombre} 
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageFailed(true)} 

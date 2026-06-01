@@ -1,5 +1,6 @@
-import { Minus, Plus, Send, Trash2 } from "lucide-react";
+import { Minus, Plus, Send, Sparkle, Trash2 } from "lucide-react";
 import BackLink from "../components/BackLink.jsx";
+import { getPrimaryProductImage } from "../utils/productImages.js";
 
 function CartPage({
   items,
@@ -30,6 +31,16 @@ function CartPage({
     );
   };
 
+  const renderItemImage = (item) => {
+    const image = item.imagen || getPrimaryProductImage(item.product);
+
+    return (
+      <div className={image ? "cart-item-image" : "cart-item-image placeholder"}>
+        {image ? <img src={image} alt={item.nombre} loading="lazy" /> : <Sparkle size={18} />}
+      </div>
+    );
+  };
+
   return (
     <section className="section page-section">
       <div className="section-heading">
@@ -49,10 +60,13 @@ function CartPage({
             <div className="page-cart-items">
               {items.map((item) => (
                 <article className="cart-item page-cart-item" key={item.cartItemId}>
-                  <div>
-                    <h3>{item.nombre}</h3>
-                    <p>{formatPrice(item.precio)}{item.type === "daily" ? " c/u" : ""}</p>
-                    {renderConfigDetails(item)}
+                  <div className="cart-item-main">
+                    {renderItemImage(item)}
+                    <div>
+                      <h3>{item.nombre}</h3>
+                      <p>{formatPrice(item.precio)}{item.type === "daily" ? " c/u" : ""}</p>
+                      {renderConfigDetails(item)}
+                    </div>
                   </div>
 
                   {item.type === "daily" ? (

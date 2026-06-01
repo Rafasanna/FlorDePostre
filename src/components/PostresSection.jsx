@@ -4,6 +4,7 @@ import { CalendarDays, MessageCircle, ShoppingBag, Sparkle } from "lucide-react"
 import { postresBase } from "../data/postresData.js";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
+import { getPrimaryProductImage, getProductImages } from "../utils/productImages.js";
 import BackLink from "./BackLink.jsx";
 
 const getAvailableSizes = (postre) => postre.sizes?.filter((size) => size.disponible !== false) || [];
@@ -53,18 +54,19 @@ ${date || "A definir"}
 function PostreImage({ postre, large = false }) {
   const [imageFailed, setImageFailed] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const hasImage = Boolean(postre.imagen) && !imageFailed;
+  const primaryImage = getPrimaryProductImage(postre);
+  const hasImage = Boolean(primaryImage) && !imageFailed;
 
   useEffect(() => {
     setImageFailed(false);
     setImageLoaded(false);
-  }, [postre.imagen]);
+  }, [primaryImage]);
 
   if (hasImage) {
     return (
       <>
         <img
-          src={postre.imagen}
+          src={primaryImage}
           alt={postre.nombre}
           loading={large ? "eager" : "lazy"}
           onLoad={() => setImageLoaded(true)}
@@ -86,6 +88,62 @@ function PostreImage({ postre, large = false }) {
       <Sparkle size={large ? 30 : 24} />
       <span>Flor de Postre</span>
     </div>
+  );
+}
+
+function PostreGallery({ postre }) {
+  const images = getProductImages(postre);
+  const imagesKey = images.join("|");
+  const [selectedImage, setSelectedImage] = useState(images[0] || "");
+  const [imageFailed, setImageFailed] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const hasImages = images.length > 0;
+
+  useEffect(() => {
+    setSelectedImage(images[0] || "");
+  }, [imagesKey]);
+
+  useEffect(() => {
+    setImageFailed(false);
+    setImageLoaded(false);
+  }, [selectedImage]);
+
+  if (!hasImages || imageFailed) {
+    return <PostreImage postre={postre} large />;
+  }
+
+  return (
+    <>
+      <img
+        src={selectedImage}
+        alt={postre.nombre}
+        loading="eager"
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setImageFailed(true)}
+        style={{ display: imageLoaded ? "block" : "none" }}
+      />
+      {!imageLoaded && (
+        <div className="postre-placeholder">
+          <Sparkle size={30} />
+          <span>Flor de Postre</span>
+        </div>
+      )}
+      {images.length > 1 && (
+        <div className="postre-gallery-thumbs" aria-label="Imágenes del producto">
+          {images.map((image, index) => (
+            <button
+              key={`${image}-${index}`}
+              type="button"
+              className={image === selectedImage ? "active" : ""}
+              onClick={() => setSelectedImage(image)}
+              aria-label={`Ver imagen ${index + 1} de ${postre.nombre}`}
+            >
+              <img src={image} alt="" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -140,8 +198,8 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
         <BackLink onClick={() => navigate("/postres")} label="Volver a postres" />
 
         <article className="postre-detail">
-          <div className={selectedPostre.imagen ? "postre-detail-media" : "postre-detail-media placeholder"}>
-            <PostreImage postre={selectedPostre} large />
+          <div className={getPrimaryProductImage(selectedPostre) ? "postre-detail-media" : "postre-detail-media placeholder"}>
+            <PostreGallery postre={selectedPostre} />
           </div>
 
           <div className="postre-detail-copy">
@@ -245,7 +303,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
             className="postre-card"
             to={`/postres/${postre.id}`}
           >
-            <div className={postre.imagen ? "postre-card-media" : "postre-card-media placeholder"}>
+            <div className={getPrimaryProductImage(postre) ? "postre-card-media" : "postre-card-media placeholder"}>
               <PostreImage postre={postre} />
             </div>
             <div className="product-info">

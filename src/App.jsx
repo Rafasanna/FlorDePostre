@@ -19,6 +19,7 @@ import {
   fetchTortaRellenosFromSheet,
   fetchTortaTamanosFromSheet
 } from "./services/googleSheets.js";
+import { getPrimaryProductImage } from "./utils/productImages.js";
 import { getActiveCampaigns, getEffectivePrice, isProductVisible } from "./utils/seasonal.js";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
@@ -327,7 +328,8 @@ function App() {
 
       return {
         ...item,
-        product: currentProduct,
+        product: { id: currentProduct.id, imagen: getPrimaryProductImage(currentProduct) },
+        imagen: getPrimaryProductImage(currentProduct),
         nombre: currentProduct.nombre,
         precio: currentPrice
       };
@@ -342,7 +344,8 @@ function App() {
 
       return {
         ...item,
-        product: currentPostre,
+        product: { id: currentPostre.id, imagen: getPrimaryProductImage(currentPostre) },
+        imagen: getPrimaryProductImage(currentPostre),
         nombre: currentPostre.nombre,
         precio: currentSize.precio,
         configuracion: {
@@ -408,6 +411,15 @@ function App() {
 
     setCartValidationMessage("");
     setCartItems((prev) => {
+      const cartProduct = productObj.product
+        ? { id: productObj.product.id, imagen: getPrimaryProductImage(productObj.product) }
+        : productObj.product;
+      const cartItem = {
+        ...productObj,
+        product: cartProduct,
+        imagen: productObj.imagen || cartProduct?.imagen || ""
+      };
+
       // Si es menú diario, intentar agrupar
       if (productObj.type === 'daily') {
         const existing = prev.find(item => item.product.id === productObj.product.id && item.type === 'daily');
@@ -422,7 +434,7 @@ function App() {
       
       // Si no es diario o no existe, agregarlo como nuevo item con cartItemId unico
       return [...prev, { 
-        ...productObj, 
+        ...cartItem, 
         cartItemId: crypto.randomUUID() 
       }];
     });

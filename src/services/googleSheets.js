@@ -1,3 +1,5 @@
+import { parseProductImages } from "../utils/productImages.js";
+
 const FALSE_VALUES = new Set(["false", "no", "0", "agotado", "no disponible", "reservado"]);
 const TRUE_VALUES = new Set(["true", "si", "sí", "1", "x", "destacado", "sin tacc", "disponible"]);
 
@@ -66,6 +68,19 @@ const parseStock = (value) => {
   return stock === null ? null : stock;
 };
 
+const getImagesFromRow = (row) => {
+  // Google Sheets: la columna nueva se llama exactamente "imagenes".
+  // Formato esperado: URLs separadas por coma, por ejemplo "url1,url2,url3".
+  const images = parseProductImages(getCell(row, "imagenes"));
+  const fallbackImage = normalizeText(getCell(row, "Imagen", "imagen"));
+  const normalizedImages = images.length > 0 ? images : parseProductImages(fallbackImage);
+
+  return {
+    imagen: normalizedImages[0] || fallbackImage,
+    imagenes: normalizedImages
+  };
+};
+
 const CAMPAIGN_COLOR_FALLBACKS = {
   fondo: "#FFE5EE",
   texto: "#4B342F",
@@ -94,8 +109,7 @@ const REQUIRED_SIN_TACC_HEADERS = [
   "ID interno (no tocar)",
   "Producto",
   "Descripción",
-  "Precio",
-  "Imagen"
+  "Precio"
 ].map(normalizeKey);
 
 const REQUIRED_POSTRES_HEADERS = [
@@ -264,6 +278,7 @@ export const normalizeDailyProduct = (row) => {
   const precio = parseNumber(getCell(row, "Precio", "precio"));
   const categoria = normalizeText(getCell(row, "Categoría", "categoria"));
   const sinTacc = parseBoolean(getCell(row, "Sin TACC", "sintacc", "sin_tacc")) || categoria.toLowerCase() === "sin tacc";
+  const images = getImagesFromRow(row);
 
   if (!nombre || precio === null || !categoria) return null;
 
@@ -273,7 +288,7 @@ export const normalizeDailyProduct = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precio,
     categoria,
-    imagen: normalizeText(getCell(row, "Imagen", "imagen")),
+    ...images,
     disponible: parseAvailability(getCell(row, "Disponible", "disponible", "Estado", "estado")),
     stock: parseStock(getCell(row, "Stock", "stock")),
     reservado: parseBoolean(getCell(row, "Reservado", "reservado")),
@@ -292,6 +307,7 @@ export const normalizeDailyProduct = (row) => {
 export const normalizeSinTaccProduct = (row) => {
   const nombre = normalizeText(getCell(row, "Producto", "nombre"));
   const precio = parseNumber(getCell(row, "Precio", "precio"));
+  const images = getImagesFromRow(row);
 
   if (!nombre || precio === null) return null;
 
@@ -301,7 +317,7 @@ export const normalizeSinTaccProduct = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precio,
     categoria: "Sin TACC",
-    imagen: normalizeText(getCell(row, "Imagen", "imagen")),
+    ...images,
     disponible: parseAvailability(getCell(row, "Disponible", "disponible", "Estado", "estado")),
     stock: parseStock(getCell(row, "Stock", "stock")),
     reservado: parseBoolean(getCell(row, "Reservado", "reservado")),
@@ -319,6 +335,7 @@ export const normalizeSinTaccProduct = (row) => {
 
 export const normalizePostre = (row) => {
   const nombre = normalizeText(getCell(row, "Postre", "Producto", "nombre"));
+  const images = getImagesFromRow(row);
 
   if (!nombre) return null;
 
@@ -326,7 +343,7 @@ export const normalizePostre = (row) => {
     id: normalizeText(getCell(row, "ID interno (no tocar)", "id")) || slugify(nombre),
     nombre,
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
-    imagen: normalizeText(getCell(row, "Imagen", "imagen")),
+    ...images,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible", "Estado", "estado"), true),
     destacado: parseBoolean(getCell(row, "Destacado", "destacado")),
     etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta")),
@@ -406,6 +423,7 @@ export const normalizeCampaign = (row) => {
 export const normalizeSpecialProduct = (row) => {
   const nombre = normalizeText(getCell(row, "Producto", "nombre"));
   const precio = parseNumber(getCell(row, "Precio", "precio"));
+  const images = getImagesFromRow(row);
 
   if (!nombre || precio === null) return null;
 
@@ -417,7 +435,7 @@ export const normalizeSpecialProduct = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precio,
     categoria: "Especial",
-    imagen: normalizeText(getCell(row, "Imagen", "imagen")),
+    ...images,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible", "Estado", "estado"), true),
     stock: parseStock(getCell(row, "Stock", "stock")),
     reservado: parseBoolean(getCell(row, "Reservado", "reservado")),

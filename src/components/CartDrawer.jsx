@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Minus, Plus, Send, Trash2, X } from "lucide-react";
+import { Minus, Plus, Send, Sparkle, Trash2, X } from "lucide-react";
+import { getPrimaryProductImage } from "../utils/productImages.js";
 
 function CartDrawer({
   isOpen,
@@ -54,6 +55,16 @@ function CartDrawer({
     );
   };
 
+  const renderItemImage = (item) => {
+    const image = item.imagen || getPrimaryProductImage(item.product);
+
+    return (
+      <div className={image ? "cart-item-image" : "cart-item-image placeholder"}>
+        {image ? <img src={image} alt={item.nombre} loading="lazy" /> : <Sparkle size={18} />}
+      </div>
+    );
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -90,10 +101,13 @@ function CartDrawer({
           <div className="cart-items">
             {items.map((item) => (
               <div className="cart-item" key={item.cartItemId} style={{ alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, paddingRight: '12px' }}>
-                  <h3>{item.nombre}</h3>
-                  <p>{formatPrice(item.precio)}{item.type === 'daily' ? ' c/u' : ''}</p>
-                  {renderConfigDetails(item)}
+                <div className="cart-item-main">
+                  {renderItemImage(item)}
+                  <div style={{ flex: 1, paddingRight: '12px' }}>
+                    <h3>{item.nombre}</h3>
+                    <p>{formatPrice(item.precio)}{item.type === 'daily' ? ' c/u' : ''}</p>
+                    {renderConfigDetails(item)}
+                  </div>
                 </div>
                 {item.type === 'daily' ? (
                   <div className="quantity-control" style={{ marginTop: '0' }}>
