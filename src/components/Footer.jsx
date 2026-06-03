@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { INSTAGRAM_URL, WHATSAPP_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
-const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2075";
+const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2085%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
 const RAFAELA_WHATSAPP_MESSAGE = "¡Hola Rafaela! Vi tu trabajo en Flor de Postre y me gustaría consultarte por una página web 😊";
 const RAFAELA_WHATSAPP_URL = `https://wa.me/54344660818?text=${encodeURIComponent(RAFAELA_WHATSAPP_MESSAGE)}`;
 
@@ -16,7 +16,7 @@ function Footer() {
         <p>Pastelería, desayunos y catering artesanal.</p>
         <a className="footer-address" href={MAPS_URL} target="_blank" rel="noreferrer">
           <MapPin size={15} />
-          <span>3 de Febrero 75</span>
+          <span>3 de Febrero 85</span>
         </a>
       </div>
 
@@ -27,14 +27,14 @@ function Footer() {
         </div>
         <div className="footer-schedule">
           <p>
-            <span>Lunes a viernes</span>
-            7:30 hs a 13:00 hs<br />
-            16:30 hs a 20:30 hs
+            <span>Lunes a Viernes</span>
+            07:30 a 13:00<br />
+            16:00 a 20:00
           </p>
           <p>
             <span>Sábados</span>
-            9:00 hs a 13:30 hs<br />
-            16:30 hs a 20:30 hs
+            09:00 a 13:30<br />
+            16:00 a 20:00
           </p>
         </div>
       </div>

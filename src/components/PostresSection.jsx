@@ -4,7 +4,7 @@ import { CalendarDays, MessageCircle, ShoppingBag, Sparkle } from "lucide-react"
 import { postresBase } from "../data/postresData.js";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
-import { getPrimaryProductImage, getProductImages } from "../utils/productImages.js";
+import { getProductImages } from "../utils/productImages.js";
 import BackLink from "./BackLink.jsx";
 
 const getAvailableSizes = (postre) => postre.sizes?.filter((size) => size.disponible !== false) || [];
@@ -13,6 +13,14 @@ const getLowestPostrePrice = (postre) => {
   const prices = getAvailableSizes(postre).map((size) => size.precio).filter(Number.isFinite);
   return prices.length ? Math.min(...prices) : null;
 };
+
+const preloadPostreImage = (src) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = resolve;
+    image.onerror = reject;
+    image.src = src;
+  });
 
 const selectSizeCtaStyle = {
   alignItems: "center",
@@ -52,26 +60,57 @@ ${date || "A definir"}
 };
 
 function PostreImage({ postre, large = false }) {
-  const [imageFailed, setImageFailed] = useState(false);
+  const images = useMemo(() => getProductImages(postre), [postre]);
+  const imagesKey = images.join("|");
+  const [failedImages, setFailedImages] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const primaryImage = getPrimaryProductImage(postre);
-  const hasImage = Boolean(primaryImage) && !imageFailed;
+  const activeImage = images.find((image) => !failedImages.includes(image)) || "";
+  const hasImage = Boolean(activeImage);
 
   useEffect(() => {
-    setImageFailed(false);
+    setFailedImages([]);
+  }, [imagesKey]);
+
+  useEffect(() => {
     setImageLoaded(false);
-  }, [primaryImage]);
+  }, [activeImage]);
+
+  useEffect(() => {
+    if (!activeImage) return undefined;
+
+    let isCancelled = false;
+
+    preloadPostreImage(activeImage)
+      .then(() => {
+        if (!isCancelled) setImageLoaded(true);
+      })
+      .catch(() => {
+        if (isCancelled) return;
+
+        setFailedImages((currentImages) =>
+          currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
+        );
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeImage]);
 
   if (hasImage) {
     return (
       <>
         <img
-          src={primaryImage}
+          src={activeImage}
           alt={postre.nombre}
           loading={large ? "eager" : "lazy"}
           onLoad={() => setImageLoaded(true)}
-          onError={() => setImageFailed(true)}
-          style={{ display: imageLoaded ? 'block' : 'none' }}
+          onError={() => {
+            setFailedImages((currentImages) =>
+              currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
+            );
+          }}
+          style={{ opacity: imageLoaded ? 1 : 0 }}
         />
         {!imageLoaded && (
           <div className="postre-placeholder">
@@ -108,6 +147,24 @@ function PostreGallery({ postre }) {
     setImageLoaded(false);
   }, [selectedImage]);
 
+  useEffect(() => {
+    if (!selectedImage) return undefined;
+
+    let isCancelled = false;
+
+    preloadPostreImage(selectedImage)
+      .then(() => {
+        if (!isCancelled) setImageLoaded(true);
+      })
+      .catch(() => {
+        if (!isCancelled) setImageFailed(true);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedImage]);
+
   if (!hasImages || imageFailed) {
     return <PostreImage postre={postre} large />;
   }
@@ -120,7 +177,7 @@ function PostreGallery({ postre }) {
         loading="eager"
         onLoad={() => setImageLoaded(true)}
         onError={() => setImageFailed(true)}
-        style={{ display: imageLoaded ? "block" : "none" }}
+        style={{ opacity: imageLoaded ? 1 : 0 }}
       />
       {!imageLoaded && (
         <div className="postre-placeholder">
@@ -198,7 +255,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
         <BackLink onClick={() => navigate("/postres")} label="Volver a postres" />
 
         <article className="postre-detail">
-          <div className={getPrimaryProductImage(selectedPostre) ? "postre-detail-media" : "postre-detail-media placeholder"}>
+          <div className={getProductImages(selectedPostre).length > 0 ? "postre-detail-media" : "postre-detail-media placeholder"}>
             <PostreGallery postre={selectedPostre} />
           </div>
 
@@ -291,7 +348,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
           Elegí tu postre favorito, seleccioná el tamaño y reservalo para tu próxima fecha especial.
         </p>
         <p>
-          Tené en cuenta que no todos los postres rinden igual. Los postres con chocolate o crema suelen rendir más que algunas tartas frutales.
+          Tené en cuenta que no todos los postres rinden igual. Por ejemplo, aquellos que tienen cremas o chocolate, son más rendidores que un postre liviano como un tiramisú o una tarta frutal. Nuestro cálculo es estimado, cortando porciones chicas. Por eso, te sugerimos siempre avisarnos la cantidad de comensales para que podamos asesorarte y elegir el tamaño correcto para vos.
         </p>
         <BackLink to="/" label="Volver al inicio" />
       </div>
@@ -303,7 +360,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
             className="postre-card"
             to={`/postres/${postre.id}`}
           >
-            <div className={getPrimaryProductImage(postre) ? "postre-card-media" : "postre-card-media placeholder"}>
+            <div className={getProductImages(postre).length > 0 ? "postre-card-media" : "postre-card-media placeholder"}>
               <PostreImage postre={postre} />
             </div>
             <div className="product-info">

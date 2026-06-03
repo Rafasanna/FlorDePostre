@@ -4,16 +4,16 @@ const locations = [
   {
     id: "flor-de-postre-principal",
     nombre: "Flor de Postre",
-    direccion: "3 de Febrero 75",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2075",
+    direccion: "3 de Febrero 85",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2085%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina",
     horarios: [
       {
-        dias: "Lunes a viernes",
-        franjas: ["7:30 hs a 13:00 hs", "16:30 hs a 20:30 hs"]
+        dias: "Lunes a Viernes",
+        franjas: ["07:30 a 13:00", "16:00 a 20:00"]
       },
       {
         dias: "Sábados",
-        franjas: ["9:00 hs a 13:30 hs", "16:30 hs a 20:30 hs"]
+        franjas: ["09:00 a 13:30", "16:00 a 20:00"]
       }
     ]
   }

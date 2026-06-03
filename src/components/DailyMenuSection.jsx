@@ -88,7 +88,7 @@ function DailyMenuSection({
     setShowAllProducts(false);
   };
 
-  const sinTaccMapsUrl = "https://www.google.com/maps/search/?api=1&query=Sarmiento%20y%20Republica%20de%20Chile";
+  const sinTaccMapsUrl = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2085%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
 
   return (
     <section className="section page-section reveal-fade" id="menu-diario" ref={sectionRef}>
@@ -118,7 +118,7 @@ function DailyMenuSection({
             <p>
               Para más variedad y opciones, nuestro local libre de gluten está ubicado en{" "}
               <a href={sinTaccMapsUrl} target="_blank" rel="noreferrer">
-                Sarmiento y República de Chile
+                3 de Febrero 85
               </a>
               .
             </p>

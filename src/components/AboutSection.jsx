@@ -1,11 +1,90 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sparkle } from "lucide-react";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
-import LocationsSection from "./LocationsSection.jsx";
+
+const historyParagraphs = [
+  {
+    type: "subtitle",
+    title: "2015 · El comienzo"
+  },
+  {
+    type: "paragraph",
+    text: "Flor de Postre nace en 2015, impulsada por el sueño de una estudiante apasionada por la pastelería y por una tradición familiar ligada a la cocina."
+  },
+  {
+    type: "paragraph",
+    text: "Lo que comenzó como un pequeño proyecto fue creciendo junto a años de formación, capacitaciones y experiencias que ayudaron a transformar esa pasión en una profesión."
+  },
+  {
+    type: "paragraph",
+    text: "Cada curso, cada receta y cada desafío fueron construyendo la identidad de una marca que busca transmitir amor, dedicación y calidad en cada detalle."
+  },
+  {
+    type: "subtitle",
+    title: "2021 · Nuestro primer local"
+  },
+  {
+    type: "paragraph",
+    text: "En 2021 dimos un gran paso con la apertura de nuestro primer local físico, un espacio pensado para recibir a nuestros clientes y compartir momentos especiales a través de nuestras creaciones."
+  },
+  {
+    type: "subtitle",
+    title: "Hoy · Seguimos creciendo"
+  },
+  {
+    type: "paragraph",
+    text: "Hoy, Flor de Postre es una empresa consolidada en la ciudad, reconocida por la calidad de sus productos, la atención cercana y el compromiso de seguir creando experiencias que acompañen los momentos más importantes de cada persona."
+  },
+  {
+    type: "paragraph",
+    text: "Creemos que detrás de cada torta, cada desayuno y cada mesa dulce hay una historia para celebrar. Y nos sentimos felices de ser parte de ella."
+  }
+];
+
+const brandValues = [
+  {
+    title: "Compromiso",
+    text: "Creemos que cada pedido representa un momento importante para quien lo recibe. Por eso trabajamos con dedicación, responsabilidad y cercanía, cuidando cada detalle desde la atención hasta la entrega final."
+  },
+  {
+    title: "Mejora continua",
+    text: "La pasión por la pastelería nos impulsa a aprender y crecer constantemente. Buscamos perfeccionar nuestros procesos, incorporar nuevas técnicas y seguir capacitándonos para ofrecer experiencias cada vez mejores."
+  },
+  {
+    title: "Calidad",
+    text: "La calidad es la base de todo lo que hacemos. Seleccionamos cuidadosamente nuestros ingredientes y cuidamos cada etapa de elaboración para ofrecer productos que destaquen por su sabor, presentación y excelencia."
+  }
+];
 
 function AboutSection() {
   const sectionRef = useIntersectionObserver();
+  const revealRefs = useRef([]);
   const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    const revealItems = revealRefs.current.filter(Boolean);
+
+    if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      revealItems.forEach((item) => item.classList.add("is-visible"));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.18 }
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section className="about section page-section reveal-fade" id="sobre-nosotras" ref={sectionRef}>
@@ -31,31 +110,53 @@ function AboutSection() {
           )}
         </div>
         <div className="about-text">
-          <p>
-            Flor de Postre nace con la idea de crear productos de pastelería artesanal de alta calidad, cuidando cada detalle del proceso y la experiencia de cada cliente.
-          </p>
-          <p>
-            Buscamos que cada pedido combine sabor, estética y calidez, manteniendo una atención cercana y una identidad delicada en cada elaboración.
-          </p>
+          {historyParagraphs.map((item, index) => {
+            if (item.type === "subtitle") {
+              return (
+                <h3
+                  className="about-story-subtitle about-reveal"
+                  key={item.title}
+                  ref={(element) => {
+                    revealRefs.current[index] = element;
+                  }}
+                  style={{ transitionDelay: `${index * 55}ms` }}
+                >
+                  {item.title}
+                </h3>
+              );
+            }
+
+            return (
+              <p
+                className="about-history-paragraph about-reveal"
+                key={item.text}
+                ref={(element) => {
+                  revealRefs.current[index] = element;
+                }}
+                style={{ transitionDelay: `${index * 70}ms` }}
+              >
+                {item.text}
+              </p>
+            );
+          })}
         </div>
       </div>
 
       <div className="values-grid">
-        <article>
-          <h3>Artesanía y cuidado</h3>
-          <p>Productos hechos con dedicación, respetando los tiempos y detalles de cada elaboración.</p>
-        </article>
-        <article>
-          <h3>Calidad constante</h3>
-          <p>Trabajamos para que cada producto mantenga el nivel de sabor, presentación y cuidado que caracteriza a Flor de Postre.</p>
-        </article>
-        <article>
-          <h3>Calidez en la atención</h3>
-          <p>Acompañamos cada pedido con cercanía, buscando que la experiencia sea simple, linda y personalizada.</p>
-        </article>
+        {brandValues.map((value, index) => (
+          <article
+            className="about-value-card about-reveal"
+            key={value.title}
+            ref={(element) => {
+              revealRefs.current[historyParagraphs.length + index] = element;
+            }}
+            style={{ transitionDelay: `${index * 90}ms` }}
+          >
+            <h3>{value.title}</h3>
+            <p>{value.text}</p>
+          </article>
+        ))}
       </div>
-
-      <LocationsSection />
     </section>
   );
 }

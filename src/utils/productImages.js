@@ -10,10 +10,22 @@ export const parseProductImages = (value) => {
 };
 
 export const getProductImages = (product) => {
-  const images = parseProductImages(product?.imagenes);
-  if (images.length > 0) return images;
+  const images = [
+    ...parseProductImages(product?.imagenes),
+    ...parseProductImages(product?.images),
+    ...parseProductImages(product?.imageUrls)
+  ];
+  if (images.length > 0) return [...new Set(images)];
 
-  return parseProductImages(product?.imagen);
+  return [...new Set([
+    ...parseProductImages(product?.imagen),
+    ...parseProductImages(product?.image),
+    ...parseProductImages(product?.imageUrl),
+    ...parseProductImages(product?.mainImage),
+    ...parseProductImages(product?.thumbnail),
+    ...parseProductImages(product?.foto),
+    ...parseProductImages(product?.portada)
+  ])];
 };
 
 export const getPrimaryProductImage = (product) => getProductImages(product)[0] || "";

@@ -65,11 +65,7 @@ const cateringTabs = [
       "Hola Flor de Postre! Quiero consultar por Desayunos para Empresas.\n\nEmpresa / equipo:\nCantidad aproximada de personas:\nFecha:\nLugar de entrega:\nIdea o necesidad:\n\n¿Me pasan una propuesta?",
     content: {
       intro: [
-        "Diseñamos desayunos personalizados para oficinas, reuniones laborales, equipos de trabajo, celebraciones corporativas y fechas especiales."
-      ],
-      note: [
-        "Podemos trabajar propuestas de hasta 150 personas.",
-        "Cada desayuno se diseña según las necesidades del cliente."
+        "Trabajamos en propuestas de entre 15 y 150 personas. Cada desayuno se diseña según las necesidades y presupuesto de cada cliente. Nos ocupamos del traslado, armado y desarmado del servicio. Contamos con nuestro propio inventario de vajilla de porcelana, mesas, mantelería, cafeteras y todo lo necesario para una experiencia completa."
       ]
     }
   },
