@@ -4,8 +4,8 @@ import { INSTAGRAM_URL, WHATSAPP_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
 const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=3%20de%20Febrero%2085%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
-const RAFAELA_WHATSAPP_MESSAGE = "¡Hola Rafaela! Vi tu trabajo en Flor de Postre y me gustaría consultarte por una página web 😊";
-const RAFAELA_WHATSAPP_URL = `https://wa.me/54344660818?text=${encodeURIComponent(RAFAELA_WHATSAPP_MESSAGE)}`;
+const RAFAELA_WHATSAPP_MESSAGE = "Hola Rafaela, vi uno de tus trabajos y me gustaría consultarte sobre diseño y desarrollo web.";
+const RAFAELA_WHATSAPP_URL = `https://wa.me/5493446608118?text=${encodeURIComponent(RAFAELA_WHATSAPP_MESSAGE)}`;
 
 function Footer() {
   return (
