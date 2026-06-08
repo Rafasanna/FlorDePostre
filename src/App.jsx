@@ -6,7 +6,7 @@ import { WHATSAPP_URL } from "./config.js";
 import { campaigns } from "./data/campaigns.js";
 import { dailyProducts } from "./data/dailyProducts.js";
 import { postresBase, postresSizes } from "./data/postresData.js";
-import { coberturas, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
+import { coberturas, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
 import {
   fetchCampaignsFromSheet,
   fetchDailyProductsFromSheet,
@@ -351,9 +351,33 @@ function App() {
       };
     }
 
+    if (item.type === "torta") {
+      const currentSize = tortaTamanos.find((size) => size.id === item.configuracion?.sizeId) || {
+        id: item.configuracion?.sizeId,
+        nombre: item.configuracion?.sizeName
+      };
+      const currentPrice = getCakeSizePrice(item.configuracion?.cakeOptionId, currentSize);
+
+      if (currentPrice) {
+        return {
+          ...item,
+          nombre: "Torta por encargo",
+          precio: currentPrice.price,
+          configuracion: {
+            ...item.configuracion,
+            sizeName: currentPrice.nombre,
+            porciones: currentPrice.porciones
+          }
+        };
+      }
+
+      if (!Number.isFinite(item.precio)) return null;
+      return item;
+    }
+
     if (!Number.isFinite(item.precio)) return null;
     return item;
-  }, [cartCatalog]);
+  }, [cartCatalog, tortaTamanos]);
 
   const validateCartItems = useCallback((items) => {
     const nextItems = [];
@@ -457,11 +481,17 @@ function App() {
     let detail = "";
     
     items.forEach(item => {
-      detail += `- ${item.nombre} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}\n`;
+      const cakeLabel = item.type === "torta" && item.configuracion
+        ? `${item.nombre} - ${item.configuracion.coberturaName || item.configuracion.cakeOptionName || "A definir"} - ${item.configuracion.sizeName || "A definir"}`
+        : item.nombre;
+
+      detail += `- ${cakeLabel} x${item.quantity} - ${formatPrice(item.precio * item.quantity)}\n`;
       if (item.type !== 'daily' && item.configuracion) {
         const c = item.configuracion;
         if (c.sizeName) detail += `  • Tamaño: ${c.sizeName}\n`;
+        if (c.porciones) detail += `  • Porciones: ${c.porciones}\n`;
         if (c.coberturaName) detail += `  • Cobertura: ${c.coberturaName}\n`;
+        if (c.fillingsCount) detail += `  • Cantidad de rellenos: ${c.fillingsCount}\n`;
         if (c.rellenos && c.rellenos.length > 0) detail += `  • Rellenos: ${c.rellenos.map(r => r.nombre).join(', ')}\n`;
         if (c.extras && c.extras.length > 0) detail += `  • Extras: ${c.extras.map(e => e.nombre).join(', ')}\n`;
         if (c.date) detail += `  • Fecha deseada: ${c.date}\n`;

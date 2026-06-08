@@ -43,12 +43,20 @@ function CartDrawer({
     return (
       <div className="cart-item-config" style={{ fontSize: '0.85rem', color: 'var(--cocoa-soft)', marginTop: '4px' }}>
         {item.configuracion.sizeName && <div>• Tamaño: {item.configuracion.sizeName}</div>}
+        {item.configuracion.porciones && <div>• Porciones: {item.configuracion.porciones}</div>}
         {item.configuracion.coberturaName && <div>• Cobertura: {item.configuracion.coberturaName}</div>}
+        {item.configuracion.fillingsCount && <div>• Cantidad de rellenos: {item.configuracion.fillingsCount}</div>}
         {item.configuracion.rellenos && item.configuracion.rellenos.length > 0 && (
           <div>• Rellenos: {item.configuracion.rellenos.map(r => r.nombre).join(', ')}</div>
         )}
         {item.configuracion.extras && item.configuracion.extras.length > 0 && (
           <div>• Extras: {item.configuracion.extras.map(e => e.nombre).join(', ')}</div>
+        )}
+        {item.type === "torta" && (
+          <>
+            <div>• Precio unitario: {formatPrice(item.precio)}</div>
+            <div>• Subtotal: {formatPrice(item.precio * item.quantity)}</div>
+          </>
         )}
         {item.configuracion.date && <div style={{ color: 'var(--rose-500)', marginTop: '4px' }}>• Para el: {item.configuracion.date}</div>}
       </div>

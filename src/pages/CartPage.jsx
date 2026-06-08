@@ -19,12 +19,20 @@ function CartPage({
     return (
       <div className="cart-item-config page-cart-config">
         {item.configuracion.sizeName && <div>Tamaño: {item.configuracion.sizeName}</div>}
+        {item.configuracion.porciones && <div>Porciones: {item.configuracion.porciones}</div>}
         {item.configuracion.coberturaName && <div>Cobertura: {item.configuracion.coberturaName}</div>}
+        {item.configuracion.fillingsCount && <div>Cantidad de rellenos: {item.configuracion.fillingsCount}</div>}
         {item.configuracion.rellenos?.length > 0 && (
           <div>Rellenos: {item.configuracion.rellenos.map((relleno) => relleno.nombre).join(", ")}</div>
         )}
         {item.configuracion.extras?.length > 0 && (
           <div>Extras: {item.configuracion.extras.map((extra) => extra.nombre).join(", ")}</div>
+        )}
+        {item.type === "torta" && (
+          <>
+            <div>Precio unitario: {formatPrice(item.precio)}</div>
+            <div>Subtotal: {formatPrice(item.precio * item.quantity)}</div>
+          </>
         )}
         {item.configuracion.date && <div>Para el: {item.configuracion.date}</div>}
       </div>

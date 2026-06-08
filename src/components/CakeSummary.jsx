@@ -1,11 +1,12 @@
 import { X, ShoppingBag, Edit2 } from "lucide-react";
 import {
   coberturas as fallbackCoberturas,
+  getCakePriceOption,
+  getCakeSizePrice,
   tortaSizes as fallbackTortaSizes,
   rellenos as fallbackRellenos,
   tortaExtras as fallbackTortaExtras
 } from "../data/tortasData.js";
-import { WHATSAPP_URL } from "../config.js";
 
 function CakeSummary({
   config,
@@ -31,19 +32,17 @@ function CakeSummary({
   const getRellenos = (ids) => ids.map(id => safeRellenos.find(r => r.id === id)).filter(Boolean);
   const getExtras = (ids) => ids.map(id => safeTortaExtras.find(e => e.id === id)).filter(Boolean);
 
-  const cobertura = getCobertura(safeConfig.cobertura);
+  const cakeOption = getCakePriceOption(safeConfig.cobertura);
+  const cobertura = getCobertura(cakeOption?.coberturaId) || cakeOption;
   const size = getSize(safeConfig.size);
   const rellenosList = getRellenos(selectedRellenos);
   const extrasList = getExtras(selectedExtras);
+  const sizePrice = getCakeSizePrice(safeConfig.cobertura, size);
+  const requiredFillings = cakeOption?.fillings || 0;
+  const hasValidFillings = requiredFillings > 0 && rellenosList.length === requiredFillings;
 
-  let precioEstimado = Number.isFinite(size?.precioBaseEstimado) ? size.precioBaseEstimado : 0;
-  rellenosList.forEach(r => {
-    precioEstimado += Number.isFinite(r.precioExtra) ? r.precioExtra : 0;
-  });
-  extrasList.forEach(e => {
-    precioEstimado += Number.isFinite(e.precioExtra) ? e.precioExtra : 0;
-  });
-  const canAddToCart = Boolean(size && cobertura && Number.isFinite(precioEstimado));
+  const precioEstimado = Number.isFinite(sizePrice?.price) ? sizePrice.price : 0;
+  const canAddToCart = Boolean(size && cobertura && sizePrice && hasValidFillings);
 
   const handleSend = () => {
     if (!canAddToCart) return;
@@ -51,14 +50,18 @@ function CakeSummary({
     const cartItem = {
       type: 'torta',
       product: { id: 'torta-personalizada' },
-      nombre: 'Torta Personalizada',
+      nombre: 'Torta por encargo',
       precio: precioEstimado,
       quantity: 1,
       configuracion: {
-        coberturaId: cobertura.id,
-        coberturaName: cobertura.nombre,
+        cakeOptionId: cakeOption.id,
+        cakeOptionName: cakeOption.nombre,
+        coberturaId: cakeOption.coberturaId,
+        coberturaName: `${cakeOption.nombre}, ${cakeOption.fillings} rellenos`,
+        fillingsCount: cakeOption.fillings,
         sizeId: size.id,
-        sizeName: size.nombre,
+        sizeName: sizePrice.nombre,
+        porciones: sizePrice.porciones,
         rellenos: rellenosList,
         extras: extrasList,
         date: safeConfig.date,
@@ -88,11 +91,19 @@ function CakeSummary({
           <div className="summary-card">
             <div className="summary-row">
               <span className="summary-label">Cobertura</span>
-              <span className="summary-value">{cobertura?.nombre || ""}</span>
+              <span className="summary-value">{cakeOption ? `${cakeOption.nombre}, ${cakeOption.fillings} rellenos` : ""}</span>
             </div>
             <div className="summary-row">
               <span className="summary-label">Tamaño</span>
-              <span className="summary-value">{size?.nombre || ""}</span>
+              <span className="summary-value">{sizePrice?.nombre || size?.nombre || ""}</span>
+            </div>
+            <div className="summary-row">
+              <span className="summary-label">Porciones</span>
+              <span className="summary-value">{sizePrice?.porciones || size?.porciones || ""}</span>
+            </div>
+            <div className="summary-row">
+              <span className="summary-label">Cantidad de rellenos</span>
+              <span className="summary-value">{requiredFillings ? `${requiredFillings}` : ""}</span>
             </div>
             
             {rellenosList.length > 0 && (
@@ -126,9 +137,14 @@ function CakeSummary({
 
         <div className="cart-footer">
           <div className="cart-total" style={{ marginBottom: '16px' }}>
-            <span>Precio Base Estimado</span>
+            <span>Precio estimado</span>
             <strong>{formatPrice(precioEstimado)}</strong>
           </div>
+          {!canAddToCart && (
+            <p className="help-text">
+              Revisá cobertura, tamaño y cantidad de rellenos antes de agregar la torta.
+            </p>
+          )}
 
           <div className="step-footer">
             <button className="secondary-button" onClick={onEdit} style={{ flex: 'none', padding: '12px' }}>

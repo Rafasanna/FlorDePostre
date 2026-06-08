@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight } from "lucide-react";
 import {
+  cakePriceOptions,
   coberturas as fallbackCoberturas,
+  getCakePriceOption,
+  getCakeSizePrice,
   tortaSizes as fallbackTortaSizes,
   rellenos as fallbackRellenos,
   tortaExtras as fallbackTortaExtras
@@ -48,6 +51,14 @@ function CakeConfigurator({
     date: "",
     comments: ""
   });
+  const selectedCakeOption = getCakePriceOption(config.cobertura);
+  const requiredFillings = selectedCakeOption?.fillings || 0;
+  const availableSizes = tortaSizes
+    .map((size) => ({
+      ...size,
+      cakePrice: getCakeSizePrice(config.cobertura, size)
+    }))
+    .filter((size) => size.cakePrice);
 
   const minDate = (() => {
     const d = new Date();
@@ -125,10 +136,13 @@ function CakeConfigurator({
       const isSelected = prev.rellenosSeleccionados.includes(id);
       if (isSelected) {
         return { ...prev, rellenosSeleccionados: prev.rellenosSeleccionados.filter(r => r !== id) };
-      } else {
-        // En un futuro podríamos limitar la cantidad máxima de rellenos aquí
-        return { ...prev, rellenosSeleccionados: [...prev.rellenosSeleccionados, id] };
       }
+
+      const currentOption = getCakePriceOption(prev.cobertura);
+      const maxFillings = currentOption?.fillings || Infinity;
+      if (prev.rellenosSeleccionados.length >= maxFillings) return prev;
+
+      return { ...prev, rellenosSeleccionados: [...prev.rellenosSeleccionados, id] };
     });
   };
 
@@ -179,13 +193,18 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Elegí la cobertura *</label>
               <div className="options-grid">
-                {coberturas.map(c => (
+                {cakePriceOptions.map(c => (
                   <button 
                     key={c.id}
                     className={`option-btn ${config.cobertura === c.id ? 'selected' : ''}`}
-                    onClick={() => setConfig({...config, cobertura: c.id})}
+                    onClick={() => setConfig({
+                      ...config,
+                      cobertura: c.id,
+                      size: null,
+                      rellenosSeleccionados: config.rellenosSeleccionados.slice(0, c.fillings)
+                    })}
                   >
-                    <strong>{c.nombre}</strong>
+                    <strong>{c.nombre}{c.fillings ? `, ${c.fillings} rellenos` : ""}</strong>
                     <small>{c.descripcion}</small>
                   </button>
                 ))}
@@ -197,15 +216,15 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Elegí el tamaño *</label>
               <div className="options-grid">
-                {tortaSizes.map(s => (
+                {availableSizes.map(s => (
                   <button 
                     key={s.id}
                     className={`option-btn ${config.size === s.id ? 'selected' : ''}`}
                     onClick={() => setConfig({...config, size: s.id})}
                   >
                     <strong>{s.nombre}</strong>
-                    <small>{s.porciones}</small>
-                    <span className="price-tag">Base: {formatPrice(s.precioBaseEstimado)}</span>
+                    <small>{s.cakePrice.porciones}</small>
+                    <span className="price-tag">{formatPrice(s.cakePrice.price)}</span>
                   </button>
                 ))}
               </div>
@@ -214,7 +233,7 @@ function CakeConfigurator({
 
           {step === 3 && (
             <div className="form-group slide-in">
-              <label>Rellenos (Múltiples opciones)</label>
+              <label>Elegí {requiredFillings} rellenos *</label>
               <div className="options-list">
                 {rellenos.map(r => {
                   const isSelected = config.rellenosSeleccionados.includes(r.id);
@@ -230,11 +249,13 @@ function CakeConfigurator({
                       <div style={{ flex: 1 }}>
                         <strong>{r.nombre}</strong>
                       </div>
-                      {r.precioExtra > 0 && <span className="price-extra">+{formatPrice(r.precioExtra)}</span>}
                     </div>
                   )
                 })}
               </div>
+              <p className="help-text">
+                Seleccioná exactamente {requiredFillings} rellenos para esta opción.
+              </p>
             </div>
           )}
 
@@ -256,7 +277,6 @@ function CakeConfigurator({
                       <div style={{ flex: 1 }}>
                         <strong>{e.nombre}</strong>
                       </div>
-                      <span className="price-extra">+{formatPrice(e.precioExtra)}</span>
                     </div>
                   )
                 })}
@@ -327,6 +347,7 @@ function CakeConfigurator({
             disabled={
               (step === 1 && !config.cobertura) || 
               (step === 2 && !config.size) || 
+              (step === 3 && config.rellenosSeleccionados.length !== requiredFillings) ||
               (step === 5 && (!config.date || isSunday(config.date)))
             }
           >

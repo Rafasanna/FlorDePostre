@@ -33,3 +33,80 @@ export const tortaExtras = [
   { id: "extra-pisos-falsos", nombre: "Pisos falsos (para Fondant)", precioExtra: 10000 },
   { id: "extra-corazon", nombre: "Forma de corazón", precioExtra: 10000 }
 ];
+
+export const cakePriceOptions = [
+  {
+    id: "merengue-italiano-2-rellenos",
+    coberturaId: "merengue-italiano",
+    nombre: "Merengue italiano",
+    descripcion: "2 rellenos incluidos.",
+    fillings: 2,
+    sizes: [
+      { nombre: "18 cm", price: 38900, porciones: "hasta 12 porciones" },
+      { nombre: "22 cm", price: 44900, porciones: "hasta 22 porciones" },
+      { nombre: "24 cm", price: 55900, porciones: "hasta 35 porciones" }
+    ]
+  },
+  {
+    id: "buttercream-2-rellenos",
+    coberturaId: "buttercream",
+    nombre: "Buttercream",
+    descripcion: "2 rellenos incluidos.",
+    fillings: 2,
+    sizes: [
+      { nombre: "18 cm", price: 56900, porciones: "hasta 15 porciones" },
+      { nombre: "22 cm", price: 64000, porciones: "hasta 25 porciones" },
+      { nombre: "24 cm", price: 75000, porciones: "hasta 35 porciones" }
+    ]
+  },
+  {
+    id: "buttercream-3-rellenos",
+    coberturaId: "buttercream",
+    nombre: "Buttercream",
+    descripcion: "3 rellenos incluidos.",
+    fillings: 3,
+    sizes: [
+      { nombre: "18 cm", price: 65000, porciones: "hasta 25 porciones" },
+      { nombre: "22 cm", price: 70000, porciones: "hasta 35 porciones" },
+      { nombre: "24 cm", price: 85000, porciones: "hasta 50 porciones" }
+    ]
+  },
+  {
+    id: "fondant-2-rellenos",
+    coberturaId: "fondant",
+    nombre: "Fondant",
+    descripcion: "2 rellenos incluidos.",
+    fillings: 2,
+    sizes: [
+      { nombre: "18 cm", price: 66000, porciones: "hasta 18 porciones" },
+      { nombre: "22 cm", price: 78000, porciones: "hasta 25 porciones" },
+      { nombre: "24 cm", price: 85000, porciones: "hasta 35/40 porciones" }
+    ]
+  }
+];
+
+const normalizeCakeKey = (value) =>
+  String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+
+export const getCakePriceOption = (optionId) =>
+  cakePriceOptions.find((option) => option.id === optionId) || null;
+
+export const getCakeSizePrice = (optionId, size) => {
+  const option = getCakePriceOption(optionId);
+  if (!option || !size) return null;
+
+  const sizeName = typeof size === "string" ? size : size.nombre;
+  const sizePrice = option.sizes.find((item) => normalizeCakeKey(item.nombre) === normalizeCakeKey(sizeName));
+  if (!sizePrice || !Number.isFinite(sizePrice.price)) return null;
+
+  return {
+    ...sizePrice,
+    sizeId: typeof size === "string" ? null : size.id,
+    nombre: sizeName,
+    option
+  };
+};

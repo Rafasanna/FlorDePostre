@@ -458,13 +458,13 @@ export const normalizeTortaTamano = (row) => {
     getCell(row, "Precio", "Precio base", "Precio base estimado", "precioBaseEstimado")
   );
 
-  if (!nombre || precioBaseEstimado === null) return null;
+  if (!nombre) return null;
 
   return {
     id: normalizeText(getCell(row, "ID interno (no tocar)", "id")) || slugify(nombre),
     nombre,
     porciones: normalizeText(getCell(row, "Porciones", "porciones")),
-    precioBaseEstimado,
+    precioBaseEstimado: precioBaseEstimado ?? 0,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true)
   };
 };
