@@ -47,10 +47,14 @@ function CartDrawer({
         {item.configuracion.coberturaName && <div>• Cobertura: {item.configuracion.coberturaName}</div>}
         {item.configuracion.fillingsCount && <div>• Cantidad de rellenos: {item.configuracion.fillingsCount}</div>}
         {item.configuracion.rellenos && item.configuracion.rellenos.length > 0 && (
-          <div>• Rellenos: {item.configuracion.rellenos.map(r => r.nombre).join(', ')}</div>
+          <div>
+            • Rellenos: {item.configuracion.rellenos.map(r => `${r.nombre}${r.precioTexto ? `: ${r.precioTexto}` : ""}`).join(', ')}
+          </div>
         )}
         {item.configuracion.extras && item.configuracion.extras.length > 0 && (
-          <div>• Extras: {item.configuracion.extras.map(e => e.nombre).join(', ')}</div>
+          <div>
+            • Extras: {item.configuracion.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}
+          </div>
         )}
         {item.type === "torta" && (
           <>

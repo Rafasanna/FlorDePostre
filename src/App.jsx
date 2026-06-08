@@ -6,7 +6,7 @@ import { WHATSAPP_URL } from "./config.js";
 import { campaigns } from "./data/campaigns.js";
 import { dailyProducts } from "./data/dailyProducts.js";
 import { postresBase, postresSizes } from "./data/postresData.js";
-import { coberturas, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
+import { coberturas, enrichCakeExtra, enrichCakeFilling, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
 import {
   fetchCampaignsFromSheet,
   fetchDailyProductsFromSheet,
@@ -359,14 +359,28 @@ function App() {
       const currentPrice = getCakeSizePrice(item.configuracion?.cakeOptionId, currentSize);
 
       if (currentPrice) {
+        const selectedRellenos = Array.isArray(item.configuracion?.rellenos)
+          ? item.configuracion.rellenos.map((relleno) => enrichCakeFilling(relleno, formatPrice))
+          : [];
+        const rellenosTotal = selectedRellenos.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);
+        const extras = Array.isArray(item.configuracion?.extras)
+          ? item.configuracion.extras.map((extra) => enrichCakeExtra(extra, currentPrice.price, formatPrice))
+          : [];
+        const extrasTotal = extras.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
+
         return {
           ...item,
           nombre: "Torta por encargo",
-          precio: currentPrice.price,
+          precio: currentPrice.price + rellenosTotal + extrasTotal,
           configuracion: {
             ...item.configuracion,
             sizeName: currentPrice.nombre,
-            porciones: currentPrice.porciones
+            porciones: currentPrice.porciones,
+            cakeBasePrice: currentPrice.price,
+            rellenos: selectedRellenos,
+            rellenosTotal,
+            extras,
+            extrasTotal
           }
         };
       }
@@ -492,8 +506,12 @@ function App() {
         if (c.porciones) detail += `  • Porciones: ${c.porciones}\n`;
         if (c.coberturaName) detail += `  • Cobertura: ${c.coberturaName}\n`;
         if (c.fillingsCount) detail += `  • Cantidad de rellenos: ${c.fillingsCount}\n`;
-        if (c.rellenos && c.rellenos.length > 0) detail += `  • Rellenos: ${c.rellenos.map(r => r.nombre).join(', ')}\n`;
-        if (c.extras && c.extras.length > 0) detail += `  • Extras: ${c.extras.map(e => e.nombre).join(', ')}\n`;
+        if (c.rellenos && c.rellenos.length > 0) {
+          detail += `  • Rellenos: ${c.rellenos.map(r => `${r.nombre}${r.precioTexto ? ` (${r.precioTexto})` : ""}`).join(', ')}\n`;
+        }
+        if (c.extras && c.extras.length > 0) {
+          detail += `  • Extras: ${c.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}\n`;
+        }
         if (c.date) detail += `  • Fecha deseada: ${c.date}\n`;
         if (c.comments) detail += `  • Detalles: ${c.comments}\n`;
       }

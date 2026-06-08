@@ -2508,6 +2508,29 @@ h1 {
   color: var(--cocoa-soft);
 }
 
+.cake-extra-copy {
+  align-items: baseline;
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.cake-extra-name {
+  flex: 0 1 auto;
+}
+
+.cake-extra-separator,
+.cake-extra-price {
+  color: var(--cocoa-soft);
+  font-weight: 600;
+}
+
+.cake-extra-price {
+  line-height: 1.35;
+}
+
 .step-footer {
   display: flex;
   gap: 12px;

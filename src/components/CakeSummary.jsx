@@ -1,6 +1,9 @@
 import { X, ShoppingBag, Edit2 } from "lucide-react";
 import {
   coberturas as fallbackCoberturas,
+  enrichCakeFilling,
+  enrichCakeExtra,
+  getCakeOptionDisplayKey,
   getCakePriceOption,
   getCakeSizePrice,
   tortaSizes as fallbackTortaSizes,
@@ -22,8 +25,18 @@ function CakeSummary({
   const safeConfig = config || {};
   const safeCoberturas = Array.isArray(coberturas) ? coberturas : [];
   const safeTortaSizes = Array.isArray(tortaSizes) ? tortaSizes : [];
-  const safeRellenos = Array.isArray(rellenos) ? rellenos : [];
-  const safeTortaExtras = Array.isArray(tortaExtras) ? tortaExtras : [];
+  const rellenosByDisplayName = new Map(
+    [...fallbackRellenos, ...(Array.isArray(rellenos) ? rellenos : [])]
+      .filter(Boolean)
+      .map((relleno) => [getCakeOptionDisplayKey(relleno), relleno])
+  );
+  const safeRellenos = Array.from(rellenosByDisplayName.values());
+  const extrasById = new Map(
+    [...fallbackTortaExtras, ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
+      .filter(Boolean)
+      .map((extra) => [getCakeOptionDisplayKey(extra), extra])
+  );
+  const safeTortaExtras = Array.from(extrasById.values());
   const selectedRellenos = Array.isArray(safeConfig.rellenosSeleccionados) ? safeConfig.rellenosSeleccionados : [];
   const selectedExtras = Array.isArray(safeConfig.extrasSeleccionados) ? safeConfig.extrasSeleccionados : [];
 
@@ -35,13 +48,16 @@ function CakeSummary({
   const cakeOption = getCakePriceOption(safeConfig.cobertura);
   const cobertura = getCobertura(cakeOption?.coberturaId) || cakeOption;
   const size = getSize(safeConfig.size);
-  const rellenosList = getRellenos(selectedRellenos);
-  const extrasList = getExtras(selectedExtras);
+  const rellenosList = getRellenos(selectedRellenos).map((relleno) => enrichCakeFilling(relleno, formatPrice));
   const sizePrice = getCakeSizePrice(safeConfig.cobertura, size);
+  const cakeBasePrice = Number.isFinite(sizePrice?.price) ? sizePrice.price : 0;
+  const extrasList = getExtras(selectedExtras).map((extra) => enrichCakeExtra(extra, cakeBasePrice, formatPrice));
   const requiredFillings = cakeOption?.fillings || 0;
   const hasValidFillings = requiredFillings > 0 && rellenosList.length === requiredFillings;
+  const rellenosTotal = rellenosList.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);
+  const extrasTotal = extrasList.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
 
-  const precioEstimado = Number.isFinite(sizePrice?.price) ? sizePrice.price : 0;
+  const precioEstimado = cakeBasePrice + rellenosTotal + extrasTotal;
   const canAddToCart = Boolean(size && cobertura && sizePrice && hasValidFillings);
 
   const handleSend = () => {
@@ -63,7 +79,10 @@ function CakeSummary({
         sizeName: sizePrice.nombre,
         porciones: sizePrice.porciones,
         rellenos: rellenosList,
+        rellenosTotal,
         extras: extrasList,
+        cakeBasePrice,
+        extrasTotal,
         date: safeConfig.date,
         comments: safeConfig.comments
       }
@@ -110,7 +129,11 @@ function CakeSummary({
               <div className="summary-row column">
                 <span className="summary-label">Rellenos</span>
                 <ul>
-                  {rellenosList.map(r => <li key={r.id}>{r.nombre}</li>)}
+                  {rellenosList.map(r => (
+                    <li key={r.id}>
+                      {r.nombre}{r.precioTexto ? `: ${r.precioTexto}` : ""}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -119,7 +142,11 @@ function CakeSummary({
               <div className="summary-row column">
                 <span className="summary-label">Extras</span>
                 <ul>
-                  {extrasList.map(e => <li key={e.id}>{e.nombre}</li>)}
+                  {extrasList.map(e => (
+                    <li key={e.id}>
+                      {e.nombre}{e.precioTexto ? `: ${e.precioTexto}` : ""}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}

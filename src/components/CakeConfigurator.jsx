@@ -4,6 +4,9 @@ import { X, ArrowRight } from "lucide-react";
 import {
   cakePriceOptions,
   coberturas as fallbackCoberturas,
+  enrichCakeFilling,
+  enrichCakeExtra,
+  getCakeOptionDisplayKey,
   getCakePriceOption,
   getCakeSizePrice,
   tortaSizes as fallbackTortaSizes,
@@ -59,6 +62,24 @@ function CakeConfigurator({
       cakePrice: getCakeSizePrice(config.cobertura, size)
     }))
     .filter((size) => size.cakePrice);
+  const selectedSize = tortaSizes.find((size) => size.id === config.size);
+  const selectedCakeBasePrice = getCakeSizePrice(config.cobertura, selectedSize)?.price;
+  const rellenosByDisplayName = new Map(
+    [...fallbackRellenos, ...(Array.isArray(rellenos) ? rellenos : [])]
+      .filter(Boolean)
+      .map((relleno) => [getCakeOptionDisplayKey(relleno), relleno])
+  );
+  const displayedRellenos = Array.from(rellenosByDisplayName.values()).map((relleno) =>
+    enrichCakeFilling(relleno, formatPrice)
+  );
+  const extrasByDisplayName = new Map(
+    [...fallbackTortaExtras, ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
+      .filter(Boolean)
+      .map((extra) => [getCakeOptionDisplayKey(extra), extra])
+  );
+  const displayedTortaExtras = Array.from(extrasByDisplayName.values()).map((extra) =>
+    enrichCakeExtra(extra, selectedCakeBasePrice, formatPrice)
+  );
 
   const minDate = (() => {
     const d = new Date();
@@ -235,7 +256,7 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Elegí {requiredFillings} rellenos *</label>
               <div className="options-list">
-                {rellenos.map(r => {
+                {displayedRellenos.map(r => {
                   const isSelected = config.rellenosSeleccionados.includes(r.id);
                   return (
                     <div 
@@ -246,8 +267,14 @@ function CakeConfigurator({
                       <div className="checkbox-dummy">
                         {isSelected && <div className="checkbox-inner" />}
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <strong>{r.nombre}</strong>
+                      <div className="cake-extra-copy">
+                        <strong className="cake-extra-name">{r.nombre}</strong>
+                        {r.precioTexto && (
+                          <>
+                            <span className="cake-extra-separator" aria-hidden="true">—</span>
+                            <small className="cake-extra-price">{r.precioTexto}</small>
+                          </>
+                        )}
                       </div>
                     </div>
                   )
@@ -263,7 +290,7 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Extras y Decoración</label>
               <div className="options-list">
-                {tortaExtras.map(e => {
+                {displayedTortaExtras.map(e => {
                   const isSelected = config.extrasSeleccionados.includes(e.id);
                   return (
                     <div 
@@ -274,8 +301,14 @@ function CakeConfigurator({
                       <div className="checkbox-dummy">
                         {isSelected && <div className="checkbox-inner" />}
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <strong>{e.nombre}</strong>
+                      <div className="cake-extra-copy">
+                        <strong className="cake-extra-name">{e.nombre}</strong>
+                        {e.precioTexto && (
+                          <>
+                            <span className="cake-extra-separator" aria-hidden="true">—</span>
+                            <small className="cake-extra-price">{e.precioTexto}</small>
+                          </>
+                        )}
                       </div>
                     </div>
                   )
