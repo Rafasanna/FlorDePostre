@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 import { WHATSAPP_URL } from "./config.js";
 import { campaigns } from "./data/campaigns.js";
 import { dailyProducts } from "./data/dailyProducts.js";
@@ -655,6 +656,7 @@ function App() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
+      <Analytics />
     </div>
   );
 }
