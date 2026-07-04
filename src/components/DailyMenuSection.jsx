@@ -86,6 +86,27 @@ function DailyMenuSection({
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
     setShowAllProducts(false);
+
+    const grid = document.querySelector(".products-grid");
+    if (grid) {
+      const headerHeight = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--header-height")
+      ) || 90;
+      
+      const filter = document.querySelector(".category-filter");
+      const filterHeight = filter ? filter.getBoundingClientRect().height : 0;
+      
+      const totalOffset = headerHeight + filterHeight;
+      const gridPosition = grid.getBoundingClientRect().top + window.scrollY;
+      const targetScroll = gridPosition - totalOffset;
+
+      if (window.scrollY > targetScroll) {
+        window.scrollTo({
+          top: targetScroll,
+          behavior: "smooth"
+        });
+      }
+    }
   };
 
   const sinTaccMapsUrl = "https://www.google.com/maps/search/?api=1&query=Sarmiento%20y%20Rep%C3%BAblica%20de%20Chile%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
@@ -130,7 +151,7 @@ function DailyMenuSection({
         </div>
       )}
 
-      <div className="products-grid" aria-live="polite">
+      <div className="products-grid" key={activeCategory} aria-live="polite">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
           : unifiedProducts.map((product) => (

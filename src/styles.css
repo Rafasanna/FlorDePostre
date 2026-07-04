@@ -83,7 +83,7 @@ img {
 }
 
 .site-shell {
-  overflow: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
@@ -671,11 +671,23 @@ h1 {
 }
 
 .category-filter {
+  position: sticky;
+  top: var(--header-height, 90px);
+  z-index: 15;
+  background: rgba(255, 250, 252, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   gap: 10px;
-  margin: 26px 0 32px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-top: 12px;
+  padding-bottom: 16px;
+  padding-left: calc(50vw - 50%);
+  padding-right: calc(50vw - 50%);
   overflow-x: auto;
-  padding-bottom: 8px;
   scrollbar-width: none;
 }
 
@@ -772,7 +784,20 @@ h1 {
   align-items: stretch;
   gap: 18px;
   width: 100%;
+  animation: gridFadeIn 0.45s ease-out forwards;
 }
+
+@keyframes gridFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .see-more-wrap {
   display: flex;

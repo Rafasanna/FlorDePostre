@@ -1,22 +1,49 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Search, Menu, ShoppingBag } from "lucide-react";
 import BrandMark from "./BrandMark.jsx";
 
 function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
   const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef(null);
 
   useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        const height = headerRef.current.getBoundingClientRect().height;
+        document.documentElement.style.setProperty("--header-height", `${height}px`);
+      }
+    };
+
+    updateHeaderHeight();
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
+      updateHeaderHeight();
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", updateHeaderHeight);
+
+    let resizeObserver;
+    if (headerRef.current && window.ResizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        updateHeaderHeight();
+      });
+      resizeObserver.observe(headerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateHeaderHeight);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   }, []);
 
   return (
-    <nav className={`nav ${scrolled ? "nav-scrolled" : ""}`}>
+    <nav ref={headerRef} className={`nav ${scrolled ? "nav-scrolled" : ""}`}>
       <button className="icon-button menu-trigger" type="button" onClick={onOpenMenu} aria-label="Menú principal">
         <Menu size={20} />
       </button>
