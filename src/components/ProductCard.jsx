@@ -1,48 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Sparkle, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Sparkle, Check } from "lucide-react";
 import ProductBadge from "./ProductBadge.jsx";
 import PromoBadge from "./PromoBadge.jsx";
 import { getProductBadges, hasActiveOffer } from "../utils/seasonal.js";
-import { getProductImages } from "../utils/productImages.js";
-
-const SLIDESHOW_INTERVAL_MS = 4000;
+import { getDisplayImageUrl, getProductImages } from "../utils/productImages.js";
 
 const isProductOrderable = (product) =>
   Boolean(product) && product.disponible !== false && product.reservado !== true;
 
-const preloadProductImage = (src) =>
-  new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => {
-      if (typeof image.decode === "function") {
-        image.decode().then(resolve).catch(resolve);
-        return;
-      }
-
-      resolve();
-    };
-    image.onerror = reject;
-    image.src = src;
-  });
-
 function ProductCard({ product, quantity, onAdd, formatPrice }) {
-  const cardRef = useRef(null);
   const addFeedbackTimeoutRef = useRef(null);
-  const isPreloadingNextImageRef = useRef(false);
   const [justAdded, setJustAdded] = useState(false);
   const [failedImages, setFailedImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [isCardVisible, setIsCardVisible] = useState(false);
   const badges = getProductBadges(product);
   const productImages = useMemo(() => getProductImages(product), [product]);
   const imagesKey = productImages.join("|");
-  const failedImagesKey = failedImages.join("|");
   const availableImages = useMemo(
     () => productImages.filter((image) => !failedImages.includes(image)),
     [failedImages, productImages]
   );
   const hasMultipleImages = availableImages.length > 1;
   const activeImage = availableImages[activeImageIndex] || availableImages[0] || "";
+  const activeImageUrl = getDisplayImageUrl(activeImage, {
+    width: 1200,
+    quality: "good"
+  });
   const hasImage = Boolean(activeImage);
 
   useEffect(() => {
@@ -55,94 +38,6 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
       setActiveImageIndex(0);
     }
   }, [activeImageIndex, availableImages.length]);
-
-  useEffect(() => {
-    if (!hasMultipleImages) {
-      setIsCardVisible(false);
-      return undefined;
-    }
-
-    const currentCard = cardRef.current;
-    if (!currentCard) return undefined;
-
-    if (typeof IntersectionObserver === "undefined") {
-      setIsCardVisible(true);
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsCardVisible(entry.isIntersecting);
-      },
-      {
-        rootMargin: "160px 0px",
-        threshold: 0.15
-      }
-    );
-
-    observer.observe(currentCard);
-
-    return () => {
-      observer.unobserve(currentCard);
-      observer.disconnect();
-    };
-  }, [hasMultipleImages, imagesKey]);
-
-  useEffect(() => {
-    if (!hasMultipleImages || !isCardVisible) return undefined;
-
-    let isCancelled = false;
-
-    const intervalId = window.setInterval(() => {
-      if (isPreloadingNextImageRef.current) return;
-
-      const nextIndex = (activeImageIndex + 1) % availableImages.length;
-      const nextImage = availableImages[nextIndex];
-
-      if (!nextImage) return;
-
-      isPreloadingNextImageRef.current = true;
-      preloadProductImage(nextImage)
-        .then(() => {
-          if (!isCancelled) {
-            setActiveImageIndex(nextIndex);
-          }
-        })
-        .catch(() => {
-          if (isCancelled) return;
-
-          setFailedImages((currentImages) =>
-            currentImages.includes(nextImage) ? currentImages : [...currentImages, nextImage]
-          );
-        })
-        .finally(() => {
-          isPreloadingNextImageRef.current = false;
-        });
-    }, SLIDESHOW_INTERVAL_MS);
-
-    return () => {
-      isCancelled = true;
-      window.clearInterval(intervalId);
-    };
-  }, [activeImageIndex, availableImages, failedImagesKey, hasMultipleImages, isCardVisible]);
-
-  useEffect(() => {
-    if (!activeImage) return undefined;
-
-    let isCancelled = false;
-
-    preloadProductImage(activeImage).catch(() => {
-      if (!isCancelled) {
-        setFailedImages((currentImages) =>
-          currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
-        );
-      }
-    });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [activeImage]);
 
   useEffect(() => () => {
     if (addFeedbackTimeoutRef.current) {
@@ -164,30 +59,81 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
     }, 3000);
   };
 
+  const handleImageError = () => {
+    if (!activeImage) return;
+
+    setFailedImages((currentImages) =>
+      currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
+    );
+  };
+
+  const handlePreviousImage = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!hasMultipleImages) return;
+
+    setActiveImageIndex((index) => (index - 1 + availableImages.length) % availableImages.length);
+  };
+
+  const handleNextImage = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!hasMultipleImages) return;
+
+    setActiveImageIndex((index) => (index + 1) % availableImages.length);
+  };
+
+  const handleSelectImage = (event, index) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setActiveImageIndex(index);
+  };
+
   return (
-    <article className="product-card" ref={cardRef}>
+    <article className="product-card">
       <div className={hasImage ? "product-media" : "product-media placeholder"}>
         {hasImage && (
           <img 
-            src={activeImage} 
+            src={activeImageUrl} 
             alt={product.nombre} 
-            onError={() => {
-              setFailedImages((currentImages) =>
-                currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
-              );
-            }} 
+            loading="lazy"
+            decoding="async"
+            onError={handleImageError} 
           />
         )}
         {hasMultipleImages && hasImage && (
-          <div className="product-image-dots" aria-label={`${availableImages.length} imágenes disponibles`}>
-            {availableImages.map((image, index) => (
-              <span
-                key={`${image}-${index}`}
-                className={index === activeImageIndex ? "active" : ""}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
+          <>
+            <button
+              type="button"
+              className="product-image-control previous"
+              onClick={handlePreviousImage}
+              aria-label={`Ver imagen anterior de ${product.nombre}`}
+            >
+              <ChevronLeft size={18} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="product-image-control next"
+              onClick={handleNextImage}
+              aria-label={`Ver imagen siguiente de ${product.nombre}`}
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+            <div className="product-image-dots" aria-label={`${availableImages.length} imágenes disponibles`}>
+              {availableImages.map((image, index) => (
+                <button
+                  key={`${image}-${index}`}
+                  type="button"
+                  className={index === activeImageIndex ? "active" : ""}
+                  aria-label={`Ver imagen ${index + 1} de ${availableImages.length} de ${product.nombre}`}
+                  aria-current={index === activeImageIndex ? "true" : undefined}
+                  onClick={(event) => handleSelectImage(event, index)}
+                />
+              ))}
+            </div>
+          </>
         )}
         {!hasImage && (
           <div className="placeholder-content">

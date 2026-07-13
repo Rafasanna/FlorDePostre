@@ -15,53 +15,33 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
   const sectionRef = useIntersectionObserver();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [visibleImageIndex, setVisibleImageIndex] = useState(0);
   const [failedImages, setFailedImages] = useState([]);
-  const [loadedImages, setLoadedImages] = useState([]);
   const availableImages = tortasCarouselImages.filter((image) => !failedImages.includes(image));
-  const availableImagesKey = availableImages.join("|");
   const normalizedImageIndex = availableImages.length
     ? ((activeImageIndex % availableImages.length) + availableImages.length) % availableImages.length
     : 0;
-  const normalizedVisibleImageIndex = availableImages.length
-    ? Math.min(visibleImageIndex, availableImages.length - 1)
-    : 0;
+  const activeImage = availableImages[normalizedImageIndex] || "";
 
   useEffect(() => {
-    tortasCarouselImages.forEach((src) => {
-      const image = new Image();
-      image.src = src;
-    });
-
-    const timer = window.setInterval(() => {
-      setActiveImageIndex((index) => index + 1);
-    }, 4000);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const nextImage = availableImages[normalizedImageIndex];
-
-    if (nextImage && loadedImages.includes(nextImage)) {
-      setVisibleImageIndex(normalizedImageIndex);
+    if (availableImages.length > 0 && activeImageIndex >= availableImages.length) {
+      setActiveImageIndex(0);
     }
-  }, [availableImagesKey, loadedImages, normalizedImageIndex]);
+  }, [activeImageIndex, availableImages.length]);
 
   const goToPreviousImage = () => {
-    setActiveImageIndex((index) => index - 1 + availableImages.length);
+    if (availableImages.length === 0) return;
+
+    setActiveImageIndex((index) => (index - 1 + availableImages.length) % availableImages.length);
   };
 
   const goToNextImage = () => {
-    setActiveImageIndex((index) => index + 1);
+    if (availableImages.length === 0) return;
+
+    setActiveImageIndex((index) => (index + 1) % availableImages.length);
   };
 
   const handleImageError = (image) => {
     setFailedImages((current) => (current.includes(image) ? current : [...current, image]));
-  };
-
-  const handleImageLoad = (image) => {
-    setLoadedImages((current) => (current.includes(image) ? current : [...current, image]));
   };
 
   return (
@@ -78,33 +58,34 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
       <div className="tortas-intro">
         <div className="tortas-visual">
           <div className={`tortas-carousel ${availableImages.length === 0 ? "torta-placeholder" : ""}`}>
-            {availableImages.map((image, index) => (
+            {activeImage && (
               <img
-                key={image}
-                className={`tortas-carousel-slide ${index === normalizedVisibleImageIndex ? "active" : ""}`}
-                src={image}
-                alt=""
-                aria-hidden="true"
-                loading="eager"
-                onError={() => handleImageError(image)}
-                onLoad={() => handleImageLoad(image)}
+                key={activeImage}
+                className="tortas-carousel-slide active"
+                src={activeImage}
+                alt="Ejemplo de torta personalizada de Flor de Postre"
+                loading={normalizedImageIndex === 0 ? "eager" : "lazy"}
+                fetchPriority={normalizedImageIndex === 0 ? "high" : "auto"}
+                decoding="async"
+                onError={() => handleImageError(activeImage)}
               />
-            ))}
+            )}
             {availableImages.length > 1 && (
               <>
-                <button className="tortas-carousel-control previous" type="button" onClick={goToPreviousImage} aria-label="Imagen anterior">
+                <button className="tortas-carousel-control previous" type="button" onClick={goToPreviousImage} aria-label="Imagen anterior de torta personalizada">
                   ‹
                 </button>
-                <button className="tortas-carousel-control next" type="button" onClick={goToNextImage} aria-label="Imagen siguiente">
+                <button className="tortas-carousel-control next" type="button" onClick={goToNextImage} aria-label="Imagen siguiente de torta personalizada">
                   ›
                 </button>
-                <div className="tortas-carousel-dots" aria-hidden="true">
+                <div className="tortas-carousel-dots">
                   {availableImages.map((image, index) => (
                     <button
                       key={image}
-                      className={index === normalizedVisibleImageIndex ? "active" : ""}
+                      className={index === normalizedImageIndex ? "active" : ""}
                       type="button"
-                      tabIndex={-1}
+                      aria-label={`Ver imagen ${index + 1} de ${availableImages.length}`}
+                      aria-current={index === normalizedImageIndex ? "true" : undefined}
                       onClick={() => setActiveImageIndex(index)}
                     />
                   ))}

@@ -4,7 +4,7 @@ import { CalendarDays, MessageCircle, ShoppingBag, Sparkle } from "lucide-react"
 import { postresBase } from "../data/postresData.js";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
-import { getProductImages } from "../utils/productImages.js";
+import { getDisplayImageUrl, getProductImages } from "../utils/productImages.js";
 import BackLink from "./BackLink.jsx";
 
 const getAvailableSizes = (postre) => postre.sizes?.filter((size) => size.disponible !== false) || [];
@@ -13,14 +13,6 @@ const getLowestPostrePrice = (postre) => {
   const prices = getAvailableSizes(postre).map((size) => size.precio).filter(Number.isFinite);
   return prices.length ? Math.min(...prices) : null;
 };
-
-const preloadPostreImage = (src) =>
-  new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = resolve;
-    image.onerror = reject;
-    image.src = src;
-  });
 
 const selectSizeCtaStyle = {
   alignItems: "center",
@@ -65,6 +57,10 @@ function PostreImage({ postre, large = false }) {
   const [failedImages, setFailedImages] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
   const activeImage = images.find((image) => !failedImages.includes(image)) || "";
+  const activeImageUrl = getDisplayImageUrl(activeImage, {
+    width: large ? 1800 : 1200,
+    quality: large ? "best" : "good"
+  });
   const hasImage = Boolean(activeImage);
 
   useEffect(() => {
@@ -75,35 +71,15 @@ function PostreImage({ postre, large = false }) {
     setImageLoaded(false);
   }, [activeImage]);
 
-  useEffect(() => {
-    if (!activeImage) return undefined;
-
-    let isCancelled = false;
-
-    preloadPostreImage(activeImage)
-      .then(() => {
-        if (!isCancelled) setImageLoaded(true);
-      })
-      .catch(() => {
-        if (isCancelled) return;
-
-        setFailedImages((currentImages) =>
-          currentImages.includes(activeImage) ? currentImages : [...currentImages, activeImage]
-        );
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [activeImage]);
-
   if (hasImage) {
     return (
       <>
         <img
-          src={activeImage}
+          src={activeImageUrl}
           alt={postre.nombre}
           loading={large ? "eager" : "lazy"}
+          fetchPriority={large ? "high" : undefined}
+          decoding="async"
           onLoad={() => setImageLoaded(true)}
           onError={() => {
             setFailedImages((currentImages) =>
@@ -131,52 +107,61 @@ function PostreImage({ postre, large = false }) {
 }
 
 function PostreGallery({ postre }) {
-  const images = getProductImages(postre);
+  const images = useMemo(() => getProductImages(postre), [postre]);
   const imagesKey = images.join("|");
+  const [failedImages, setFailedImages] = useState([]);
+  const availableImages = useMemo(
+    () => images.filter((image) => !failedImages.includes(image)),
+    [failedImages, images]
+  );
   const [selectedImage, setSelectedImage] = useState(images[0] || "");
-  const [imageFailed, setImageFailed] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const hasImages = images.length > 0;
+  const selectedImageUrl = getDisplayImageUrl(selectedImage, {
+    width: 1800,
+    quality: "best"
+  });
+  const hasImages = availableImages.length > 0;
 
   useEffect(() => {
     setSelectedImage(images[0] || "");
+    setFailedImages([]);
   }, [imagesKey]);
 
   useEffect(() => {
-    setImageFailed(false);
     setImageLoaded(false);
   }, [selectedImage]);
 
   useEffect(() => {
-    if (!selectedImage) return undefined;
+    if (!availableImages.length) return;
 
-    let isCancelled = false;
+    if (!selectedImage || !availableImages.includes(selectedImage)) {
+      setSelectedImage(availableImages[0]);
+    }
+  }, [availableImages, selectedImage]);
 
-    preloadPostreImage(selectedImage)
-      .then(() => {
-        if (!isCancelled) setImageLoaded(true);
-      })
-      .catch(() => {
-        if (!isCancelled) setImageFailed(true);
-      });
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedImage]);
-
-  if (!hasImages || imageFailed) {
-    return <PostreImage postre={postre} large />;
+  if (!hasImages) {
+    return (
+      <div className="postre-placeholder">
+        <Sparkle size={30} />
+        <span>Flor de Postre</span>
+      </div>
+    );
   }
 
   return (
     <>
       <img
-        src={selectedImage}
+        src={selectedImageUrl}
         alt={postre.nombre}
         loading="eager"
+        fetchPriority="high"
+        decoding="async"
         onLoad={() => setImageLoaded(true)}
-        onError={() => setImageFailed(true)}
+        onError={() => {
+          setFailedImages((currentImages) =>
+            currentImages.includes(selectedImage) ? currentImages : [...currentImages, selectedImage]
+          );
+        }}
         style={{ opacity: imageLoaded ? 1 : 0 }}
       />
       {!imageLoaded && (
@@ -185,17 +170,25 @@ function PostreGallery({ postre }) {
           <span>Flor de Postre</span>
         </div>
       )}
-      {images.length > 1 && (
+      {availableImages.length > 1 && (
         <div className="postre-gallery-thumbs" aria-label="Imágenes del producto">
-          {images.map((image, index) => (
+          {availableImages.map((image, index) => (
             <button
               key={`${image}-${index}`}
               type="button"
               className={image === selectedImage ? "active" : ""}
               onClick={() => setSelectedImage(image)}
-              aria-label={`Ver imagen ${index + 1} de ${postre.nombre}`}
+              aria-label={`Ver imagen ${index + 1} de ${availableImages.length} de ${postre.nombre}`}
             >
-              <img src={image} alt="" loading="lazy" />
+              <img
+                src={getDisplayImageUrl(image, {
+                  width: 300,
+                  quality: "good"
+                })}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
             </button>
           ))}
         </div>
