@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Minus, Plus, Send, Sparkle, Trash2, X } from "lucide-react";
-import { getPrimaryProductImage } from "../utils/productImages.js";
+import { getDisplayImageUrl, getPrimaryProductImage } from "../utils/productImages.js";
 
 function CartDrawer({
   isOpen,
@@ -69,10 +69,11 @@ function CartDrawer({
 
   const renderItemImage = (item) => {
     const image = item.imagen || getPrimaryProductImage(item.product);
+    const displayImage = getDisplayImageUrl(image, { width: 160, quality: "eco" });
 
     return (
       <div className={image ? "cart-item-image" : "cart-item-image placeholder"}>
-        {image ? <img src={image} alt={item.nombre} loading="lazy" /> : <Sparkle size={18} />}
+        {image ? <img src={displayImage} alt={item.nombre} loading="lazy" decoding="async" /> : <Sparkle size={18} />}
       </div>
     );
   };

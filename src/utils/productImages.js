@@ -30,7 +30,7 @@ export const getProductImages = (product) => {
 
 export const getPrimaryProductImage = (product) => getProductImages(product)[0] || "";
 
-const CLOUDINARY_UPLOAD_PATH = "/image/upload/";
+const CLOUDINARY_UPLOAD_PATHS = ["/image/upload/", "/video/upload/"];
 const DEFAULT_DISPLAY_WIDTH = 1200;
 const MAX_DISPLAY_WIDTH = 2400;
 const QUALITY_TRANSFORMATIONS = {
@@ -51,6 +51,12 @@ const normalizeDisplayWidth = (width) => {
 
 const normalizeQualityTransformation = (quality) =>
   QUALITY_TRANSFORMATIONS[quality] || QUALITY_TRANSFORMATIONS.good;
+
+const getCloudinaryUploadPath = (parsedUrl) => {
+  if (parsedUrl.hostname !== "res.cloudinary.com") return "";
+
+  return CLOUDINARY_UPLOAD_PATHS.find((path) => parsedUrl.pathname.includes(path)) || "";
+};
 
 const buildCloudinaryDeliveryTransformation = ({ width, quality }) =>
   [
@@ -86,16 +92,12 @@ export const getDisplayImageUrl = (url, options = {}) => {
     return url;
   }
 
-  if (
-    parsedUrl.hostname !== "res.cloudinary.com" ||
-    !parsedUrl.pathname.includes(CLOUDINARY_UPLOAD_PATH)
-  ) {
-    return url;
-  }
+  const uploadPath = getCloudinaryUploadPath(parsedUrl);
+  if (!uploadPath) return url;
 
-  const uploadPathIndex = parsedUrl.pathname.indexOf(CLOUDINARY_UPLOAD_PATH);
-  const pathBeforeUpload = parsedUrl.pathname.slice(0, uploadPathIndex + CLOUDINARY_UPLOAD_PATH.length);
-  const pathAfterUpload = parsedUrl.pathname.slice(uploadPathIndex + CLOUDINARY_UPLOAD_PATH.length);
+  const uploadPathIndex = parsedUrl.pathname.indexOf(uploadPath);
+  const pathBeforeUpload = parsedUrl.pathname.slice(0, uploadPathIndex + uploadPath.length);
+  const pathAfterUpload = parsedUrl.pathname.slice(uploadPathIndex + uploadPath.length);
 
   if (!pathAfterUpload) return url;
 
@@ -112,4 +114,23 @@ export const getDisplayImageUrl = (url, options = {}) => {
   parsedUrl.pathname = `${pathBeforeUpload}${desiredTransformation}/${assetPathParts.join("/")}`;
 
   return parsedUrl.toString();
+};
+
+export const getResponsiveImageSrcSet = (url, widths, options = {}) => {
+  if (typeof url !== "string" || !Array.isArray(widths)) return "";
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url.trim());
+  } catch {
+    return "";
+  }
+
+  if (!getCloudinaryUploadPath(parsedUrl)) return "";
+
+  const normalizedWidths = [...new Set(widths.map(normalizeDisplayWidth))].sort((a, b) => a - b);
+
+  return normalizedWidths
+    .map((width) => `${getDisplayImageUrl(url, { ...options, width })} ${width}w`)
+    .join(", ");
 };

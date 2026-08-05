@@ -23,6 +23,7 @@ const carouselImages = [
 
 function Hero({ itemCount, onOpenCart }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [preloadedImageIndexes, setPreloadedImageIndexes] = useState(() => new Set([0]));
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,6 +31,31 @@ function Hero({ itemCount, onOpenCart }) {
     }, 3500);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const nextImageIndex = (currentImageIndex + 1) % carouselImages.length;
+    if (preloadedImageIndexes.has(nextImageIndex)) return undefined;
+
+    let isCancelled = false;
+    const image = new Image();
+    const markAsPreloaded = () => {
+      if (isCancelled) return;
+
+      setPreloadedImageIndexes((currentIndexes) => {
+        if (currentIndexes.has(nextImageIndex)) return currentIndexes;
+        return new Set([...currentIndexes, nextImageIndex]);
+      });
+    };
+
+    image.onload = markAsPreloaded;
+    image.src = carouselImages[nextImageIndex];
+    if (image.complete) markAsPreloaded();
+
+    return () => {
+      isCancelled = true;
+      image.onload = null;
+    };
+  }, [currentImageIndex, preloadedImageIndexes]);
 
   return (
     <header className="hero" id="inicio">
@@ -43,22 +69,29 @@ function Hero({ itemCount, onOpenCart }) {
         </div>
 
         <div className="hero-visual" aria-label="Pasteleria Flor de Postre">
-          {carouselImages.map((src, index) => (
-            <img 
-              key={src}
-              className="hero-main-img" 
-              src={src} 
-              alt="Alfajores artesanales de Flor de Postre" 
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                opacity: index === currentImageIndex ? 1 : 0,
-                transition: 'opacity 1s ease-in-out',
-                zIndex: index === currentImageIndex ? 1 : 0
-              }}
-            />
-          ))}
+          {carouselImages.map((src, index) => {
+            if (!preloadedImageIndexes.has(index) && index !== currentImageIndex) return null;
+
+            return (
+              <img
+                key={src}
+                className="hero-main-img"
+                src={src}
+                alt="Alfajores artesanales de Flor de Postre"
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === currentImageIndex ? "high" : "low"}
+                decoding="async"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  opacity: index === currentImageIndex ? 1 : 0,
+                  transition: 'opacity 1s ease-in-out',
+                  zIndex: index === currentImageIndex ? 1 : 0
+                }}
+              />
+            );
+          })}
           <div className="hero-card mini-logo" style={{ zIndex: 10 }}>
             <BrandMark variant="circle" />
             <span>@flordepostre.ok</span>

@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Plus, Sparkle, Check } from "lucide-react";
 import ProductBadge from "./ProductBadge.jsx";
 import PromoBadge from "./PromoBadge.jsx";
 import { getProductBadges, hasActiveOffer } from "../utils/seasonal.js";
-import { getDisplayImageUrl, getProductImages } from "../utils/productImages.js";
+import { getDisplayImageUrl, getProductImages, getResponsiveImageSrcSet } from "../utils/productImages.js";
 
 const isProductOrderable = (product) =>
   Boolean(product) && product.disponible !== false && product.reservado !== true;
@@ -23,7 +23,10 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
   const hasMultipleImages = availableImages.length > 1;
   const activeImage = availableImages[activeImageIndex] || availableImages[0] || "";
   const activeImageUrl = getDisplayImageUrl(activeImage, {
-    width: 1200,
+    width: 768,
+    quality: "good"
+  });
+  const activeImageSrcSet = getResponsiveImageSrcSet(activeImage, [480, 768, 1200], {
     quality: "good"
   });
   const hasImage = Boolean(activeImage);
@@ -97,6 +100,8 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
         {hasImage && (
           <img 
             src={activeImageUrl} 
+            srcSet={activeImageSrcSet || undefined}
+            sizes="(max-width: 680px) calc(100vw - 32px), (max-width: 960px) calc(50vw - 42px), 280px"
             alt={product.nombre} 
             loading="lazy"
             decoding="async"

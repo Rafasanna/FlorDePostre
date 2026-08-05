@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Building2, Home, MessageCircle, Send, Sparkles, WheatOff } from "lucide-react";
+import { Building2, Send, Sparkles, WheatOff } from "lucide-react";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
 import BackLink from "./BackLink.jsx";
@@ -66,37 +66,6 @@ const cateringTabs = [
     content: {
       intro: [
         "Trabajamos en propuestas de entre 15 y 150 personas. Cada desayuno se diseña según las necesidades y presupuesto de cada cliente. Nos ocupamos del traslado, armado y desarmado del servicio. Contamos con nuestro propio inventario de vajilla de porcelana, mesas, mantelería, cafeteras y todo lo necesario para una experiencia completa."
-      ]
-    }
-  },
-  {
-    id: "domicilio",
-    label: "Desayunos a Domicilio",
-    eyebrow: "A domicilio",
-    title: "Desayunos a Domicilio",
-    icon: Home,
-    cta: "Personalizar por WhatsApp",
-    message:
-      "Hola! Me gustaría consultar por un desayuno personalizado u otras opciones disponibles.",
-    content: {
-      intro: [
-        "Una propuesta base pensada para regalar o compartir, con opciones dulces, saladas y bebidas."
-      ],
-      breakfast: [
-        "1 bebida a elección (café, jugo exprimido o saquitos de té)",
-        "1 yogurt artesanal con frutas y granola",
-        "1 tartita o lingote según stock del día",
-        "1 scon de queso",
-        "1 sándwich de miga",
-        "2 medialunas con jamón y queso",
-        "1 alfajor o 1 dona",
-        "1 tortita de coco, pastafrola o cuadrado de brownie/limón"
-      ],
-      price: "$31.500 + envío",
-      note: [
-        "Esta propuesta puede personalizarse.",
-        "Podés agregar opciones, sacar productos o adaptar el contenido según lo que estés buscando.",
-        "Si querés modificar algo, lo charlamos por WhatsApp."
       ]
     }
   }
@@ -169,7 +138,7 @@ function CateringSection() {
           </div>
         </div>
 
-        {activeTab.content.note && activeTab.id !== "domicilio" && (
+        {activeTab.content.note && (
           <div className="catering-note">
             <Sparkles size={20} />
             <div>
@@ -195,40 +164,6 @@ function CateringSection() {
           <p className="catering-small-note">{activeTab.content.smallNote}</p>
         )}
 
-        {activeTab.content.breakfast && (
-          <div className="breakfast-box">
-            <div>
-              <span>Propuesta estándar</span>
-              <h3>Incluye</h3>
-            </div>
-            <ul>
-              {activeTab.content.breakfast.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            {activeTab.id === "domicilio" ? (
-              <a
-                className="breakfast-price"
-                href={makeWhatsappHref("Hola! Quiero consultar por el desayuno de $31.500 + envío.")}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {activeTab.content.price}
-              </a>
-            ) : (
-              <strong className="breakfast-price">{activeTab.content.price}</strong>
-            )}
-          </div>
-        )}
-
-        {activeTab.id === "domicilio" && activeTab.content.note && (
-          <div className="catering-personalize-note">
-            {activeTab.content.note.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-        )}
-
         <a
           id="catering-whatsapp-cta"
           className="primary-button whatsapp-button catering-panel-cta"
@@ -236,7 +171,7 @@ function CateringSection() {
           target="_blank"
           rel="noreferrer"
         >
-          {activeTab.id === "domicilio" ? <MessageCircle size={18} /> : <Send size={18} />}
+          <Send size={18} />
           {activeTab.cta}
         </a>
       </article>

@@ -4,7 +4,7 @@ import { CalendarDays, MessageCircle, ShoppingBag, Sparkle } from "lucide-react"
 import { postresBase } from "../data/postresData.js";
 import { WHATSAPP_URL } from "../config.js";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
-import { getDisplayImageUrl, getProductImages } from "../utils/productImages.js";
+import { getDisplayImageUrl, getProductImages, getResponsiveImageSrcSet } from "../utils/productImages.js";
 import BackLink from "./BackLink.jsx";
 
 const getAvailableSizes = (postre) => postre.sizes?.filter((size) => size.disponible !== false) || [];
@@ -58,7 +58,10 @@ function PostreImage({ postre, large = false }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const activeImage = images.find((image) => !failedImages.includes(image)) || "";
   const activeImageUrl = getDisplayImageUrl(activeImage, {
-    width: large ? 1800 : 1200,
+    width: large ? 1200 : 768,
+    quality: large ? "best" : "good"
+  });
+  const activeImageSrcSet = getResponsiveImageSrcSet(activeImage, large ? [768, 1200, 1800] : [480, 768, 1200], {
     quality: large ? "best" : "good"
   });
   const hasImage = Boolean(activeImage);
@@ -76,6 +79,10 @@ function PostreImage({ postre, large = false }) {
       <>
         <img
           src={activeImageUrl}
+          srcSet={activeImageSrcSet || undefined}
+          sizes={large
+            ? "(max-width: 960px) calc(100vw - 48px), 55vw"
+            : "(max-width: 680px) calc(100vw - 32px), (max-width: 960px) calc(50vw - 42px), 360px"}
           alt={postre.nombre}
           loading={large ? "eager" : "lazy"}
           fetchPriority={large ? "high" : undefined}
@@ -117,7 +124,10 @@ function PostreGallery({ postre }) {
   const [selectedImage, setSelectedImage] = useState(images[0] || "");
   const [imageLoaded, setImageLoaded] = useState(false);
   const selectedImageUrl = getDisplayImageUrl(selectedImage, {
-    width: 1800,
+    width: 1200,
+    quality: "best"
+  });
+  const selectedImageSrcSet = getResponsiveImageSrcSet(selectedImage, [768, 1200, 1800], {
     quality: "best"
   });
   const hasImages = availableImages.length > 0;
@@ -152,6 +162,8 @@ function PostreGallery({ postre }) {
     <>
       <img
         src={selectedImageUrl}
+        srcSet={selectedImageSrcSet || undefined}
+        sizes="(max-width: 960px) calc(100vw - 48px), 55vw"
         alt={postre.nombre}
         loading="eager"
         fetchPriority="high"
@@ -182,9 +194,11 @@ function PostreGallery({ postre }) {
             >
               <img
                 src={getDisplayImageUrl(image, {
-                  width: 300,
+                  width: 160,
                   quality: "good"
                 })}
+                srcSet={getResponsiveImageSrcSet(image, [160, 300], { quality: "good" }) || undefined}
+                sizes="80px"
                 alt=""
                 loading="lazy"
                 decoding="async"

@@ -1,6 +1,6 @@
 import { Minus, Plus, Send, Sparkle, Trash2 } from "lucide-react";
 import BackLink from "../components/BackLink.jsx";
-import { getPrimaryProductImage } from "../utils/productImages.js";
+import { getDisplayImageUrl, getPrimaryProductImage } from "../utils/productImages.js";
 
 function CartPage({
   items,
@@ -45,10 +45,11 @@ function CartPage({
 
   const renderItemImage = (item) => {
     const image = item.imagen || getPrimaryProductImage(item.product);
+    const displayImage = getDisplayImageUrl(image, { width: 160, quality: "eco" });
 
     return (
       <div className={image ? "cart-item-image" : "cart-item-image placeholder"}>
-        {image ? <img src={image} alt={item.nombre} loading="lazy" /> : <Sparkle size={18} />}
+        {image ? <img src={displayImage} alt={item.nombre} loading="lazy" decoding="async" /> : <Sparkle size={18} />}
       </div>
     );
   };

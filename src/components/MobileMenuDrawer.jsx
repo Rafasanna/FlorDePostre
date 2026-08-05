@@ -42,6 +42,7 @@ function MobileMenuDrawer({ isOpen, onClose }) {
     { label: "Nuestro Catering", to: "/catering" },
     { label: "Tortas Personalizadas", to: "/tortas-personalizadas" },
     { label: "Postres", to: "/postres" },
+    { label: "Desayunos", to: "/desayunos" },
     { label: "Sobre Flor de Postre", to: "/sobre" }
   ];
 

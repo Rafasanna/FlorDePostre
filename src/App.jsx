@@ -30,6 +30,7 @@ import DailyMenuSection from "./components/DailyMenuSection.jsx";
 import PostresSection from "./components/PostresSection.jsx";
 import TortasSection from "./components/TortasSection.jsx";
 import CateringSection from "./components/CateringSection.jsx";
+import BreakfastSection from "./components/BreakfastSection.jsx";
 import AboutSection from "./components/AboutSection.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
 import Footer from "./components/Footer.jsx";
@@ -585,7 +586,7 @@ function App() {
   const normalizedPathname = pathname.replace(/\/+$/, "") || "/";
   const floatingButtonLabel = normalizedPathname === "/tortas-personalizadas"
     ? "Diseñar mi torta"
-    : normalizedPathname === "/catering"
+    : normalizedPathname === "/catering" || normalizedPathname === "/desayunos"
       ? "Consultar por WhatsApp"
       : normalizedPathname === "/como-pedir"
         ? "Ver menú diario"
@@ -598,7 +599,7 @@ function App() {
       return;
     }
 
-    if (normalizedPathname === "/catering") {
+    if (normalizedPathname === "/catering" || normalizedPathname === "/desayunos") {
       document.getElementById("catering-whatsapp-cta")?.click();
       return;
     }
@@ -665,6 +666,7 @@ function App() {
           />
           <Route path="/como-pedir" element={<ComoPedirPage />} />
           <Route path="/catering" element={<CateringSection cateringHref={cateringHref} />} />
+          <Route path="/desayunos" element={<BreakfastSection />} />
           <Route
             path="/tortas-personalizadas"
             element={
