@@ -107,6 +107,7 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
             <li><strong>5.</strong> Detalles y fecha</li>
           </ul>
           <button 
+            id="cake-configurator-start"
             className="primary-button" 
             onClick={() => setIsConfiguring(true)}
             style={{ marginTop: '24px', width: '100%', padding: '16px' }}

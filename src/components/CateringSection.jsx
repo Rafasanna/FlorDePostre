@@ -230,6 +230,7 @@ function CateringSection() {
         )}
 
         <a
+          id="catering-whatsapp-cta"
           className="primary-button whatsapp-button catering-panel-cta"
           href={makeWhatsappHref(activeTab.message)}
           target="_blank"

@@ -582,6 +582,35 @@ function App() {
     navigate("/");
   };
 
+  const normalizedPathname = pathname.replace(/\/+$/, "") || "/";
+  const floatingButtonLabel = normalizedPathname === "/tortas-personalizadas"
+    ? "Diseñar mi torta"
+    : normalizedPathname === "/catering"
+      ? "Consultar por WhatsApp"
+      : normalizedPathname === "/como-pedir"
+        ? "Ver menú diario"
+        : "Mi pedido";
+  const isFloatingCartButton = floatingButtonLabel === "Mi pedido";
+
+  const handleFloatingButtonClick = () => {
+    if (normalizedPathname === "/tortas-personalizadas") {
+      document.getElementById("cake-configurator-start")?.click();
+      return;
+    }
+
+    if (normalizedPathname === "/catering") {
+      document.getElementById("catering-whatsapp-cta")?.click();
+      return;
+    }
+
+    if (normalizedPathname === "/como-pedir") {
+      goToMenu();
+      return;
+    }
+
+    navigate("/pedido");
+  };
+
   return (
     <div className="site-shell">
       <Header 
@@ -671,9 +700,9 @@ function App() {
         </Routes>
       </main>
 
-      <button className="floating-cart" onClick={() => navigate("/pedido")} aria-label="Ver carrito" style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
+      <button className="floating-cart" onClick={handleFloatingButtonClick} aria-label={isFloatingCartButton ? "Ver carrito" : floatingButtonLabel} style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
         <ShoppingBag size={18} />
-        <span>Mi pedido {itemCount > 0 && `(${itemCount})`}</span>
+        <span>{floatingButtonLabel} {isFloatingCartButton && itemCount > 0 && `(${itemCount})`}</span>
       </button>
 
       <Footer />
