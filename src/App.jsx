@@ -130,31 +130,40 @@ const resolvePostresWithSizes = (postres, tamanos, configs) => {
 const SHEETS_CACHE_PREFIX = "florDePostre:sheets:";
 const SHEETS_NOTICE =
   "Algunos datos pueden estar desactualizados. Confirmamos disponibilidad por WhatsApp.";
+const SHEETS_CACHE_STORAGES = ["localStorage", "sessionStorage"];
 
 const getCachedDataset = (key) => {
   if (typeof window === "undefined") return null;
 
-  try {
-    const value = window.sessionStorage.getItem(`${SHEETS_CACHE_PREFIX}${key}`);
-    if (!value) return null;
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
-  } catch (error) {
-    if (import.meta.env.DEV) {
-      console.info(`[Google Sheets] error leyendo cache de ${key}.`, error);
+  for (const storageName of SHEETS_CACHE_STORAGES) {
+    try {
+      const value = window[storageName].getItem(`${SHEETS_CACHE_PREFIX}${key}`);
+      if (!value) continue;
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.info(`[Google Sheets] error leyendo ${storageName} de ${key}.`, error);
+      }
     }
-    return null;
   }
+
+  return null;
 };
 
 const cacheDataset = (key, data) => {
   if (typeof window === "undefined" || !Array.isArray(data) || data.length === 0) return;
 
-  try {
-    window.sessionStorage.setItem(`${SHEETS_CACHE_PREFIX}${key}`, JSON.stringify(data));
-  } catch (error) {
-    if (import.meta.env.DEV) {
-      console.info(`[Google Sheets] error guardando cache de ${key}.`, error);
+  const serializedData = JSON.stringify(data);
+
+  for (const storageName of SHEETS_CACHE_STORAGES) {
+    try {
+      window[storageName].setItem(`${SHEETS_CACHE_PREFIX}${key}`, serializedData);
+      return;
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.info(`[Google Sheets] error guardando ${storageName} de ${key}.`, error);
+      }
     }
   }
 };
@@ -213,30 +222,10 @@ function App() {
       { key: "tortaExtras", label: "extras de tortas", fetcher: fetchTortaExtrasFromSheet, setter: setTortaExtrasData, showNoticeOnFallback: true }
     ];
 
-    Promise.allSettled(
-      resources.map((resource) =>
-        resource.fetcher().then((data) => ({
-          ...resource,
-          data
-        }))
-      )
-    ).then((results) => {
-      if (!isMounted) return;
+    resources.forEach((resource) => {
+      resource.fetcher().then((data) => {
+        if (!isMounted) return;
 
-      let shouldShowSheetsNotice = false;
-
-      results.forEach((result, index) => {
-        const resource = resources[index];
-
-        if (result.status === "rejected") {
-          shouldShowSheetsNotice = shouldShowSheetsNotice || resource.showNoticeOnFallback;
-          if (import.meta.env.DEV) {
-            console.info(`[Google Sheets] error en ${resource.label}; se conserva el estado actual.`, result.reason);
-          }
-          return;
-        }
-
-        const { data } = result.value;
         if (Array.isArray(data) && data.length > 0) {
           cacheDataset(resource.key, data);
           resource.setter(data);
@@ -249,15 +238,20 @@ function App() {
           return;
         }
 
-        shouldShowSheetsNotice = shouldShowSheetsNotice || resource.showNoticeOnFallback;
+        if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
         if (import.meta.env.DEV) {
           const hasCachedData = Boolean(getCachedDataset(resource.key));
           const fallbackMessage = hasCachedData ? "se conserva cache previa" : "usando fallback local";
           console.info(`[Google Sheets] ${resource.label} sin datos válidos; ${fallbackMessage}.`);
         }
-      });
+      }).catch((error) => {
+        if (!isMounted) return;
 
-      setSheetsNotice(shouldShowSheetsNotice ? SHEETS_NOTICE : "");
+        if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
+        if (import.meta.env.DEV) {
+          console.info(`[Google Sheets] error en ${resource.label}; se conserva el estado actual.`, error);
+        }
+      });
     });
 
     return () => {

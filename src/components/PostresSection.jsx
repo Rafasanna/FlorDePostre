@@ -51,7 +51,7 @@ ${date || "A definir"}
   return `${WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
 };
 
-function PostreImage({ postre, large = false }) {
+function PostreImage({ postre, large = false, priority = false }) {
   const images = useMemo(() => getProductImages(postre), [postre]);
   const imagesKey = images.join("|");
   const [failedImages, setFailedImages] = useState([]);
@@ -84,8 +84,8 @@ function PostreImage({ postre, large = false }) {
             ? "(max-width: 960px) calc(100vw - 48px), 55vw"
             : "(max-width: 680px) calc(100vw - 32px), (max-width: 960px) calc(50vw - 42px), 360px"}
           alt={postre.nombre}
-          loading={large ? "eager" : "lazy"}
-          fetchPriority={large ? "high" : undefined}
+          loading={large || priority ? "eager" : "lazy"}
+          fetchPriority={large || priority ? "high" : undefined}
           decoding="async"
           onLoad={() => setImageLoaded(true)}
           onError={() => {
@@ -223,6 +223,15 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
   );
   const availableSizes = useMemo(() => getAvailableSizes(selectedPostre || {}), [selectedPostre]);
   const selectedSize = availableSizes.find((size) => size.id === selectedSizeId) || availableSizes[0] || null;
+  const priorityImageIds = useMemo(
+    () => new Set(
+      postres
+        .filter((postre) => getProductImages(postre).length > 0)
+        .slice(0, 4)
+        .map((postre) => postre.id)
+    ),
+    [postres]
+  );
 
   const handleAddPostreToCart = () => {
     if (!selectedPostre || !selectedSize || !onAddToCart) return;
@@ -368,7 +377,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
             to={`/postres/${postre.id}`}
           >
             <div className={getProductImages(postre).length > 0 ? "postre-card-media" : "postre-card-media placeholder"}>
-              <PostreImage postre={postre} />
+              <PostreImage postre={postre} priority={priorityImageIds.has(postre.id)} />
             </div>
             <div className="product-info">
               <h3>{postre.nombre}</h3>

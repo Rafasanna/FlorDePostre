@@ -517,16 +517,30 @@ export const normalizeTortaExtra = (row) => {
   };
 };
 
-export const fetchCsv = async (url) => {
-  const response = await fetch(url);
-  if (import.meta.env.DEV) {
-    console.info(`[Google Sheets] Fetch status: ${response.status}`);
-  }
+const SHEETS_FETCH_TIMEOUT_MS = 8000;
 
-  if (!response.ok) {
-    throw new Error(`No se pudo cargar Google Sheets (${response.status})`);
+export const fetchCsv = async (url) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), SHEETS_FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (import.meta.env.DEV) {
+      console.info(`[Google Sheets] Fetch status: ${response.status}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(`No se pudo cargar Google Sheets (${response.status})`);
+    }
+    return await response.text();
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("Google Sheets tardó demasiado en responder");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  return response.text();
 };
 
 export const fetchDailyProductsFromSheet = async () => {
