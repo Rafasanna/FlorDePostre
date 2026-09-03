@@ -88,12 +88,6 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
     setActiveImageIndex((index) => (index + 1) % availableImages.length);
   };
 
-  const handleSelectImage = (event, index) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setActiveImageIndex(index);
-  };
-
   return (
     <article className="product-card">
       <div className={hasImage ? "product-media" : "product-media placeholder"}>
@@ -126,18 +120,6 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
             >
               <ChevronRight size={18} aria-hidden="true" />
             </button>
-            <div className="product-image-dots" aria-label={`${availableImages.length} imágenes disponibles`}>
-              {availableImages.map((image, index) => (
-                <button
-                  key={`${image}-${index}`}
-                  type="button"
-                  className={index === activeImageIndex ? "active" : ""}
-                  aria-label={`Ver imagen ${index + 1} de ${availableImages.length} de ${product.nombre}`}
-                  aria-current={index === activeImageIndex ? "true" : undefined}
-                  onClick={(event) => handleSelectImage(event, index)}
-                />
-              ))}
-            </div>
           </>
         )}
         {!hasImage && (
