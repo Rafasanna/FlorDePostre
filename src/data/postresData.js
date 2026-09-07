@@ -18,11 +18,3 @@ export const postresBase = [
   { id: "pavlova", nombre: "Pavlova", descripcion: "Postre con merengue y frutas." },
   { id: "flan-dulce-leche-crema", nombre: "Flan con dulce de leche y crema", descripcion: "Flan casero." }
 ];
-
-export const postresSizes = [
-  { id: "size-15", nombre: "15 cm", porciones: "4-6 porciones", precioEstimado: 11500 },
-  { id: "size-18", nombre: "18 cm", porciones: "8-10 porciones", precioEstimado: 14500 },
-  { id: "size-22", nombre: "22 cm", porciones: "12-15 porciones", precioEstimado: 18500 },
-  { id: "size-24", nombre: "24 cm", porciones: "15-20 porciones", precioEstimado: 22000 },
-  { id: "size-rectangular", nombre: "Rectangular 45x25 cm", porciones: "25-30 porciones", precioEstimado: 35000 }
-];

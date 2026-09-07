@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, ShoppingBag } from "lucide-react";
-import { postresSizes } from "../data/postresData.js";
 
 // Componente legado no montado actualmente; PostresSection usa los tamaños resueltos desde App.
 const formatPrice = (value) =>
@@ -15,6 +14,9 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
   const [selectedSize, setSelectedSize] = useState(null);
   const [date, setDate] = useState("");
   const [comments, setComments] = useState("");
+  const availableSizes = postre?.sizes?.filter(
+    (size) => size.disponible !== false && Number.isFinite(size.precio) && size.precio > 0
+  ) || [];
 
   const minDate = (() => {
     const d = new Date();
@@ -30,13 +32,14 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
   const handleSend = () => {
     if (!selectedSize || !date) return;
     
-    const sizeObj = postresSizes.find(s => s.id === selectedSize);
+    const sizeObj = availableSizes.find(s => s.id === selectedSize);
+    if (!sizeObj) return;
     
     const cartItem = {
       type: 'postre',
       product: postre,
       nombre: postre.nombre,
-      precio: sizeObj.precioEstimado, // Precio base
+      precio: sizeObj.precio,
       quantity: 1,
       configuracion: {
         sizeId: sizeObj.id,
@@ -69,8 +72,8 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
         <div className="cart-items configurator-body">
           <div className="form-group">
             <label>1. Elegí el tamaño *</label>
-            <div className="options-grid">
-              {postresSizes.map((size) => (
+            {availableSizes.length > 0 ? <div className="options-grid">
+              {availableSizes.map((size) => (
                 <button
                   key={size.id}
                   className={`option-btn ${selectedSize === size.id ? 'selected' : ''}`}
@@ -78,11 +81,17 @@ function PostreConfigurator({ postre, onClose, onAddToCart }) {
                 >
                   <strong>{size.nombre}</strong>
                   <small>{size.porciones}</small>
-                  <span className="price-tag">~{formatPrice(size.precioEstimado)}</span>
+                  <span className="price-tag">~{formatPrice(size.precio)}</span>
                 </button>
               ))}
-            </div>
-            <small className="help-text">El precio puede variar levemente según el sabor y adicionales.</small>
+            </div> : (
+              <p className="help-text">
+                No pudimos cargar los tamaños y precios en este momento. Consultanos por WhatsApp.
+              </p>
+            )}
+            {availableSizes.length > 0 && (
+              <small className="help-text">El precio puede variar levemente según el sabor y adicionales.</small>
+            )}
           </div>
 
           <div className="form-group">

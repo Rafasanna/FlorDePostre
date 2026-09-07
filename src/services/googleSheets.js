@@ -121,8 +121,7 @@ const REQUIRED_POSTRES_HEADERS = [
 const REQUIRED_POSTRES_SIZE_HEADERS = [
   "ID interno (no tocar)",
   "Tamaño",
-  "Porciones",
-  "Precio estimado"
+  "Porciones"
 ].map(normalizeKey);
 
 const REQUIRED_POSTRES_CONFIG_HEADERS = [

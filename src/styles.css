@@ -2126,6 +2126,22 @@ h1 {
   padding: 16px;
 }
 
+.postre-pricing-notice {
+  background: rgba(240, 187, 220, 0.12);
+  border: 1px solid rgba(240, 187, 220, 0.42);
+  border-radius: 16px;
+  color: var(--cocoa-soft);
+  line-height: 1.55;
+  padding: 14px 16px;
+}
+
+.postre-pricing-status {
+  color: var(--cocoa-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .postre-date-field {
   display: grid;
   gap: 10px;

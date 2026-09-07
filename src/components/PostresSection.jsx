@@ -211,7 +211,10 @@ function PostreGallery({ postre }) {
   );
 }
 
-function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
+const POSTRES_PRICING_UNAVAILABLE_MESSAGE =
+  "No pudimos cargar los tamaños y precios en este momento. Consultanos por WhatsApp.";
+
+function PostresSection({ postres = postresBase, formatPrice, onAddToCart, isPricingLoading = false }) {
   const sectionRef = useIntersectionObserver();
   const [neededDate, setNeededDate] = useState("");
   const [selectedSizeId, setSelectedSizeId] = useState("");
@@ -285,7 +288,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
               Los postres suelen requerir aproximadamente 2 días de anticipación, pero igualmente consultanos disponibilidad para la fecha que necesitás.
             </div>
 
-            {availableSizes.length > 0 && (
+            {availableSizes.length > 0 ? (
               <div className="form-group">
                 <label>Elegí el tamaño</label>
                 <select
@@ -317,6 +320,12 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
                     {selectedSize.porciones} · {formatPrice ? formatPrice(selectedSize.precio) : selectedSize.precio}
                   </p>
                 )}
+              </div>
+            ) : (
+              <div className="postre-pricing-notice" role="status">
+                {isPricingLoading
+                  ? "Estamos cargando los tamaños y precios."
+                  : POSTRES_PRICING_UNAVAILABLE_MESSAGE}
               </div>
             )}
 
@@ -370,40 +379,53 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart }) {
       </div>
 
       <div className="postres-grid">
-        {postres.map((postre) => (
-          <Link
-            key={postre.id} 
-            className="postre-card"
-            to={`/postres/${postre.id}`}
-          >
-            <div className={getProductImages(postre).length > 0 ? "postre-card-media" : "postre-card-media placeholder"}>
-              <PostreImage postre={postre} priority={priorityImageIds.has(postre.id)} />
-            </div>
-            <div className="product-info">
-              <h3>{postre.nombre}</h3>
-              <p>{postre.descripcion}</p>
-              {formatPrice && getLowestPostrePrice(postre) !== null && (
-                <strong>Desde {formatPrice(getLowestPostrePrice(postre))}</strong>
-              )}
-              <span
-                style={selectSizeCtaStyle}
-                onMouseEnter={(event) => {
-                  event.currentTarget.style.background = "#AAB68A";
-                  event.currentTarget.style.boxShadow = "0 12px 22px rgba(77, 56, 47, 0.12)";
-                  event.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(event) => {
-                  event.currentTarget.style.background = selectSizeCtaStyle.background;
-                  event.currentTarget.style.boxShadow = selectSizeCtaStyle.boxShadow;
-                  event.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                Seleccionar tamaño
-                <span aria-hidden="true">+</span>
-              </span>
-            </div>
-          </Link>
-        ))}
+        {postres.map((postre) => {
+          const lowestPrice = getLowestPostrePrice(postre);
+          const hasAvailableSizes = getAvailableSizes(postre).length > 0;
+
+          return (
+            <Link
+              key={postre.id}
+              className="postre-card"
+              to={`/postres/${postre.id}`}
+            >
+              <div className={getProductImages(postre).length > 0 ? "postre-card-media" : "postre-card-media placeholder"}>
+                <PostreImage postre={postre} priority={priorityImageIds.has(postre.id)} />
+              </div>
+              <div className="product-info">
+                <h3>{postre.nombre}</h3>
+                <p>{postre.descripcion}</p>
+                {formatPrice && lowestPrice !== null && (
+                  <strong>Desde {formatPrice(lowestPrice)}</strong>
+                )}
+                {hasAvailableSizes ? (
+                  <span
+                    style={selectSizeCtaStyle}
+                    onMouseEnter={(event) => {
+                      event.currentTarget.style.background = "#AAB68A";
+                      event.currentTarget.style.boxShadow = "0 12px 22px rgba(77, 56, 47, 0.12)";
+                      event.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(event) => {
+                      event.currentTarget.style.background = selectSizeCtaStyle.background;
+                      event.currentTarget.style.boxShadow = selectSizeCtaStyle.boxShadow;
+                      event.currentTarget.style.transform = "translateY(0)";
+                    }}
+                  >
+                    Seleccionar tamaño
+                    <span aria-hidden="true">+</span>
+                  </span>
+                ) : (
+                  <small className="postre-pricing-status">
+                    {isPricingLoading
+                      ? "Cargando tamaños y precios…"
+                      : "Tamaños y precios temporalmente no disponibles"}
+                  </small>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
     </section>

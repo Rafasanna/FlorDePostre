@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { WHATSAPP_URL } from "./config.js";
 import { campaigns } from "./data/campaigns.js";
 import { dailyProducts } from "./data/dailyProducts.js";
-import { postresBase, postresSizes } from "./data/postresData.js";
+import { postresBase } from "./data/postresData.js";
 import { coberturas, enrichCakeExtra, enrichCakeFilling, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
 import {
   fetchCampaignsFromSheet,
@@ -82,15 +82,6 @@ const withSpecialProducts = (campaignItems, specialProducts) =>
     };
   });
 
-const localPostresConfig = postresBase.flatMap((postre) =>
-  postresSizes.map((size) => ({
-    postreId: postre.id,
-    sizeId: size.id,
-    precio: size.precioEstimado,
-    disponible: true
-  }))
-);
-
 const resolvePostresWithSizes = (postres, tamanos, configs) => {
   const availableSizes = tamanos.filter((size) => size.disponible !== false);
 
@@ -98,17 +89,12 @@ const resolvePostresWithSizes = (postres, tamanos, configs) => {
     .filter((postre) => postre.disponible !== false)
     .map((postre) => {
       const postreConfigs = configs.filter((config) => config.postreId === postre.id && config.disponible !== false);
-      const sizes = (postreConfigs.length > 0 ? postreConfigs : availableSizes.map((size) => ({
-        postreId: postre.id,
-        sizeId: size.id,
-        precio: size.precioEstimado,
-        disponible: true
-      })))
+      const sizes = postreConfigs
         .map((config) => {
           const size = availableSizes.find((item) => item.id === config.sizeId);
-          const precio = Number.isFinite(config.precio) ? config.precio : size?.precioEstimado;
+          const precio = config.precio;
 
-          if (!size || !Number.isFinite(precio)) return null;
+          if (!size || !Number.isFinite(precio) || precio <= 0) return null;
 
           return {
             id: size.id,
@@ -128,19 +114,64 @@ const resolvePostresWithSizes = (postres, tamanos, configs) => {
 };
 
 const SHEETS_CACHE_PREFIX = "florDePostre:sheets:";
+const POSTRES_CACHE_PREFIX = `${SHEETS_CACHE_PREFIX}postres:v2:`;
+const POSTRES_CACHE_KEYS = {
+  postres: "productos",
+  postresTamanos: "tamanos",
+  postresConfig: "config"
+};
 const SHEETS_NOTICE =
   "Algunos datos pueden estar desactualizados. Confirmamos disponibilidad por WhatsApp.";
 const SHEETS_CACHE_STORAGES = ["localStorage", "sessionStorage"];
+const hasText = (value) => typeof value === "string" && value.trim().length > 0;
+
+const getDatasetCacheKey = (key) =>
+  POSTRES_CACHE_KEYS[key]
+    ? `${POSTRES_CACHE_PREFIX}${POSTRES_CACHE_KEYS[key]}`
+    : `${SHEETS_CACHE_PREFIX}${key}`;
+
+const isValidPostresDataset = (key, data) => {
+  if (!Array.isArray(data) || data.length === 0) return false;
+
+  if (key === "postres") {
+    return data.every((postre) => hasText(postre?.id) && hasText(postre?.nombre));
+  }
+
+  if (key === "postresTamanos") {
+    return data.every((size) => hasText(size?.id) && hasText(size?.nombre));
+  }
+
+  if (key === "postresConfig") {
+    return data.every((config) =>
+      hasText(config?.postreId) &&
+      hasText(config?.sizeId) &&
+      Number.isFinite(config?.precio) && config.precio > 0
+    );
+  }
+
+  return false;
+};
+
+const isValidDataset = (key, data) =>
+  POSTRES_CACHE_KEYS[key]
+    ? isValidPostresDataset(key, data)
+    : Array.isArray(data) && data.length > 0;
 
 const getCachedDataset = (key) => {
   if (typeof window === "undefined") return null;
 
   for (const storageName of SHEETS_CACHE_STORAGES) {
     try {
-      const value = window[storageName].getItem(`${SHEETS_CACHE_PREFIX}${key}`);
+      const value = window[storageName].getItem(getDatasetCacheKey(key));
       if (!value) continue;
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const data = POSTRES_CACHE_KEYS[key]
+        ? parsed?.source === "google-sheets" && parsed?.version === 2
+          ? parsed.data
+          : null
+        : parsed;
+
+      if (isValidDataset(key, data)) return data;
     } catch (error) {
       if (import.meta.env.DEV) {
         console.info(`[Google Sheets] error leyendo ${storageName} de ${key}.`, error);
@@ -152,13 +183,17 @@ const getCachedDataset = (key) => {
 };
 
 const cacheDataset = (key, data) => {
-  if (typeof window === "undefined" || !Array.isArray(data) || data.length === 0) return;
+  if (typeof window === "undefined" || !isValidDataset(key, data)) return;
 
-  const serializedData = JSON.stringify(data);
+  const serializedData = JSON.stringify(
+    POSTRES_CACHE_KEYS[key]
+      ? { source: "google-sheets", version: 2, data }
+      : data
+  );
 
   for (const storageName of SHEETS_CACHE_STORAGES) {
     try {
-      window[storageName].setItem(`${SHEETS_CACHE_PREFIX}${key}`, serializedData);
+      window[storageName].setItem(getDatasetCacheKey(key), serializedData);
       return;
     } catch (error) {
       if (import.meta.env.DEV) {
@@ -179,8 +214,11 @@ function App() {
   const [menuDiarioProducts, setMenuDiarioProducts] = useState(() => getCachedDataset("menuDiario") || dailyProducts);
   const [sinTaccProducts, setSinTaccProducts] = useState(() => getCachedDataset("sinTacc") || localSinTaccProducts);
   const [postresProducts, setPostresProducts] = useState(() => getCachedDataset("postres") || postresBase);
-  const [postresTamanos, setPostresTamanos] = useState(() => getCachedDataset("postresTamanos") || postresSizes);
-  const [postresConfig, setPostresConfig] = useState(() => getCachedDataset("postresConfig") || localPostresConfig);
+  const [postresTamanos, setPostresTamanos] = useState(() => getCachedDataset("postresTamanos") || []);
+  const [postresConfig, setPostresConfig] = useState(() => getCachedDataset("postresConfig") || []);
+  const [isPostresPricingLoading, setIsPostresPricingLoading] = useState(
+    () => postresTamanos.length === 0 || postresConfig.length === 0
+  );
   const [tortaTamanos, setTortaTamanos] = useState(() => getCachedDataset("tortaTamanos") || tortaSizes);
   const [tortaCoberturas, setTortaCoberturas] = useState(() => getCachedDataset("tortaCoberturas") || coberturas);
   const [tortaRellenos, setTortaRellenos] = useState(() => getCachedDataset("tortaRellenos") || rellenos);
@@ -211,9 +249,9 @@ function App() {
     const resources = [
       { key: "menuDiario", label: "menú diario", fetcher: fetchDailyProductsFromSheet, setter: setMenuDiarioProducts, showNoticeOnFallback: true },
       { key: "sinTacc", label: "Sin TACC", fetcher: fetchSinTaccProductsFromSheet, setter: setSinTaccProducts, showNoticeOnFallback: true },
-      { key: "postres", label: "Postres", fetcher: fetchPostresFromSheet, setter: setPostresProducts, showNoticeOnFallback: true },
-      { key: "postresTamanos", label: "tamaños postres", fetcher: fetchPostresTamanosFromSheet, setter: setPostresTamanos, showNoticeOnFallback: true },
-      { key: "postresConfig", label: "configuraciones postres", fetcher: fetchPostresConfigFromSheet, setter: setPostresConfig, showNoticeOnFallback: true },
+      { key: "postres", label: "Postres", fetcher: fetchPostresFromSheet, setter: setPostresProducts },
+      { key: "postresTamanos", label: "tamaños postres", fetcher: fetchPostresTamanosFromSheet, setter: setPostresTamanos, isPostresPricing: true },
+      { key: "postresConfig", label: "configuraciones postres", fetcher: fetchPostresConfigFromSheet, setter: setPostresConfig, isPostresPricing: true },
       { key: "campaigns", label: "campañas", fetcher: fetchCampaignsFromSheet, setter: setCampaignsData },
       { key: "specialProducts", label: "productos especiales", fetcher: fetchSpecialProductsFromSheet, setter: setSpecialProducts },
       { key: "tortaTamanos", label: "tamaños de tortas", fetcher: fetchTortaTamanosFromSheet, setter: setTortaTamanos, showNoticeOnFallback: true },
@@ -222,11 +260,11 @@ function App() {
       { key: "tortaExtras", label: "extras de tortas", fetcher: fetchTortaExtrasFromSheet, setter: setTortaExtrasData, showNoticeOnFallback: true }
     ];
 
-    resources.forEach((resource) => {
-      resource.fetcher().then((data) => {
+    const requests = resources.map((resource) => {
+      const request = resource.fetcher().then((data) => {
         if (!isMounted) return;
 
-        if (Array.isArray(data) && data.length > 0) {
+        if (isValidDataset(resource.key, data)) {
           cacheDataset(resource.key, data);
           resource.setter(data);
           if (resource.key === "menuDiario" || resource.key === "sinTacc") {
@@ -241,7 +279,11 @@ function App() {
         if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
         if (import.meta.env.DEV) {
           const hasCachedData = Boolean(getCachedDataset(resource.key));
-          const fallbackMessage = hasCachedData ? "se conserva cache previa" : "usando fallback local";
+          const fallbackMessage = hasCachedData
+            ? "se conserva cache previa"
+            : POSTRES_CACHE_KEYS[resource.key]
+              ? "sin cache valida disponible"
+              : "usando fallback local";
           console.info(`[Google Sheets] ${resource.label} sin datos válidos; ${fallbackMessage}.`);
         }
       }).catch((error) => {
@@ -252,6 +294,16 @@ function App() {
           console.info(`[Google Sheets] error en ${resource.label}; se conserva el estado actual.`, error);
         }
       });
+
+      return { resource, request };
+    });
+
+    Promise.allSettled(
+      requests
+        .filter(({ resource }) => resource.isPostresPricing)
+        .map(({ request }) => request)
+    ).then(() => {
+      if (isMounted) setIsPostresPricingLoading(false);
     });
 
     return () => {
@@ -675,11 +727,11 @@ function App() {
           />
           <Route
             path="/postres"
-            element={<PostresSection postres={postresProductsFinal} formatPrice={formatPrice} onAddToCart={addToCart} />}
+            element={<PostresSection postres={postresProductsFinal} formatPrice={formatPrice} onAddToCart={addToCart} isPricingLoading={isPostresPricingLoading} />}
           />
           <Route
             path="/postres/:postreId"
-            element={<PostresSection postres={postresProductsFinal} formatPrice={formatPrice} onAddToCart={addToCart} />}
+            element={<PostresSection postres={postresProductsFinal} formatPrice={formatPrice} onAddToCart={addToCart} isPricingLoading={isPostresPricingLoading} />}
           />
           <Route path="/sobre" element={<AboutSection />} />
           <Route path="/terminos-y-condiciones" element={<LegalPage title="Términos y condiciones" />} />
