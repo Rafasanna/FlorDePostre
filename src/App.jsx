@@ -670,7 +670,8 @@ function App() {
       <CampaignBanner campaign={homeCampaign} onOpenSpecial={goToCampaignSpecial} />
 
       <main>
-        <Routes>
+        <div className="page-transition" key={pathname}>
+          <Routes>
           <Route
             path="/"
             element={
@@ -745,7 +746,8 @@ function App() {
               />
             }
           />
-        </Routes>
+          </Routes>
+        </div>
       </main>
 
       <button className="floating-cart" onClick={handleFloatingButtonClick} aria-label={isFloatingCartButton ? "Ver carrito" : floatingButtonLabel} style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>

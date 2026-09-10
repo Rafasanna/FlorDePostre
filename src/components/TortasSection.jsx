@@ -20,7 +20,6 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
   const normalizedImageIndex = availableImages.length
     ? ((activeImageIndex % availableImages.length) + availableImages.length) % availableImages.length
     : 0;
-  const activeImage = availableImages[normalizedImageIndex] || "";
 
   useEffect(() => {
     if (availableImages.length > 0 && activeImageIndex >= availableImages.length) {
@@ -58,18 +57,23 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
       <div className="tortas-intro">
         <div className="tortas-visual">
           <div className={`tortas-carousel ${availableImages.length === 0 ? "torta-placeholder" : ""}`}>
-            {activeImage && (
-              <img
-                key={activeImage}
-                className="tortas-carousel-slide active"
-                src={activeImage}
-                alt="Ejemplo de torta personalizada de Flor de Postre"
-                loading={normalizedImageIndex === 0 ? "eager" : "lazy"}
-                fetchPriority={normalizedImageIndex === 0 ? "high" : "auto"}
-                decoding="async"
-                onError={() => handleImageError(activeImage)}
-              />
-            )}
+            {availableImages.map((image, index) => {
+              const isActive = index === normalizedImageIndex;
+
+              return (
+                <img
+                  key={image}
+                  className={`tortas-carousel-slide ${isActive ? "active" : ""}`}
+                  src={image}
+                  alt={isActive ? "Ejemplo de torta personalizada de Flor de Postre" : ""}
+                  aria-hidden={!isActive}
+                  loading="eager"
+                  fetchPriority={isActive ? "high" : "low"}
+                  decoding="async"
+                  onError={() => handleImageError(image)}
+                />
+              );
+            })}
             {availableImages.length > 1 && (
               <>
                 <button className="tortas-carousel-control previous" type="button" onClick={goToPreviousImage} aria-label="Imagen anterior de torta personalizada">

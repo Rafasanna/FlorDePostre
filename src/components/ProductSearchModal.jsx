@@ -12,28 +12,43 @@ function ProductSearchModal({
   postres = fallbackPostres
 }) {
   const [query, setQuery] = useState("");
+  const [shouldRender, setShouldRender] = useState(isOpen);
   const inputRef = useRef(null);
   const focusTimeoutRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
+      setShouldRender(true);
       document.body.style.overflow = 'hidden';
       focusTimeoutRef.current = window.setTimeout(() => {
         inputRef.current?.focus();
         focusTimeoutRef.current = null;
-      }, 100);
+      }, 180);
     } else {
-      document.body.style.overflow = '';
-      setQuery("");
+      closeTimeoutRef.current = window.setTimeout(() => {
+        setShouldRender(false);
+        setQuery("");
+        document.body.style.overflow = '';
+        closeTimeoutRef.current = null;
+      }, 280);
     }
+
     return () => {
       if (focusTimeoutRef.current) {
         window.clearTimeout(focusTimeoutRef.current);
         focusTimeoutRef.current = null;
       }
-      document.body.style.overflow = '';
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
     };
   }, [isOpen]);
+
+  useEffect(() => () => {
+    document.body.style.overflow = '';
+  }, []);
 
   const results = useMemo(() => {
     if (query.trim().length < 2) return [];
@@ -58,11 +73,11 @@ function ProductSearchModal({
     return [...dailyMatches, ...postresMatches, ...tortasMatches];
   }, [dailyProducts, postres, query]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="search-modal-overlay">
-      <div className="search-modal">
+    <div className={`search-modal-overlay ${isOpen ? "is-open" : "is-closing"}`}>
+      <div className="search-modal" role="dialog" aria-modal="true" aria-label="Buscar productos">
         <div className="search-header">
           <Search size={20} className="search-icon" />
           <input 

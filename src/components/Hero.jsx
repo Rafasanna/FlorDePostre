@@ -86,7 +86,8 @@ function Hero({ itemCount, onOpenCart }) {
                   top: 0,
                   left: 0,
                   opacity: index === currentImageIndex ? 1 : 0,
-                  transition: 'opacity 1s ease-in-out',
+                  transform: index === currentImageIndex ? 'scale(1)' : 'scale(1.018)',
+                  transition: 'opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1), transform 1.5s cubic-bezier(0.22, 1, 0.36, 1)',
                   zIndex: index === currentImageIndex ? 1 : 0
                 }}
               />
