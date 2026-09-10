@@ -94,7 +94,20 @@ const normalizeCakeKey = (value) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "");
 
+const CAKE_FILLING_EXTRA_KEYS = new Set([
+  "nutella",
+  "oreos",
+  "nueces",
+  "frutosrojos",
+  "merenguitos"
+]);
+
 export const getCakeOptionDisplayKey = (item) => normalizeCakeKey(item?.nombre || item?.id);
+
+export const isCakeFillingExtra = (relleno) => {
+  const keys = [relleno?.id, relleno?.nombre].map(normalizeCakeKey);
+  return keys.some((key) => CAKE_FILLING_EXTRA_KEYS.has(key));
+};
 
 export const getCakePriceOption = (optionId) =>
   cakePriceOptions.find((option) => option.id === optionId) || null;

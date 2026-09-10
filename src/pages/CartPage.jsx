@@ -27,9 +27,14 @@ function CartPage({
             Rellenos: {item.configuracion.rellenos.map((relleno) => `${relleno.nombre}${relleno.precioTexto ? `: ${relleno.precioTexto}` : ""}`).join(", ")}
           </div>
         )}
+        {item.configuracion.rellenoExtras?.length > 0 && (
+          <div>
+            Extras: {item.configuracion.rellenoExtras.map((extra) => `${extra.nombre}${extra.precioTexto ? `: ${extra.precioTexto}` : ""}`).join(", ")}
+          </div>
+        )}
         {item.configuracion.extras?.length > 0 && (
           <div>
-            Extras: {item.configuracion.extras.map((extra) => `${extra.nombre}${extra.precioTexto ? `: ${extra.precioTexto}` : ""}`).join(", ")}
+            Agregados de decoración: {item.configuracion.extras.map((extra) => `${extra.nombre}${extra.precioTexto ? `: ${extra.precioTexto}` : ""}`).join(", ")}
           </div>
         )}
         {item.type === "torta" && (

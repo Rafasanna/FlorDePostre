@@ -107,7 +107,7 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
             <li><strong>1.</strong> Cobertura</li>
             <li><strong>2.</strong> Tamaño</li>
             <li><strong>3.</strong> Rellenos</li>
-            <li><strong>4.</strong> Extras y decoración</li>
+            <li><strong>4.</strong> Agregados de decoración</li>
             <li><strong>5.</strong> Detalles y fecha</li>
           </ul>
           <button 

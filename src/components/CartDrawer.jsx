@@ -51,9 +51,14 @@ function CartDrawer({
             • Rellenos: {item.configuracion.rellenos.map(r => `${r.nombre}${r.precioTexto ? `: ${r.precioTexto}` : ""}`).join(', ')}
           </div>
         )}
+        {item.configuracion.rellenoExtras && item.configuracion.rellenoExtras.length > 0 && (
+          <div>
+            • Extras: {item.configuracion.rellenoExtras.map(extra => `${extra.nombre}${extra.precioTexto ? `: ${extra.precioTexto}` : ""}`).join(', ')}
+          </div>
+        )}
         {item.configuracion.extras && item.configuracion.extras.length > 0 && (
           <div>
-            • Extras: {item.configuracion.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}
+            • Agregados de decoración: {item.configuracion.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}
           </div>
         )}
         {item.type === "torta" && (

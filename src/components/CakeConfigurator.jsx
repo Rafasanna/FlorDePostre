@@ -9,6 +9,7 @@ import {
   getCakeOptionDisplayKey,
   getCakePriceOption,
   getCakeSizePrice,
+  isCakeFillingExtra,
   tortaSizes as fallbackTortaSizes,
   rellenos as fallbackRellenos,
   tortaExtras as fallbackTortaExtras
@@ -50,6 +51,7 @@ function CakeConfigurator({
     cobertura: null,
     size: null,
     rellenosSeleccionados: [],
+    rellenoExtrasSeleccionados: [],
     extrasSeleccionados: [],
     date: "",
     comments: ""
@@ -72,6 +74,8 @@ function CakeConfigurator({
   const displayedRellenos = Array.from(rellenosByDisplayName.values()).map((relleno) =>
     enrichCakeFilling(relleno, formatPrice)
   );
+  const displayedRellenoOptions = displayedRellenos.filter((relleno) => !isCakeFillingExtra(relleno));
+  const displayedRellenoExtras = displayedRellenos.filter(isCakeFillingExtra);
   const extrasByDisplayName = new Map(
     [...fallbackTortaExtras, ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
       .filter(Boolean)
@@ -178,6 +182,18 @@ function CakeConfigurator({
     });
   };
 
+  const toggleRellenoExtra = (id) => {
+    setConfig(prev => {
+      const isSelected = prev.rellenoExtrasSeleccionados.includes(id);
+      return {
+        ...prev,
+        rellenoExtrasSeleccionados: isSelected
+          ? prev.rellenoExtrasSeleccionados.filter(extraId => extraId !== id)
+          : [...prev.rellenoExtrasSeleccionados, id]
+      };
+    });
+  };
+
   if (step === 6) {
     return createPortal(
       <CakeSummary
@@ -256,7 +272,7 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Elegí {requiredFillings} rellenos *</label>
               <div className="options-list">
-                {displayedRellenos.map(r => {
+                {displayedRellenoOptions.map(r => {
                   const isSelected = config.rellenosSeleccionados.includes(r.id);
                   return (
                     <div 
@@ -280,6 +296,36 @@ function CakeConfigurator({
                   )
                 })}
               </div>
+              {displayedRellenoExtras.length > 0 && (
+                <>
+                  <h3 className="cake-option-subheading">Extras</h3>
+                  <div className="options-list">
+                    {displayedRellenoExtras.map(extra => {
+                      const isSelected = config.rellenoExtrasSeleccionados.includes(extra.id);
+                      return (
+                        <div
+                          key={extra.id}
+                          className={`option-list-item ${isSelected ? 'selected' : ''}`}
+                          onClick={() => toggleRellenoExtra(extra.id)}
+                        >
+                          <div className="checkbox-dummy">
+                            {isSelected && <div className="checkbox-inner" />}
+                          </div>
+                          <div className="cake-extra-copy">
+                            <strong className="cake-extra-name">{extra.nombre}</strong>
+                            {extra.precioTexto && (
+                              <>
+                                <span className="cake-extra-separator" aria-hidden="true">—</span>
+                                <small className="cake-extra-price">{extra.precioTexto}</small>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
               <p className="help-text">
                 Seleccioná exactamente {requiredFillings} rellenos para esta opción.
               </p>
@@ -288,7 +334,7 @@ function CakeConfigurator({
 
           {step === 4 && (
             <div className="form-group slide-in">
-              <label>Extras y Decoración</label>
+              <label>Agregados de decoración</label>
               <div className="options-list">
                 {displayedTortaExtras.map(e => {
                   const isSelected = config.extrasSeleccionados.includes(e.id);

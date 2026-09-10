@@ -6,6 +6,7 @@ import {
   getCakeOptionDisplayKey,
   getCakePriceOption,
   getCakeSizePrice,
+  isCakeFillingExtra,
   tortaSizes as fallbackTortaSizes,
   rellenos as fallbackRellenos,
   tortaExtras as fallbackTortaExtras
@@ -38,6 +39,7 @@ function CakeSummary({
   );
   const safeTortaExtras = Array.from(extrasById.values());
   const selectedRellenos = Array.isArray(safeConfig.rellenosSeleccionados) ? safeConfig.rellenosSeleccionados : [];
+  const selectedRellenoExtras = Array.isArray(safeConfig.rellenoExtrasSeleccionados) ? safeConfig.rellenoExtrasSeleccionados : [];
   const selectedExtras = Array.isArray(safeConfig.extrasSeleccionados) ? safeConfig.extrasSeleccionados : [];
 
   const getCobertura = (id) => safeCoberturas.find(c => c.id === id);
@@ -48,16 +50,22 @@ function CakeSummary({
   const cakeOption = getCakePriceOption(safeConfig.cobertura);
   const cobertura = getCobertura(cakeOption?.coberturaId) || cakeOption;
   const size = getSize(safeConfig.size);
-  const rellenosList = getRellenos(selectedRellenos).map((relleno) => enrichCakeFilling(relleno, formatPrice));
+  const rellenosList = getRellenos(selectedRellenos)
+    .filter((relleno) => !isCakeFillingExtra(relleno))
+    .map((relleno) => enrichCakeFilling(relleno, formatPrice));
+  const rellenoExtrasList = getRellenos(selectedRellenoExtras)
+    .filter(isCakeFillingExtra)
+    .map((relleno) => enrichCakeFilling(relleno, formatPrice));
   const sizePrice = getCakeSizePrice(safeConfig.cobertura, size);
   const cakeBasePrice = Number.isFinite(sizePrice?.price) ? sizePrice.price : 0;
   const extrasList = getExtras(selectedExtras).map((extra) => enrichCakeExtra(extra, cakeBasePrice, formatPrice));
   const requiredFillings = cakeOption?.fillings || 0;
   const hasValidFillings = requiredFillings > 0 && rellenosList.length === requiredFillings;
   const rellenosTotal = rellenosList.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);
+  const rellenoExtrasTotal = rellenoExtrasList.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
   const extrasTotal = extrasList.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
 
-  const precioEstimado = cakeBasePrice + rellenosTotal + extrasTotal;
+  const precioEstimado = cakeBasePrice + rellenosTotal + rellenoExtrasTotal + extrasTotal;
   const canAddToCart = Boolean(size && cobertura && sizePrice && hasValidFillings);
 
   const handleSend = () => {
@@ -80,6 +88,8 @@ function CakeSummary({
         porciones: sizePrice.porciones,
         rellenos: rellenosList,
         rellenosTotal,
+        rellenoExtras: rellenoExtrasList,
+        rellenoExtrasTotal,
         extras: extrasList,
         cakeBasePrice,
         extrasTotal,
@@ -138,9 +148,22 @@ function CakeSummary({
               </div>
             )}
 
-            {extrasList.length > 0 && (
+            {rellenoExtrasList.length > 0 && (
               <div className="summary-row column">
                 <span className="summary-label">Extras</span>
+                <ul>
+                  {rellenoExtrasList.map(extra => (
+                    <li key={extra.id}>
+                      {extra.nombre}{extra.precioTexto ? `: ${extra.precioTexto}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {extrasList.length > 0 && (
+              <div className="summary-row column">
+                <span className="summary-label">Agregados de decoración</span>
                 <ul>
                   {extrasList.map(e => (
                     <li key={e.id}>

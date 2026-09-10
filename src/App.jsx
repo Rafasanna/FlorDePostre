@@ -410,6 +410,10 @@ function App() {
           ? item.configuracion.rellenos.map((relleno) => enrichCakeFilling(relleno, formatPrice))
           : [];
         const rellenosTotal = selectedRellenos.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);
+        const rellenoExtras = Array.isArray(item.configuracion?.rellenoExtras)
+          ? item.configuracion.rellenoExtras.map((extra) => enrichCakeFilling(extra, formatPrice))
+          : [];
+        const rellenoExtrasTotal = rellenoExtras.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
         const extras = Array.isArray(item.configuracion?.extras)
           ? item.configuracion.extras.map((extra) => enrichCakeExtra(extra, currentPrice.price, formatPrice))
           : [];
@@ -418,7 +422,7 @@ function App() {
         return {
           ...item,
           nombre: "Torta por encargo",
-          precio: currentPrice.price + rellenosTotal + extrasTotal,
+          precio: currentPrice.price + rellenosTotal + rellenoExtrasTotal + extrasTotal,
           configuracion: {
             ...item.configuracion,
             sizeName: currentPrice.nombre,
@@ -426,6 +430,8 @@ function App() {
             cakeBasePrice: currentPrice.price,
             rellenos: selectedRellenos,
             rellenosTotal,
+            rellenoExtras,
+            rellenoExtrasTotal,
             extras,
             extrasTotal
           }
@@ -556,8 +562,11 @@ function App() {
         if (c.rellenos && c.rellenos.length > 0) {
           detail += `  • Rellenos: ${c.rellenos.map(r => `${r.nombre}${r.precioTexto ? ` (${r.precioTexto})` : ""}`).join(', ')}\n`;
         }
+        if (c.rellenoExtras && c.rellenoExtras.length > 0) {
+          detail += `  • Extras: ${c.rellenoExtras.map(extra => `${extra.nombre}${extra.precioTexto ? ` (${extra.precioTexto})` : ""}`).join(', ')}\n`;
+        }
         if (c.extras && c.extras.length > 0) {
-          detail += `  • Extras: ${c.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}\n`;
+          detail += `  • Agregados de decoración: ${c.extras.map(e => `${e.nombre}${e.precioTexto ? `: ${e.precioTexto}` : ""}`).join(', ')}\n`;
         }
         if (c.date) detail += `  • Fecha deseada: ${c.date}\n`;
         if (c.comments) detail += `  • Detalles: ${c.comments}\n`;
