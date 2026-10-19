@@ -4192,14 +4192,12 @@ body::before { display: none; }
   border-radius: 36px;
 }
 .hero-flower-detail {
-  width: 260px;
-  height: 260px;
-  opacity: .35;
-  right: calc(50% - 24px);
-  /* Upper petals tuck behind the fixed header, clear of the text and photo. */
-  top: -40px;
-  z-index: 0;
-  pointer-events: none;
+  width: clamp(180px, 20vw, 280px);
+  height: clamp(180px, 20vw, 280px);
+  opacity: .55;
+  right: max(4vw, calc((100vw - 1250px) / 2));
+  top: 100px;
+  transform: translateX(-30rem);
 }
 .mini-logo { left: 12px; top: 16px; }
 .hero-card { background: color-mix(in srgb, var(--color-white-warm) 90%, transparent); }
@@ -4353,7 +4351,7 @@ body::before { display: none; }
   .hero-copy p { font-size: 1.05rem; }
   .hero-actions { order: 2; width: 100%; margin-top: 0; }
   .hero-actions .primary-button { width: 100%; }
-  .hero-flower-detail { top: 4px; right: 16px; width: 120px; height: 120px; }
+  .hero-flower-detail { top: 4px; right: 16px; width: 120px; height: 120px; opacity: .35; }
   .section { padding: 64px 16px; }
   .page-section { padding-top: 64px; }
   .section-heading h2, .contact-band h2 { font-size: clamp(1.9rem, 8vw, 2.5rem); line-height: 1.1; }
