@@ -17,10 +17,10 @@ const getLowestPostrePrice = (postre) => {
 const selectSizeCtaStyle = {
   alignItems: "center",
   alignSelf: "flex-start",
-  background: "var(--color-rose)",
+  background: "var(--color-sage)",
   borderRadius: "999px",
   boxShadow: "var(--shadow-soft)",
-  color: "var(--cocoa)",
+  color: "var(--color-text)",
   cursor: "pointer",
   display: "inline-flex",
   fontSize: "0.82rem",
@@ -402,7 +402,7 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart, isPri
                   <span
                     style={selectSizeCtaStyle}
                     onMouseEnter={(event) => {
-                      event.currentTarget.style.background = "var(--color-rose-old)";
+                      event.currentTarget.style.background = "color-mix(in srgb, var(--color-sage) 85%, var(--color-text))";
                       event.currentTarget.style.boxShadow = "var(--shadow-soft)";
                       event.currentTarget.style.transform = "translateY(-1px)";
                     }}
