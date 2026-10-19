@@ -62,9 +62,11 @@ function Hero() {
 
       <div className="hero-content">
         <div className="hero-copy">
-          <span className="eyebrow">Menú </span>
-          <h1>Flor de Postre</h1>
-          <p>Pastelería, desayunos y momentos dulces para compartir</p>
+          <div className="hero-intro">
+            <span className="eyebrow">Menú </span>
+            <h1>Flor de Postre</h1>
+            <p>Pastelería, desayunos y momentos dulces para compartir</p>
+          </div>
           <div className="hero-actions">
             <a className="primary-button" href="#menu-diario">Ver el menú</a>
           </div>
