@@ -1,9 +1,4 @@
-const CAMPAIGN_COLOR_FALLBACKS = {
-  fondo: "#FFE5EE",
-  texto: "#4B342F",
-  acento: "#F0BBDC",
-  badge: "#FFCFED"
-};
+import { CAMPAIGN_COLOR_FALLBACKS } from "../theme.js";
 
 function CampaignBanner({ campaign, onOpenSpecial }) {
   if (!campaign) return null;

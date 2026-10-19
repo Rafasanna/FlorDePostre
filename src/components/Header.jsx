@@ -58,7 +58,7 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
           <NavLink className="cart-link" to="/pedido">
             <ShoppingBag size={16} />
             <span className="cart-label">Mi pedido</span>
-            {itemCount > 0 && <span className="cart-count">({itemCount})</span>}
+            {itemCount > 0 && <span key={itemCount} className="cart-count" aria-label={`${itemCount} productos en el pedido`}>{itemCount}</span>}
           </NavLink>
         </div>
         
@@ -73,7 +73,7 @@ function Header({ onOpenSearch, onOpenMenu, onOpenDailyMenu, itemCount }) {
         </button>
         <NavLink className="icon-button mobile-cart-link" to="/pedido" aria-label="Ver mi pedido">
           <ShoppingBag size={18} />
-          {itemCount > 0 && <span className="mobile-cart-count">{itemCount}</span>}
+          {itemCount > 0 && <span key={itemCount} className="mobile-cart-count">{itemCount}</span>}
         </NavLink>
       </div>
     </nav>

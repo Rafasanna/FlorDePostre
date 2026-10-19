@@ -59,7 +59,7 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
     addFeedbackTimeoutRef.current = window.setTimeout(() => {
       setJustAdded(false);
       addFeedbackTimeoutRef.current = null;
-    }, 3000);
+    }, 1200);
   };
 
   const handleImageError = () => {
@@ -139,7 +139,7 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
       <div className="product-info">
         <div>
           <h3>{product.nombre}</h3>
-          <p>{product.descripcion}</p>
+          {product.descripcion?.trim().toLocaleLowerCase() !== product.nombre?.trim().toLocaleLowerCase() && product.descripcion && <p>{product.descripcion}</p>}
         </div>
         <div className="product-footer">
           <PromoBadge product={product} formatPrice={formatPrice} />
@@ -150,7 +150,7 @@ function ProductCard({ product, quantity, onAdd, formatPrice }) {
             className={justAdded ? "added" : ""}
           >
             {justAdded ? <Check size={17} /> : <Plus size={17} />}
-            {quantity > 0 ? `Agregar (${quantity})` : "Agregar"}
+            {justAdded ? "Agregado" : quantity > 0 ? `Agregar (${quantity})` : "Agregar"}
           </button>
         </div>
       </div>

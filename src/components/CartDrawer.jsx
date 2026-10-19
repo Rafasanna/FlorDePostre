@@ -93,7 +93,7 @@ function CartDrawer({
       />
 
       {/* Drawer */}
-      <aside className={`cart-drawer ${isOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Carrito de compras">
+      <div className={`cart-drawer ${isOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Carrito de compras" inert={!isOpen}>
         <div className="cart-header">
           <div>
             <span>Resumen</span>
@@ -203,7 +203,7 @@ function CartDrawer({
             <p className="help-text">{validationMessage}</p>
           )}
         </div>
-      </aside>
+      </div>
     </>
   );
 }

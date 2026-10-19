@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Instagram, ShoppingBag } from "lucide-react";
 import { INSTAGRAM_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
 
@@ -21,7 +20,7 @@ const carouselImages = [
   "/images/home-carousel/home-15.jpg"
 ];
 
-function Hero({ itemCount, onOpenCart }) {
+function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [preloadedImageIndexes, setPreloadedImageIndexes] = useState(() => new Set([0]));
 
@@ -66,6 +65,9 @@ function Hero({ itemCount, onOpenCart }) {
           <span className="eyebrow">Menú </span>
           <h1>Flor de Postre</h1>
           <p>Pastelería, desayunos y momentos dulces para compartir</p>
+          <div className="hero-actions">
+            <a className="primary-button" href="#menu-diario">Ver el menú</a>
+          </div>
         </div>
 
         <div className="hero-visual" aria-label="Pasteleria Flor de Postre">
@@ -93,21 +95,13 @@ function Hero({ itemCount, onOpenCart }) {
               />
             );
           })}
-          <div className="hero-card mini-logo" style={{ zIndex: 10 }}>
+          <a className="hero-card mini-logo" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram @flordepostre.ok" style={{ zIndex: 10 }}>
             <BrandMark variant="circle" />
             <span>@flordepostre.ok</span>
-          </div>
-          <button className="hero-card mini-cart" type="button" onClick={onOpenCart} style={{ zIndex: 10 }}>
-            <ShoppingBag size={18} />
-            <span>Carrito {itemCount}</span>
-          </button>
+          </a>
         </div>
       </div>
 
-      <a className="instagram-pill" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
-        <Instagram size={17} />
-        @flordepostre.ok
-      </a>
     </header>
   );
 }

@@ -103,7 +103,7 @@ function AboutSection() {
               style={{ width: '100%', borderRadius: '24px', objectFit: 'cover', height: '100%' }} 
             />
           ) : (
-            <div className="about-image-placeholder" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 237, 245, 0.5)', height: '100%', minHeight: '300px', borderRadius: '24px', color: 'var(--rose-500)', border: '1px dashed var(--rose-old)' }}>
+            <div className="about-image-placeholder" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'color-mix(in srgb, var(--color-rose-light) 50%, transparent)', height: '100%', minHeight: '300px', borderRadius: '24px', color: 'var(--color-text)', border: '1px dashed var(--color-rose-old)' }}>
               <Sparkle size={48} style={{ marginBottom: '12px' }} />
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Flor de Postre</span>
             </div>

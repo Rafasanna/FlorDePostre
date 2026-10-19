@@ -685,10 +685,7 @@ function App() {
             path="/"
             element={
               <>
-                <Hero
-                  itemCount={itemCount}
-                  onOpenCart={() => setIsCartOpen(true)}
-                />
+                <Hero />
                 <DailyMenuSection
                   cart={dailyCartState}
                   addToCart={handleDailyAddToCart}
@@ -749,17 +746,14 @@ function App() {
           <Route
             path="*"
             element={
-              <Hero
-                itemCount={itemCount}
-                onOpenCart={() => setIsCartOpen(true)}
-              />
+              <Hero />
             }
           />
           </Routes>
         </div>
       </main>
 
-      <button className="floating-cart" onClick={handleFloatingButtonClick} aria-label={isFloatingCartButton ? "Ver carrito" : floatingButtonLabel} style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
+      <button className={`floating-cart ${normalizedPathname === "/" ? "home-floating-cart" : ""}`} onClick={handleFloatingButtonClick} aria-label={isFloatingCartButton ? "Ver carrito" : floatingButtonLabel} style={{ border: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
         <ShoppingBag size={18} />
         <span>{floatingButtonLabel} {isFloatingCartButton && itemCount > 0 && `(${itemCount})`}</span>
       </button>

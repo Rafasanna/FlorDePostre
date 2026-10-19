@@ -7,6 +7,7 @@ function CategoryFilter({ categories, activeCategory, onChange }) {
           className={category === activeCategory ? "active" : ""}
           type="button"
           onClick={() => onChange(category)}
+          aria-pressed={category === activeCategory}
         >
           {category}
         </button>

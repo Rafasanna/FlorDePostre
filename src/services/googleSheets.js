@@ -1,4 +1,5 @@
 import { parseProductImages } from "../utils/productImages.js";
+import { CAMPAIGN_COLOR_FALLBACKS } from "../theme.js";
 
 const FALSE_VALUES = new Set(["false", "no", "0", "agotado", "no disponible", "reservado"]);
 const TRUE_VALUES = new Set(["true", "si", "sí", "1", "x", "destacado", "sin tacc", "disponible"]);
@@ -79,13 +80,6 @@ const getImagesFromRow = (row) => {
     imagen: normalizedImages[0] || fallbackImage,
     imagenes: normalizedImages
   };
-};
-
-const CAMPAIGN_COLOR_FALLBACKS = {
-  fondo: "#FFE5EE",
-  texto: "#4B342F",
-  acento: "#F0BBDC",
-  badge: "#FFCFED"
 };
 
 const parseHexColor = (value, fallback) => {

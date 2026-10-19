@@ -30,7 +30,7 @@ function MobileMenuDrawer({ isOpen, onClose }) {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '14px 12px',
-    borderBottom: '1px solid rgba(232, 215, 198, 0.3)',
+    borderBottom: '1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent)',
     color: 'var(--cocoa)',
     textDecoration: 'none',
     fontSize: '1.1rem',
@@ -55,7 +55,7 @@ function MobileMenuDrawer({ isOpen, onClose }) {
         style={{ zIndex: 1200 }} // Asegurar que esté sobre todo
       />
 
-      <aside className={`cart-drawer mobile-menu-drawer ${isOpen ? 'open' : ''}`} style={{ zIndex: 1250 }} role="dialog" aria-label="Menú principal">
+      <div className={`cart-drawer mobile-menu-drawer ${isOpen ? 'open' : ''}`} style={{ zIndex: 1250 }} role="dialog" aria-label="Menú principal" inert={!isOpen}>
         <div className="cart-header">
           <div className="mobile-menu-heading">
             <span>Flor de Postre</span>
@@ -81,7 +81,7 @@ function MobileMenuDrawer({ isOpen, onClose }) {
             ))}
           </nav>
         </div>
-      </aside>
+      </div>
     </>
   );
 }

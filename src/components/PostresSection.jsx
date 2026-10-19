@@ -17,9 +17,9 @@ const getLowestPostrePrice = (postre) => {
 const selectSizeCtaStyle = {
   alignItems: "center",
   alignSelf: "flex-start",
-  background: "#B8C19A",
+  background: "var(--color-rose)",
   borderRadius: "999px",
-  boxShadow: "0 8px 18px rgba(77, 56, 47, 0.08)",
+  boxShadow: "var(--shadow-soft)",
   color: "var(--cocoa)",
   cursor: "pointer",
   display: "inline-flex",
@@ -298,10 +298,10 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart, isPri
                   style={{
                     appearance: "none",
                     background:
-                      "linear-gradient(135deg, rgba(255, 254, 253, 0.96), rgba(255, 250, 243, 0.94))",
-                    border: "1px solid rgba(177, 186, 149, 0.58)",
+                      "linear-gradient(135deg, var(--color-white-warm), var(--color-rose-light))",
+                    border: "1px solid var(--color-rose-old)",
                     borderRadius: "999px",
-                    boxShadow: "0 10px 22px rgba(77, 56, 47, 0.07)",
+                    boxShadow: "var(--shadow-soft)",
                     color: "var(--cocoa)",
                     cursor: "pointer",
                     fontWeight: 800,
@@ -402,8 +402,8 @@ function PostresSection({ postres = postresBase, formatPrice, onAddToCart, isPri
                   <span
                     style={selectSizeCtaStyle}
                     onMouseEnter={(event) => {
-                      event.currentTarget.style.background = "#AAB68A";
-                      event.currentTarget.style.boxShadow = "0 12px 22px rgba(77, 56, 47, 0.12)";
+                      event.currentTarget.style.background = "var(--color-rose-old)";
+                      event.currentTarget.style.boxShadow = "var(--shadow-soft)";
                       event.currentTarget.style.transform = "translateY(-1px)";
                     }}
                     onMouseLeave={(event) => {

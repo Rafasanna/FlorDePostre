@@ -1,32 +1,43 @@
-@import url("https://fonts.googleapis.com/css2?family=Belleza&family=Old+Standard+TT:wght@400;700&family=Sacramento&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Old+Standard+TT:wght@400;700&family=Sacramento&display=swap");
 
 :root {
-  --rose-old: #F0BBDC;
-  --rose-soft: #FFE5EE;
-  --rose-pastel: #FFCFED;
-  --sage: #B1BA95;
+  --color-rose-old: #F0BBDC;
+  --color-rose-light: #FFE5EE;
+  --color-rose: #FFCFED;
+  --color-sage: #B1BA95;
+  --color-text: #4A3530;
+  --color-text-muted: #6B5550;
+  --color-white: #FFFFFF;
+  --color-white-warm: #FFFCFB;
+  --rose-old: var(--color-rose-old);
+  --rose-soft: var(--color-rose-light);
+  --rose-pastel: var(--color-rose);
+  --sage: var(--color-sage);
   --rose-50: var(--rose-soft);
   --rose-100: var(--rose-pastel);
   --rose-200: var(--rose-old);
-  --rose-500: #c96d9e;
-  --cream: #fffafc;
-  --warm: #fff3f6;
-  --beige: #ead8d0;
-  --mint: #eef2e7;
+  --rose-500: var(--color-text);
+  --cream: var(--color-white-warm);
+  --warm: var(--color-rose-light);
+  --beige: var(--color-rose);
+  --mint: var(--color-rose-light);
   --mint-strong: var(--sage);
-  --cocoa: #4d382f;
-  --cocoa-soft: #80665d;
-  --white: #ffffff;
-  --shadow: 0 18px 48px rgba(77, 56, 47, 0.12);
-  --shadow-soft: 0 8px 28px rgba(77, 56, 47, 0.07);
+  --cocoa: var(--color-text);
+  --cocoa-soft: var(--color-text-muted);
+  --white: var(--color-white);
+  --shadow: 0 12px 30px color-mix(in srgb, var(--color-text) 10%, transparent);
+  --shadow-soft: 0 4px 20px color-mix(in srgb, var(--color-text) 6%, transparent);
   --radius: 20px;
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --radius-footer: 28px;
   --font-serif: "Old Standard TT", Georgia, "Times New Roman", serif;
-  --font-display: "Belleza", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-serif);
   --font-script: "Sacramento", "Brush Script MT", cursive;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--cocoa);
+  color: var(--color-text);
   font-family: var(--font-sans);
-  background: var(--cream);
+  background: var(--color-white-warm);
 }
 
 * {
@@ -43,17 +54,17 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, rgba(240, 187, 220, 0.36), transparent 34rem),
-    radial-gradient(circle at right 18%, rgba(177, 186, 149, 0.24), transparent 30rem),
-    radial-gradient(circle at 12% 86%, rgba(177, 186, 149, 0.12), transparent 24rem),
-    linear-gradient(180deg, var(--cream), #fff4f8 52%, #fffaf7);
+    radial-gradient(circle at top left, color-mix(in srgb, var(--color-rose-old) 36%, transparent), transparent 34rem),
+    radial-gradient(circle at right 18%, color-mix(in srgb, var(--color-sage) 24%, transparent), transparent 30rem),
+    radial-gradient(circle at 12% 86%, color-mix(in srgb, var(--color-sage) 12%, transparent), transparent 24rem),
+    linear-gradient(180deg, var(--cream), var(--color-rose-light) 52%, var(--color-white-warm));
 }
 
 body::before {
   content: "";
   width: 220px;
   height: 220px;
-  background: radial-gradient(circle, rgba(255, 207, 237, 0.34), transparent 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-rose) 34%, transparent), transparent 68%);
   border-radius: 50%;
   left: -70px;
   pointer-events: none;
@@ -123,18 +134,18 @@ img {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(177, 186, 149, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.34);
-  box-shadow: 0 10px 26px rgba(77, 56, 47, 0.08);
+  background: color-mix(in srgb, var(--color-sage) 92%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-white) 34%, transparent);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--color-text) 8%, transparent);
   padding: 16px clamp(18px, 5vw, 68px);
   transition: all 0.3s ease;
 }
 
 .nav-scrolled {
-  background: rgba(177, 186, 149, 0.96);
+  background: color-mix(in srgb, var(--color-sage) 96%, transparent);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 12px 30px rgba(77, 56, 47, 0.12);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-text) 12%, transparent);
   padding: 12px clamp(18px, 5vw, 68px);
 }
 
@@ -174,7 +185,7 @@ img {
 .brand-mark-horizontal {
   font-size: 1.05rem;
   min-width: 168px;
-  text-shadow: 0 1px 0 rgba(77, 56, 47, 0.06);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--color-text) 6%, transparent);
 }
 
 .brand-mark-official {
@@ -200,14 +211,14 @@ img {
 
 .nav-links {
   align-items: center;
-  background: rgba(255, 250, 252, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.56);
+  background: color-mix(in srgb, var(--color-white-warm) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 56%, transparent);
   border-radius: 999px;
   display: flex;
   gap: 6px;
   padding: 6px;
   backdrop-filter: blur(18px);
-  box-shadow: 0 8px 24px rgba(77, 56, 47, 0.05);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text) 5%, transparent);
 }
 
 .nav-links a,
@@ -354,35 +365,35 @@ h1 {
 
 .primary-button,
 .product-footer button {
-  background: linear-gradient(135deg, #6a4a3f, #4d382f);
-  box-shadow: 0 14px 30px rgba(77, 56, 47, 0.18);
+  background: linear-gradient(135deg, var(--color-text), var(--color-text));
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--color-text) 18%, transparent);
   color: var(--white);
   transition: all 0.3s ease;
 }
 
 .primary-button:hover,
 .product-footer button:hover {
-  background: linear-gradient(135deg, #593d34, #3f2e27);
+  background: linear-gradient(135deg, var(--color-text), var(--color-text));
   transform: translateY(-2px);
-  box-shadow: 0 16px 34px rgba(77, 56, 47, 0.24);
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--color-text) 24%, transparent);
 }
 
 .product-footer button.added {
   background: var(--mint-strong);
   color: var(--white);
-  box-shadow: 0 8px 24px rgba(177, 186, 149, 0.3);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-sage) 30%, transparent);
 }
 
 .whatsapp-button {
-  background: rgba(177, 186, 149, 0.22);
-  border: 1px solid rgba(177, 186, 149, 0.62);
-  box-shadow: 0 14px 28px rgba(177, 186, 149, 0.2);
-  color: #566041;
+  background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 62%, transparent);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--color-sage) 20%, transparent);
+  color: var(--color-text);
 }
 
 .ghost-button {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(177, 186, 149, 0.42);
+  background: color-mix(in srgb, var(--color-white) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 42%, transparent);
   color: var(--cocoa);
 }
 
@@ -390,8 +401,8 @@ h1 {
 .see-more-button,
 .mini-whatsapp-link {
   background: var(--rose-soft);
-  border: 1px solid rgba(240, 187, 220, 0.5);
-  color: #8d5270;
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 50%, transparent);
+  color: var(--color-text);
 }
 
 .primary-button:hover,
@@ -415,7 +426,7 @@ h1 {
 .hero-main-img {
   width: 100%;
   height: 100%;
-  border: 12px solid rgba(255, 255, 255, 0.72);
+  border: 12px solid color-mix(in srgb, var(--color-white) 72%, transparent);
   border-radius: 42px;
   box-shadow: var(--shadow);
   object-fit: cover;
@@ -423,8 +434,8 @@ h1 {
 
 .hero-card {
   align-items: center;
-  background: rgba(255, 250, 252, 0.84);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 85%, transparent);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
   display: flex;
@@ -479,7 +490,7 @@ h1 {
 }
 
 .brand-strip {
-  border-block: 1px solid rgba(240, 187, 220, 0.38);
+  border-block: 1px solid color-mix(in srgb, var(--color-rose-old) 38%, transparent);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   margin: 0 auto;
@@ -498,8 +509,8 @@ h1 {
 }
 
 .catering-strip-button {
-  background: rgba(255, 244, 248, 0.58);
-  border-inline: 1px solid rgba(240, 187, 220, 0.28);
+  background: color-mix(in srgb, var(--color-rose-light) 58%, transparent);
+  border-inline: 1px solid color-mix(in srgb, var(--color-rose-old) 28%, transparent);
   color: var(--cocoa-soft);
   font-weight: 800;
   transition: background 180ms ease, color 180ms ease;
@@ -533,8 +544,8 @@ h1 {
 
 .catering-copy,
 .catering-notes article {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   box-shadow: var(--shadow-soft);
 }
 
@@ -614,7 +625,7 @@ h1 {
 }
 
 .alfajores-image {
-  border: 10px solid rgba(255, 254, 253, 0.76);
+  border: 10px solid color-mix(in srgb, var(--color-white-warm) 76%, transparent);
   border-radius: 34px;
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -628,8 +639,8 @@ h1 {
 }
 
 .alfajores-copy {
-  background: rgba(255, 244, 248, 0.82);
-  border: 1px solid rgba(240, 187, 220, 0.32);
+  background: color-mix(in srgb, var(--color-rose-light) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 32%, transparent);
   border-radius: 30px;
   box-shadow: var(--shadow-soft);
   padding: clamp(22px, 4vw, 38px);
@@ -690,7 +701,7 @@ h1 {
   position: sticky;
   top: var(--header-height, 90px);
   z-index: 15;
-  background: rgba(255, 250, 252, 0.88);
+  background: color-mix(in srgb, var(--color-white-warm) 88%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
@@ -712,8 +723,8 @@ h1 {
 }
 
 .category-filter button {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  background: color-mix(in srgb, var(--color-white) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   border-radius: 999px;
   color: var(--cocoa-soft);
   flex: 0 0 auto;
@@ -723,15 +734,15 @@ h1 {
 }
 
 .category-filter button.active {
-  background: rgba(177, 186, 149, 0.22);
-  border-color: rgba(177, 186, 149, 0.62);
+  background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-sage) 62%, transparent);
   color: var(--cocoa);
 }
 
 .sin-tacc-intro {
   align-items: flex-start;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(240, 187, 220, 0.32);
+  background: color-mix(in srgb, var(--color-white) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 32%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   display: flex;
@@ -760,14 +771,14 @@ h1 {
   color: var(--cocoa);
   font-weight: 800;
   text-decoration: underline;
-  text-decoration-color: rgba(177, 186, 149, 0.72);
+  text-decoration-color: color-mix(in srgb, var(--color-sage) 72%, transparent);
   text-underline-offset: 4px;
 }
 
 .sin-tacc-location-link {
   align-items: center;
-  background: rgba(177, 186, 149, 0.16);
-  border: 1px solid rgba(177, 186, 149, 0.48);
+  background: color-mix(in srgb, var(--color-sage) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 48%, transparent);
   border-radius: 999px;
   color: var(--cocoa);
   display: inline-flex;
@@ -780,8 +791,8 @@ h1 {
 }
 
 .sin-tacc-location-link:hover {
-  background: rgba(177, 186, 149, 0.24);
-  border-color: rgba(177, 186, 149, 0.7);
+  background: color-mix(in srgb, var(--color-sage) 24%, transparent);
+  border-color: color-mix(in srgb, var(--color-sage) 70%, transparent);
   transform: translateY(-1px);
 }
 
@@ -827,8 +838,8 @@ h1 {
 
 .back-link {
   align-items: center;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(177, 186, 149, 0.42);
+  background: color-mix(in srgb, var(--color-white) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 42%, transparent);
   border-radius: 50%;
   color: var(--cocoa);
   display: inline-flex;
@@ -841,7 +852,7 @@ h1 {
 }
 
 .back-link:hover {
-  background: rgba(177, 186, 149, 0.18);
+  background: color-mix(in srgb, var(--color-sage) 18%, transparent);
   box-shadow: var(--shadow-soft);
   transform: translateX(-2px);
 }
@@ -850,7 +861,7 @@ h1 {
 .cart,
 .steps article {
   background: var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
 }
@@ -878,7 +889,7 @@ h1 {
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 34px rgba(77, 56, 47, 0.1);
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--color-text) 10%, transparent);
 }
 
 .product-media {
@@ -899,10 +910,10 @@ h1 {
 
 .product-image-control {
   align-items: center;
-  background: rgba(255, 254, 253, 0.78);
-  border: 1px solid rgba(240, 187, 220, 0.44);
+  background: color-mix(in srgb, var(--color-white-warm) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 44%, transparent);
   border-radius: 50%;
-  box-shadow: 0 8px 18px rgba(77, 56, 47, 0.1);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-text) 10%, transparent);
   color: var(--cocoa);
   cursor: pointer;
   display: inline-flex;
@@ -927,8 +938,8 @@ h1 {
 
 .product-image-control:hover,
 .product-image-control:focus-visible {
-  background: rgba(255, 254, 253, 0.92);
-  box-shadow: 0 10px 20px rgba(77, 56, 47, 0.14);
+  background: color-mix(in srgb, var(--color-white-warm) 92%, transparent);
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--color-text) 14%, transparent);
 }
 
 .product-image-control:focus-visible {
@@ -939,7 +950,7 @@ h1 {
 .product-media.placeholder {
   align-items: center;
   background:
-    linear-gradient(135deg, rgba(249, 220, 233, 0.8), rgba(255, 250, 243, 0.95)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 80%, transparent), color-mix(in srgb, var(--color-white-warm) 95%, transparent)),
     var(--rose-50);
   display: flex;
   justify-content: center;
@@ -947,7 +958,7 @@ h1 {
 
 .placeholder-content {
   align-items: center;
-  border: 1px solid rgba(240, 187, 220, 0.54);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 54%, transparent);
   border-radius: 50%;
   color: var(--rose-500);
   display: flex;
@@ -975,8 +986,8 @@ h1 {
 }
 
 .product-badge {
-  background: rgba(255, 254, 253, 0.88);
-  border: 1px solid rgba(240, 187, 220, 0.52);
+  background: color-mix(in srgb, var(--color-white-warm) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 52%, transparent);
   border-radius: 999px;
   color: var(--cocoa);
   font-size: 0.72rem;
@@ -991,12 +1002,12 @@ h1 {
 
 .product-badge-sin-tacc {
   background: var(--mint);
-  color: #315b34;
+  color: var(--color-text);
 }
 
 .product-badge-offer {
-  background: #fff8e6;
-  color: #7a4e1b;
+  background: var(--color-rose-light);
+  color: var(--color-text);
 }
 
 .product-info {
@@ -1091,8 +1102,8 @@ h1 {
 
 .mobile-menu-title {
   align-items: center;
-  background: rgba(255, 207, 237, 0.36);
-  border: 1px solid rgba(240, 187, 220, 0.54);
+  background: color-mix(in srgb, var(--color-rose) 36%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 54%, transparent);
   border-radius: 999px;
   color: var(--cocoa);
   display: flex;
@@ -1104,8 +1115,8 @@ h1 {
 }
 
 .mobile-menu-title:hover {
-  background: rgba(255, 207, 237, 0.52);
-  border-color: rgba(201, 109, 158, 0.36);
+  background: color-mix(in srgb, var(--color-rose) 52%, transparent);
+  border-color: color-mix(in srgb, var(--color-rose-old) 36%, transparent);
   transform: translateY(-1px);
 }
 
@@ -1119,7 +1130,7 @@ h1 {
 .quantity-control button {
   align-items: center;
   background: var(--rose-50);
-  border: 1px solid rgba(240, 187, 220, 0.52);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 52%, transparent);
   border-radius: 50%;
   color: var(--cocoa);
   display: inline-flex;
@@ -1144,7 +1155,7 @@ h1 {
 
 .cart-item {
   align-items: center;
-  border-bottom: 1px solid rgba(240, 187, 220, 0.3);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent);
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 14px;
@@ -1161,7 +1172,7 @@ h1 {
 .cart-item-image {
   align-items: center;
   background: linear-gradient(135deg, var(--rose-soft), var(--cream));
-  border: 1px solid rgba(240, 187, 220, 0.36);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 36%, transparent);
   border-radius: 14px;
   color: var(--rose-500);
   display: flex;
@@ -1180,7 +1191,7 @@ h1 {
 
 .cart-item-image.placeholder {
   background:
-    linear-gradient(135deg, rgba(255, 240, 245, 0.86), rgba(255, 254, 253, 0.92)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 86%, transparent), color-mix(in srgb, var(--color-white-warm) 92%, transparent)),
     var(--rose-50);
 }
 
@@ -1262,7 +1273,7 @@ h1 {
 .contact-band {
   align-items: center;
   background:
-    linear-gradient(rgba(79, 57, 47, 0.54), rgba(79, 57, 47, 0.54)),
+    linear-gradient(color-mix(in srgb, var(--color-text) 54%, transparent), color-mix(in srgb, var(--color-text) 54%, transparent)),
     url("/images/envios-retiro.png") center / cover;
   color: var(--white);
   display: flex;
@@ -1296,9 +1307,9 @@ h1 {
 
 .footer {
   background:
-    linear-gradient(135deg, rgba(255, 229, 238, 0.74), rgba(177, 186, 149, 0.16) 48%, rgba(255, 250, 252, 0.96)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 74%, transparent), color-mix(in srgb, var(--color-sage) 16%, transparent) 48%, color-mix(in srgb, var(--color-white-warm) 96%, transparent)),
     var(--rose-soft);
-  border: 1px solid rgba(240, 187, 220, 0.36);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 36%, transparent);
   border-radius: 30px 30px 0 0;
   margin: 0 auto;
   max-width: 1180px;
@@ -1315,7 +1326,7 @@ h1 {
 }
 
 .footer-credits {
-  color: rgba(77, 56, 47, 0.58);
+  color: color-mix(in srgb, var(--color-text) 58%, transparent);
   grid-column: 1 / -1;
   margin: 0;
   padding-top: 2px;
@@ -1326,7 +1337,7 @@ h1 {
 
 .footer-legal {
   align-items: center;
-  color: rgba(77, 56, 47, 0.56);
+  color: color-mix(in srgb, var(--color-text) 56%, transparent);
   display: flex;
   flex-wrap: wrap;
   font-size: 0.76rem;
@@ -1346,7 +1357,7 @@ h1 {
   color: var(--cocoa);
   opacity: 0.86;
   text-decoration: underline;
-  text-decoration-color: rgba(201, 109, 158, 0.45);
+  text-decoration-color: color-mix(in srgb, var(--color-rose-old) 45%, transparent);
   text-underline-offset: 3px;
 }
 
@@ -1360,7 +1371,7 @@ h1 {
   color: var(--cocoa);
   opacity: 0.86;
   text-decoration: underline;
-  text-decoration-color: rgba(201, 109, 158, 0.45);
+  text-decoration-color: color-mix(in srgb, var(--color-rose-old) 45%, transparent);
   text-underline-offset: 3px;
 }
 
@@ -1401,7 +1412,7 @@ h1 {
 }
 
 .footer-hours-title {
-  color: #566041;
+  color: var(--color-text);
 }
 
 .footer-hours-title strong {
@@ -1416,7 +1427,7 @@ h1 {
 }
 
 .footer-schedule span {
-  color: #566041;
+  color: var(--color-text);
   display: block;
   font-weight: 800;
 }
@@ -1436,7 +1447,7 @@ h1 {
 
 .floating-cart {
   align-items: center;
-  background: linear-gradient(135deg, #6a4a3f, var(--cocoa));
+  background: linear-gradient(135deg, var(--color-text), var(--cocoa));
   border-radius: 999px;
   bottom: 18px;
   box-shadow: var(--shadow);
@@ -1712,7 +1723,7 @@ h1 {
 }
 
 .skeleton-pulse {
-  background: linear-gradient(90deg, #f0e6dd 0%, #faecd7 50%, #f0e6dd 100%);
+  background: linear-gradient(90deg, var(--color-rose-light) 0%, var(--color-rose-light) 50%, var(--color-rose-light) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
   border-radius: 8px;
@@ -1752,7 +1763,7 @@ h1 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(40, 25, 18, 0.4);
+  background: color-mix(in srgb, var(--color-text) 40%, transparent);
   backdrop-filter: blur(4px);
   z-index: 3000;
   opacity: 0;
@@ -1774,7 +1785,7 @@ h1 {
   height: 100vh;
   background: var(--cream);
   z-index: 3010;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+  box-shadow: -10px 0 40px color-mix(in srgb, var(--color-text) 10%, transparent);
   transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -1801,7 +1812,7 @@ h1 {
 .cart-drawer .cart-header {
   padding: 24px 24px 16px;
   background: var(--cream);
-  border-bottom: 1px solid rgba(240, 187, 220, 0.3);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1850,7 +1861,7 @@ h1 {
 .cart-drawer .cart-footer {
   padding: 24px;
   background: var(--white);
-  border-top: 1px solid rgba(240, 187, 220, 0.3);
+  border-top: 1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent);
 }
 
 .close-btn {
@@ -1878,7 +1889,7 @@ h1 {
 .search-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(40, 25, 18, 0.6);
+  background: color-mix(in srgb, var(--color-text) 60%, transparent);
   backdrop-filter: blur(8px);
   z-index: 2000;
   display: flex;
@@ -1901,7 +1912,7 @@ h1 {
   width: 90%;
   max-width: 600px;
   border-radius: 24px;
-  box-shadow: 0 24px 50px rgba(77, 56, 47, 0.18);
+  box-shadow: 0 24px 50px color-mix(in srgb, var(--color-text) 18%, transparent);
   overflow: hidden;
   will-change: opacity, transform;
 }
@@ -1950,7 +1961,7 @@ h1 {
   display: flex;
   align-items: center;
   padding: 16px 24px;
-  border-bottom: 1px solid rgba(240, 187, 220, 0.34);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   gap: 12px;
 }
 
@@ -1985,7 +1996,7 @@ h1 {
 }
 
 .search-list li {
-  border-bottom: 1px solid rgba(240, 187, 220, 0.18);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 18%, transparent);
 }
 
 .search-list button {
@@ -2035,7 +2046,7 @@ h1 {
 
 .postre-card {
   background: var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 30%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   display: grid;
@@ -2072,7 +2083,7 @@ h1 {
 .postre-detail-media.placeholder {
   align-items: center;
   background:
-    linear-gradient(135deg, rgba(255, 240, 245, 0.86), rgba(255, 254, 253, 0.92)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 86%, transparent), color-mix(in srgb, var(--color-white-warm) 92%, transparent)),
     var(--rose-50);
   display: flex;
   justify-content: center;
@@ -2080,7 +2091,7 @@ h1 {
 
 .postre-placeholder {
   align-items: center;
-  border: 1px solid rgba(240, 187, 220, 0.54);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 54%, transparent);
   border-radius: 50%;
   color: var(--rose-500);
   display: flex;
@@ -2098,8 +2109,8 @@ h1 {
 
 .postre-detail {
   align-items: stretch;
-  background: rgba(255, 254, 253, 0.88);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 30px;
   box-shadow: var(--shadow-soft);
   display: grid;
@@ -2127,9 +2138,9 @@ h1 {
 }
 
 .postre-gallery-thumbs button {
-  border: 2px solid rgba(255, 254, 253, 0.78);
+  border: 2px solid color-mix(in srgb, var(--color-white-warm) 78%, transparent);
   border-radius: 14px;
-  box-shadow: 0 8px 18px rgba(77, 56, 47, 0.12);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--color-text) 12%, transparent);
   cursor: pointer;
   flex: 0 0 auto;
   height: 64px;
@@ -2183,8 +2194,8 @@ h1 {
 }
 
 .postre-availability-note {
-  background: rgba(177, 186, 149, 0.12);
-  border: 1px solid rgba(177, 186, 149, 0.38);
+  background: color-mix(in srgb, var(--color-sage) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 38%, transparent);
   border-radius: 18px;
   color: var(--cocoa-soft);
   line-height: 1.6;
@@ -2193,8 +2204,8 @@ h1 {
 }
 
 .postre-pricing-notice {
-  background: rgba(240, 187, 220, 0.12);
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  background: color-mix(in srgb, var(--color-rose-old) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   border-radius: 16px;
   color: var(--cocoa-soft);
   line-height: 1.55;
@@ -2215,7 +2226,7 @@ h1 {
 
 .postre-date-field span {
   align-items: center;
-  color: #566041;
+  color: var(--color-text);
   display: inline-flex;
   font-weight: 800;
   gap: 8px;
@@ -2223,7 +2234,7 @@ h1 {
 
 .postre-date-field input {
   background: var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.52);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 52%, transparent);
   border-radius: 14px;
   color: var(--cocoa);
   font: inherit;
@@ -2233,7 +2244,7 @@ h1 {
 
 .postre-date-field input:focus {
   border-color: var(--rose-old);
-  box-shadow: 0 0 0 4px rgba(240, 187, 220, 0.18);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-rose-old) 18%, transparent);
   outline: none;
 }
 
@@ -2285,8 +2296,8 @@ h1 {
 
 .tortas-carousel-control {
   align-items: center;
-  background: rgba(255, 250, 252, 0.82);
-  border: 1px solid rgba(240, 187, 220, 0.45);
+  background: color-mix(in srgb, var(--color-white-warm) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 45%, transparent);
   border-radius: 999px;
   color: var(--cocoa);
   cursor: pointer;
@@ -2304,9 +2315,9 @@ h1 {
 
 .tortas-carousel-control:hover,
 .tortas-carousel-control:focus-visible {
-  background: rgba(255, 250, 252, 0.96);
-  border-color: rgba(201, 109, 158, 0.62);
-  box-shadow: 0 8px 20px rgba(77, 56, 47, 0.14);
+  background: color-mix(in srgb, var(--color-white-warm) 96%, transparent);
+  border-color: color-mix(in srgb, var(--color-rose-old) 62%, transparent);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--color-text) 14%, transparent);
   transform: translateY(-50%) scale(1.08);
 }
 
@@ -2333,7 +2344,7 @@ h1 {
 }
 
 .tortas-carousel-dots button {
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--color-white) 72%, transparent);
   border: 0;
   border-radius: 999px;
   cursor: pointer;
@@ -2351,8 +2362,8 @@ h1 {
 
 .cake-order-note,
 .cake-date-note {
-  background: rgba(255, 229, 238, 0.7);
-  border: 1px solid rgba(240, 187, 220, 0.48);
+  background: color-mix(in srgb, var(--color-rose-light) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 48%, transparent);
   border-radius: 16px;
   color: var(--cocoa-soft);
   line-height: 1.55;
@@ -2366,8 +2377,8 @@ h1 {
 }
 
 .cake-calendar {
-  background: rgba(255, 250, 252, 0.82);
-  border: 1px solid rgba(240, 187, 220, 0.46);
+  background: color-mix(in srgb, var(--color-white-warm) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 46%, transparent);
   border-radius: 18px;
   padding: 14px;
 }
@@ -2392,7 +2403,7 @@ h1 {
 .cake-calendar-header button,
 .cake-calendar-day {
   align-items: center;
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   display: inline-flex;
   font: inherit;
   justify-content: center;
@@ -2451,7 +2462,7 @@ h1 {
 }
 
 .cake-calendar-day.outside-month:not(:disabled) {
-  background: rgba(255, 250, 252, 0.78);
+  background: color-mix(in srgb, var(--color-white-warm) 78%, transparent);
   color: var(--cocoa-soft);
 }
 
@@ -2461,16 +2472,16 @@ h1 {
 }
 
 .cake-calendar-day:disabled {
-  background: rgba(232, 215, 198, 0.18);
-  border-color: rgba(232, 215, 198, 0.34);
-  color: rgba(128, 102, 93, 0.38);
+  background: color-mix(in srgb, var(--color-rose) 18%, transparent);
+  border-color: color-mix(in srgb, var(--color-rose) 34%, transparent);
+  color: color-mix(in srgb, var(--color-text-muted) 38%, transparent);
   cursor: not-allowed;
   text-decoration: line-through;
 }
 
 .cake-calendar-day.sunday:disabled {
-  background: rgba(240, 187, 220, 0.16);
-  color: rgba(201, 109, 158, 0.5);
+  background: color-mix(in srgb, var(--color-rose-old) 16%, transparent);
+  color: color-mix(in srgb, var(--color-rose-old) 50%, transparent);
 }
 
 .cake-calendar-help {
@@ -2500,7 +2511,7 @@ h1 {
 
 .pasos-lista li {
   padding: 12px 0;
-  border-bottom: 1px solid rgba(240, 187, 220, 0.24);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 24%, transparent);
   font-size: 1.1rem;
 }
 
@@ -2537,7 +2548,7 @@ h1 {
 
 .option-btn {
   background: var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   border-radius: 12px;
   padding: 16px;
   text-align: left;
@@ -2550,7 +2561,7 @@ h1 {
 
 .option-btn:hover {
   border-color: var(--rose-500);
-  box-shadow: 0 6px 18px rgba(240, 187, 220, 0.2);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-rose-old) 20%, transparent);
 }
 
 .option-btn.selected {
@@ -2584,7 +2595,7 @@ h1 {
 .form-input {
   width: 100%;
   padding: 14px;
-  border: 1px solid rgba(240, 187, 220, 0.5);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 50%, transparent);
   border-radius: 12px;
   background: var(--white);
   font-family: inherit;
@@ -2595,7 +2606,7 @@ h1 {
 
 .form-input:focus {
   border-color: var(--rose-old);
-  box-shadow: 0 0 0 4px rgba(240, 187, 220, 0.18);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-rose-old) 18%, transparent);
 }
 
 .options-list {
@@ -2617,7 +2628,7 @@ h1 {
   align-items: center;
   padding: 12px 16px;
   background: var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
@@ -2686,7 +2697,7 @@ h1 {
 
 .secondary-button {
   background: transparent;
-  border: 1px solid rgba(240, 187, 220, 0.62);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 62%, transparent);
   color: var(--cocoa);
   padding: 14px 24px;
   border-radius: 999px;
@@ -2695,7 +2706,7 @@ h1 {
 }
 
 .secondary-button:hover {
-  background: rgba(255, 229, 238, 0.5);
+  background: color-mix(in srgb, var(--color-rose-light) 50%, transparent);
 }
 
 .slide-in {
@@ -2712,14 +2723,14 @@ h1 {
   background: var(--white);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(240, 187, 220, 0.38);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 38%, transparent);
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(240, 187, 220, 0.24);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 24%, transparent);
 }
 
 .summary-row:last-child {
@@ -2854,8 +2865,8 @@ h1 {
 
 .page-steps article,
 .page-cart {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   padding: 24px;
@@ -2869,8 +2880,8 @@ h1 {
 }
 
 .como-pedir-note {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   padding: 24px;
@@ -2903,8 +2914,8 @@ h1 {
 }
 
 .legal-block {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 20px;
   box-shadow: var(--shadow-soft);
   padding: clamp(18px, 3vw, 24px);
@@ -2995,9 +3006,9 @@ h1 {
 
 .catering-hero {
   background:
-    linear-gradient(135deg, rgba(255, 229, 238, 0.78), rgba(255, 250, 252, 0.94)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 78%, transparent), color-mix(in srgb, var(--color-white-warm) 94%, transparent)),
     var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 30px;
   box-shadow: var(--shadow-soft);
   padding: clamp(26px, 5vw, 54px);
@@ -3027,8 +3038,8 @@ h1 {
 
 .catering-tabs button {
   align-items: center;
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.42);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 42%, transparent);
   border-radius: 999px;
   color: var(--cocoa-soft);
   display: inline-flex;
@@ -3041,16 +3052,16 @@ h1 {
 }
 
 .catering-tabs button.active {
-  background: rgba(177, 186, 149, 0.22);
-  border-color: rgba(177, 186, 149, 0.62);
+  background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-sage) 62%, transparent);
   color: var(--cocoa);
 }
 
 .catering-panel {
   background:
-    linear-gradient(135deg, rgba(255, 254, 253, 0.92), rgba(255, 229, 238, 0.42)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-white-warm) 92%, transparent), color-mix(in srgb, var(--color-rose-light) 42%, transparent)),
     var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 30px;
   box-shadow: var(--shadow-soft);
   min-width: 0;
@@ -3075,8 +3086,8 @@ h1 {
 
 .catering-panel-icon {
   align-items: center;
-  background: rgba(177, 186, 149, 0.16);
-  border: 1px solid rgba(177, 186, 149, 0.42);
+  background: color-mix(in srgb, var(--color-sage) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 42%, transparent);
   border-radius: 50%;
   display: inline-flex;
   height: 48px;
@@ -3086,8 +3097,8 @@ h1 {
 
 .catering-note,
 .catering-small-note {
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white) 76%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 20px;
   color: var(--cocoa-soft);
   line-height: 1.65;
@@ -3136,8 +3147,8 @@ h1 {
 }
 
 .breakfast-box {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 24px;
   display: grid;
   gap: 18px;
@@ -3190,10 +3201,10 @@ h1 {
 
 .breakfast-price {
   align-items: center;
-  background: rgba(177, 186, 149, 0.2);
-  border: 1px solid rgba(177, 186, 149, 0.42);
+  background: color-mix(in srgb, var(--color-sage) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 42%, transparent);
   border-radius: 999px;
-  color: #566041;
+  color: var(--color-text);
   display: inline-flex;
   font-size: 1.15rem;
   justify-content: center;
@@ -3205,11 +3216,11 @@ h1 {
 }
 
 a.breakfast-price:hover {
-  background: rgba(177, 186, 149, 0.35) !important;
-  border-color: rgba(177, 186, 149, 0.65) !important;
+  background: color-mix(in srgb, var(--color-sage) 35%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-sage) 65%, transparent) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(77, 56, 47, 0.1);
-  color: #566041;
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--color-text) 10%, transparent);
+  color: var(--color-text);
 }
 
 a.breakfast-price:active {
@@ -3217,8 +3228,8 @@ a.breakfast-price:active {
 }
 
 .catering-personalize-note {
-  background: rgba(177, 186, 149, 0.12);
-  border: 1px solid rgba(177, 186, 149, 0.34);
+  background: color-mix(in srgb, var(--color-sage) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-sage) 34%, transparent);
   border-radius: 22px;
   color: var(--cocoa);
   display: grid;
@@ -3240,8 +3251,8 @@ a.breakfast-price:active {
 .catering-feature-card,
 .sin-tacc-block,
 .catering-final-cta {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 28px;
   box-shadow: var(--shadow-soft);
   padding: clamp(22px, 4vw, 36px);
@@ -3307,7 +3318,7 @@ a.breakfast-price:active {
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 500;
-  border: 1px solid rgba(240, 187, 220, 0.38);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 38%, transparent);
 }
 
 .catering-grid {
@@ -3323,13 +3334,13 @@ a.breakfast-price:active {
   border-radius: 24px;
   min-width: 0;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--color-text) 3%, transparent);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .catering-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--color-text) 8%, transparent);
 }
 
 .catering-card h3 {
@@ -3415,7 +3426,7 @@ a.breakfast-price:active {
 }
 
 .about-story-subtitle::after {
-  background: rgba(177, 186, 149, 0.62);
+  background: color-mix(in srgb, var(--color-sage) 62%, transparent);
   border-radius: 999px;
   content: "";
   display: block;
@@ -3442,8 +3453,8 @@ a.breakfast-price:active {
 }
 
 .values-grid article {
-  background: rgba(255, 254, 253, 0.84);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  background: color-mix(in srgb, var(--color-white-warm) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
   display: flex;
@@ -3454,8 +3465,8 @@ a.breakfast-price:active {
 }
 
 .values-grid article:hover {
-  border-color: rgba(240, 187, 220, 0.52);
-  box-shadow: 0 18px 38px rgba(77, 56, 47, 0.1);
+  border-color: color-mix(in srgb, var(--color-rose-old) 52%, transparent);
+  box-shadow: 0 18px 38px color-mix(in srgb, var(--color-text) 10%, transparent);
   transform: translateY(-3px);
 }
 
@@ -3496,9 +3507,9 @@ a.breakfast-price:active {
 
 .location-card {
   background:
-    linear-gradient(135deg, rgba(255, 229, 238, 0.62), rgba(255, 254, 253, 0.92)),
+    linear-gradient(135deg, color-mix(in srgb, var(--color-rose-light) 62%, transparent), color-mix(in srgb, var(--color-white-warm) 92%, transparent)),
     var(--white);
-  border: 1px solid rgba(240, 187, 220, 0.34);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 34%, transparent);
   border-radius: 28px;
   box-shadow: var(--shadow-soft);
   display: grid;
@@ -3518,7 +3529,7 @@ a.breakfast-price:active {
 .location-icon {
   align-items: center;
   background: var(--rose-50);
-  border: 1px solid rgba(240, 187, 220, 0.46);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 46%, transparent);
   border-radius: 50%;
   display: inline-flex;
   height: 46px;
@@ -3547,8 +3558,8 @@ a.breakfast-price:active {
 }
 
 .location-schedule {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(240, 187, 220, 0.28);
+  background: color-mix(in srgb, var(--color-white) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 28%, transparent);
   border-radius: 18px;
   display: grid;
   gap: 4px;
@@ -4087,4 +4098,275 @@ a.breakfast-price:active {
   margin: 48px auto 0;
   padding: 0 16px;
   opacity: 0.85;
+}
+
+/* October 2026 brand refresh */
+body {
+  color: var(--color-text);
+  font-size: 16px;
+  line-height: 1.55;
+  background: linear-gradient(180deg, var(--color-white-warm), var(--color-rose-light));
+}
+
+body::before { display: none; }
+.site-shell svg { color: var(--color-rose-old); }
+
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 2px;
+}
+
+.nav, .nav-scrolled {
+  height: 72px;
+  min-height: 72px;
+  padding: 0 clamp(18px, 5vw, 68px);
+  background: color-mix(in srgb, var(--color-rose-light) 88%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-rose-old) 40%, transparent);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--color-text) 6%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 220ms ease-out, box-shadow 220ms ease-out;
+}
+
+.brand-mark-official { height: 66px; width: 164px; }
+.header-logo img {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(13%) saturate(1145%) hue-rotate(325deg) brightness(92%) contrast(87%);
+}
+.nav-links {
+  background: color-mix(in srgb, var(--color-white) 80%, transparent);
+  border-color: color-mix(in srgb, var(--color-rose-old) 40%, transparent);
+  box-shadow: none;
+}
+.nav-links a, .nav-links button { color: var(--color-text); font-weight: 600; }
+.nav-links a:hover, .nav-links a.active, .nav-links button:hover { background: var(--color-rose); }
+.nav .icon-button {
+  background: var(--color-white);
+  border-color: color-mix(in srgb, var(--color-rose-old) 60%, transparent);
+  height: 44px;
+  width: 44px;
+  transition: background 220ms ease-out, transform 220ms ease-out;
+}
+.nav .icon-button:hover { background: var(--color-rose); }
+.nav .icon-button svg { color: var(--color-rose-old); }
+.cart-link { position: relative; }
+.cart-count, .mobile-cart-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-sage);
+  color: var(--color-text);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  animation: badgePulse 250ms ease-out;
+}
+.mobile-cart-count { position: absolute; right: -3px; top: -4px; border: 1px solid var(--color-white); }
+@keyframes badgePulse { 50% { transform: scale(1.18); } }
+
+.hero {
+  min-height: 800px;
+  padding: 120px 24px 96px;
+}
+.hero-content {
+  max-width: 1200px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(40px, 6vw, 84px);
+  margin-top: 50px;
+}
+.hero-copy { position: relative; z-index: 1; }
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(64px, 6.12vw, 88px);
+  line-height: 1;
+  max-width: 10ch;
+  margin: 16px 0 22px;
+}
+.hero-copy p { color: var(--color-text-muted); font-size: 16px; line-height: 1.55; }
+.hero .eyebrow { color: var(--color-text); }
+.hero-actions { margin-top: 30px; }
+.hero-visual { min-height: 0; animation: none; }
+.hero-main-img {
+  border: 8px solid var(--color-white-warm);
+  border-radius: 36px;
+}
+.hero-flower-detail {
+  width: clamp(180px, 20vw, 280px);
+  height: clamp(180px, 20vw, 280px);
+  opacity: .55;
+  right: max(4vw, calc((100vw - 1250px) / 2));
+  top: 100px;
+}
+.mini-logo { left: 12px; top: 16px; }
+.hero-card { background: color-mix(in srgb, var(--color-white-warm) 90%, transparent); }
+.mini-logo:hover { background: var(--color-rose); }
+.instagram-pill, .mini-cart { display: none; }
+
+.primary-button, .whatsapp-button, .floating-cart {
+  background: var(--color-rose-old);
+  color: var(--color-text);
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+  min-height: 44px;
+  padding: 12px 22px;
+  font-weight: 700;
+  transition: background 220ms ease-out, box-shadow 220ms ease-out, transform 220ms ease-out;
+}
+.primary-button:hover, .whatsapp-button:hover, .floating-cart:hover {
+  background: var(--color-rose);
+  color: var(--color-text);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-2px);
+}
+.product-footer button {
+  min-height: 44px;
+  background: var(--color-rose);
+  color: var(--color-text);
+  box-shadow: none;
+  font-weight: 700;
+  transition: background 220ms ease-out, transform 220ms ease-out;
+}
+.product-footer button:hover { background: var(--color-rose-old); color: var(--color-text); box-shadow: none; }
+.product-footer button.added { background: var(--color-sage); color: var(--color-text); box-shadow: none; }
+.product-footer button svg { color: var(--color-text); }
+.see-more-button, .secondary-button, .rose-button {
+  background: transparent;
+  border: 1.5px solid var(--color-rose-old);
+  color: var(--color-text);
+  box-shadow: none;
+  transition: background 220ms ease-out, transform 220ms ease-out;
+}
+.see-more-button:hover, .secondary-button:hover, .rose-button:hover { background: var(--color-rose-light); }
+
+.section { max-width: 1200px; padding: 96px 24px; }
+.page-section { padding-top: 96px; }
+.section-heading { max-width: 730px; margin-bottom: 32px; }
+.section-heading h2, .contact-band h2 {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  line-height: 1.1;
+}
+.section-heading span, .eyebrow, .cart-header span, .contact-band span {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.hero .eyebrow { font-size: clamp(30px, 4vw, 42px); letter-spacing: 0; text-transform: none; }
+.section-heading p { color: var(--color-text-muted); font-size: 16px; line-height: 1.55; }
+
+.category-filter {
+  background: color-mix(in srgb, var(--color-white-warm) 90%, transparent);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  mask-image: linear-gradient(90deg, transparent, black 12px, black calc(100% - 12px), transparent);
+}
+.category-filter button {
+  min-height: 44px;
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 60%, transparent);
+  color: var(--color-text);
+  transition: background 220ms ease-out, border-color 220ms ease-out;
+}
+.category-filter button:hover { background: var(--color-rose-light); }
+.category-filter button.active, .category-filter button.active:hover {
+  background: var(--color-sage);
+  border-color: var(--color-sage);
+  color: var(--color-text);
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-white-warm);
+  border: 1px solid var(--color-rose-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+  transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+}
+.product-card::after { display: none; }
+.product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.product-media { aspect-ratio: 4 / 3; flex: 0 0 auto; overflow: hidden; }
+.product-media img { object-fit: cover; transition: transform 250ms ease-out; }
+.product-card:hover .product-media img { transform: scale(1.03); }
+.product-info { flex: 1; gap: 22px; }
+.product-info h3 { font-family: var(--font-serif); font-size: 18px; line-height: 1.2; }
+.product-info p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 15px;
+}
+.product-footer { margin-top: auto; }
+.product-footer strong, .promo-price strong { color: var(--color-text); font-family: var(--font-sans); font-weight: 600; }
+.product-image-control {
+  background: color-mix(in srgb, var(--color-white) 90%, transparent);
+  border-color: color-mix(in srgb, var(--color-rose-old) 40%, transparent);
+  transition: opacity 220ms ease-out, background 220ms ease-out;
+}
+
+.footer {
+  max-width: 1200px;
+  background: color-mix(in srgb, var(--color-rose) 60%, var(--color-white-warm));
+  border: 0;
+  border-radius: var(--radius-footer) var(--radius-footer) 0 0;
+  padding: 48px 42px;
+  gap: 28px;
+}
+.footer strong { font-family: var(--font-serif); }
+.footer p, .footer-hours, .footer-legal, .footer-credits { color: var(--color-text-muted); }
+.footer-hours-title, .footer-schedule span { color: var(--color-text); }
+.footer-links a {
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--color-white-warm);
+  border: 1px solid color-mix(in srgb, var(--color-rose-old) 60%, transparent);
+  color: var(--color-text);
+  transition: background 220ms ease-out;
+}
+.footer-links a:hover { background: var(--color-rose-light); }
+
+@media (hover: hover) and (pointer: fine) {
+  .product-image-control { opacity: 0; }
+  .product-card:hover .product-image-control,
+  .product-image-control:focus-visible { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  body { font-size: 15px; }
+  .nav, .nav-scrolled { height: 60px; min-height: 60px; padding: 0 16px; }
+  .brand-mark-official { height: 52px; width: 118px; }
+  .nav .icon-button { height: 40px; width: 40px; }
+  .hero { min-height: 0; padding: 76px 16px 64px; }
+  .hero-content { display: flex; flex-direction: column; gap: 30px; margin-top: 0; }
+  .hero-visual { order: 0; width: 100%; aspect-ratio: 4 / 5; }
+  .hero-copy { order: 1; width: 100%; }
+  .hero h1 { font-size: 52px; line-height: 1; max-width: none; margin: 12px 0 18px; }
+  .hero-copy p { font-size: 15px; }
+  .hero-actions { margin-top: 24px; }
+  .hero-actions .primary-button { width: 100%; }
+  .hero-flower-detail { top: 70px; right: 0; width: 160px; height: 160px; }
+  .section { padding: 64px 16px; }
+  .page-section { padding-top: 64px; }
+  .section-heading h2, .contact-band h2 { font-size: 32px; line-height: 1.1; }
+  .section-heading p { font-size: 15px; }
+  .product-info h3 { font-size: 17px; }
+  .footer { gap: 24px; padding: 36px 20px 88px; }
+  .footer-links { justify-content: center; }
+  .campaign-banner { top: 60px; }
+  .home-floating-cart { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card:hover, .product-card:hover .product-media img,
+  .primary-button:hover, .whatsapp-button:hover, .floating-cart:hover,
+  .product-footer button:hover { transform: none; }
+  .cart-count, .mobile-cart-count { animation: none; }
 }
