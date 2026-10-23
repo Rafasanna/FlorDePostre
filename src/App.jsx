@@ -8,6 +8,7 @@ import { dailyProducts } from "./data/dailyProducts.js";
 import { postresBase } from "./data/postresData.js";
 import { coberturas, enrichCakeExtra, enrichCakeFilling, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
 import {
+  usesNeonCatalog,
   fetchCampaignsFromSheet,
   fetchDailyProductsFromSheet,
   fetchPostresConfigFromSheet,
@@ -19,7 +20,7 @@ import {
   fetchTortaExtrasFromSheet,
   fetchTortaRellenosFromSheet,
   fetchTortaTamanosFromSheet
-} from "./services/googleSheets.js";
+} from "./services/catalog.js";
 import { getPrimaryProductImage } from "./utils/productImages.js";
 import { getActiveCampaigns, getEffectivePrice, isProductVisible } from "./utils/seasonal.js";
 import Header from "./components/Header.jsx";
@@ -158,7 +159,7 @@ const isValidDataset = (key, data) =>
     : Array.isArray(data) && data.length > 0;
 
 const getCachedDataset = (key) => {
-  if (typeof window === "undefined") return null;
+  if (usesNeonCatalog || typeof window === "undefined") return null;
 
   for (const storageName of SHEETS_CACHE_STORAGES) {
     try {
@@ -183,7 +184,7 @@ const getCachedDataset = (key) => {
 };
 
 const cacheDataset = (key, data) => {
-  if (typeof window === "undefined" || !isValidDataset(key, data)) return;
+  if (usesNeonCatalog || typeof window === "undefined" || !isValidDataset(key, data)) return;
 
   const serializedData = JSON.stringify(
     POSTRES_CACHE_KEYS[key]
@@ -203,7 +204,17 @@ const cacheDataset = (key, data) => {
   }
 };
 
+const initialDataset = (key, fallback) => usesNeonCatalog ? [] : getCachedDataset(key) || fallback;
+
 function App() {
+  const [catalogRefresh, setCatalogRefresh] = useState(0);
+  useEffect(() => {
+    if (!usesNeonCatalog) return;
+    const refresh = () => setCatalogRefresh(n => n + 1);
+    const timer = setInterval(refresh, 30000);
+    window.addEventListener("focus", refresh);
+    return () => { clearInterval(timer); window.removeEventListener("focus", refresh); };
+  }, []);
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -211,20 +222,20 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [shouldScrollToMenu, setShouldScrollToMenu] = useState(false);
   const [menuCategoryRequest, setMenuCategoryRequest] = useState(null);
-  const [menuDiarioProducts, setMenuDiarioProducts] = useState(() => getCachedDataset("menuDiario") || dailyProducts);
-  const [sinTaccProducts, setSinTaccProducts] = useState(() => getCachedDataset("sinTacc") || localSinTaccProducts);
-  const [postresProducts, setPostresProducts] = useState(() => getCachedDataset("postres") || postresBase);
-  const [postresTamanos, setPostresTamanos] = useState(() => getCachedDataset("postresTamanos") || []);
-  const [postresConfig, setPostresConfig] = useState(() => getCachedDataset("postresConfig") || []);
+  const [menuDiarioProducts, setMenuDiarioProducts] = useState(() => initialDataset("menuDiario", dailyProducts));
+  const [sinTaccProducts, setSinTaccProducts] = useState(() => initialDataset("sinTacc", localSinTaccProducts));
+  const [postresProducts, setPostresProducts] = useState(() => initialDataset("postres", postresBase));
+  const [postresTamanos, setPostresTamanos] = useState(() => initialDataset("postresTamanos", []));
+  const [postresConfig, setPostresConfig] = useState(() => initialDataset("postresConfig", []));
   const [isPostresPricingLoading, setIsPostresPricingLoading] = useState(
     () => postresTamanos.length === 0 || postresConfig.length === 0
   );
-  const [tortaTamanos, setTortaTamanos] = useState(() => getCachedDataset("tortaTamanos") || tortaSizes);
-  const [tortaCoberturas, setTortaCoberturas] = useState(() => getCachedDataset("tortaCoberturas") || coberturas);
-  const [tortaRellenos, setTortaRellenos] = useState(() => getCachedDataset("tortaRellenos") || rellenos);
-  const [tortaExtrasData, setTortaExtrasData] = useState(() => getCachedDataset("tortaExtras") || tortaExtras);
-  const [campaignsData, setCampaignsData] = useState(() => getCachedDataset("campaigns") || campaigns);
-  const [specialProducts, setSpecialProducts] = useState(() => getCachedDataset("specialProducts") || []);
+  const [tortaTamanos, setTortaTamanos] = useState(() => initialDataset("tortaTamanos", tortaSizes));
+  const [tortaCoberturas, setTortaCoberturas] = useState(() => initialDataset("tortaCoberturas", coberturas));
+  const [tortaRellenos, setTortaRellenos] = useState(() => initialDataset("tortaRellenos", rellenos));
+  const [tortaExtrasData, setTortaExtrasData] = useState(() => initialDataset("tortaExtras", tortaExtras));
+  const [campaignsData, setCampaignsData] = useState(() => initialDataset("campaigns", campaigns));
+  const [specialProducts, setSpecialProducts] = useState(() => initialDataset("specialProducts", []));
   const [isUsingSheetProducts, setIsUsingSheetProducts] = useState(
     () => Boolean(getCachedDataset("menuDiario") || getCachedDataset("sinTacc"))
   );
@@ -264,7 +275,8 @@ function App() {
       const request = resource.fetcher().then((data) => {
         if (!isMounted) return;
 
-        if (isValidDataset(resource.key, data)) {
+        if (usesNeonCatalog ? Array.isArray(data) : isValidDataset(resource.key, data)) {
+          if (usesNeonCatalog) setSheetsNotice("");
           cacheDataset(resource.key, data);
           resource.setter(data);
           if (resource.key === "menuDiario" || resource.key === "sinTacc") {
@@ -276,7 +288,8 @@ function App() {
           return;
         }
 
-        if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
+        if (usesNeonCatalog) { resource.setter([]); setSheetsNotice("El catálogo no está disponible. Volvé a intentar en unos instantes."); }
+        else if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
         if (import.meta.env.DEV) {
           const hasCachedData = Boolean(getCachedDataset(resource.key));
           const fallbackMessage = hasCachedData
@@ -289,7 +302,8 @@ function App() {
       }).catch((error) => {
         if (!isMounted) return;
 
-        if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
+        if (usesNeonCatalog) { resource.setter([]); setSheetsNotice("El catálogo no está disponible. Volvé a intentar en unos instantes."); }
+        else if (resource.showNoticeOnFallback) setSheetsNotice(SHEETS_NOTICE);
         if (import.meta.env.DEV) {
           console.info(`[Google Sheets] error en ${resource.label}; se conserva el estado actual.`, error);
         }
@@ -309,7 +323,7 @@ function App() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [catalogRefresh]);
 
   const dailyMenuProductsFinal = useMemo(
     () => dedupeProductsById([...menuDiarioProducts, ...sinTaccProducts]),

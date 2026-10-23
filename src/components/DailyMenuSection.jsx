@@ -34,7 +34,7 @@ function DailyMenuSection({
     const knownCategories = categories.filter((category) => sheetCategories.includes(category));
     const newCategories = sheetCategories.filter((category) => !categories.includes(category));
 
-    return ["Todos", "Sin TACC", ...new Set([...knownCategories, ...newCategories])];
+    return ["Todos", ...new Set([...knownCategories, ...newCategories]), "Sin TACC"];
   }, [isUsingSheetProducts, menuProducts]);
   const menuCategories = useMemo(
     () => (specialProducts.length > 0 ? ["Especial", ...baseCategories] : baseCategories),

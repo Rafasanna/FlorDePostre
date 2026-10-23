@@ -1,6 +1,5 @@
 export const categories = [
   "Todos",
-  "Sin TACC",
   "Alfajores",
   "Cookies",
   "Budines",
@@ -8,7 +7,8 @@ export const categories = [
   "Mini tartas",
   "Otros dulces",
   "Salado",
-  "Bandejas"
+  "Bandejas",
+  "Sin TACC"
 ];
 
 const productDefaults = {

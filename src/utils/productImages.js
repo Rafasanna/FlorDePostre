@@ -13,22 +13,25 @@ export const getProductImages = (product) => {
   const images = [
     ...parseProductImages(product?.imagenes),
     ...parseProductImages(product?.images),
-    ...parseProductImages(product?.imageUrls)
+    ...parseProductImages(product?.imageUrls),
   ];
   if (images.length > 0) return [...new Set(images)];
 
-  return [...new Set([
-    ...parseProductImages(product?.imagen),
-    ...parseProductImages(product?.image),
-    ...parseProductImages(product?.imageUrl),
-    ...parseProductImages(product?.mainImage),
-    ...parseProductImages(product?.thumbnail),
-    ...parseProductImages(product?.foto),
-    ...parseProductImages(product?.portada)
-  ])];
+  return [
+    ...new Set([
+      ...parseProductImages(product?.imagen),
+      ...parseProductImages(product?.image),
+      ...parseProductImages(product?.imageUrl),
+      ...parseProductImages(product?.mainImage),
+      ...parseProductImages(product?.thumbnail),
+      ...parseProductImages(product?.foto),
+      ...parseProductImages(product?.portada),
+    ]),
+  ];
 };
 
-export const getPrimaryProductImage = (product) => getProductImages(product)[0] || "";
+export const getPrimaryProductImage = (product) =>
+  getProductImages(product)[0] || "";
 
 const CLOUDINARY_UPLOAD_PATHS = ["/image/upload/", "/video/upload/"];
 const DEFAULT_DISPLAY_WIDTH = 1200;
@@ -38,7 +41,7 @@ const QUALITY_TRANSFORMATIONS = {
   good: "q_auto:good",
   eco: "q_auto:eco",
   low: "q_auto:low",
-  best: "q_auto:best"
+  best: "q_auto:best",
 };
 
 const normalizeDisplayWidth = (width) => {
@@ -55,27 +58,32 @@ const normalizeQualityTransformation = (quality) =>
 const getCloudinaryUploadPath = (parsedUrl) => {
   if (parsedUrl.hostname !== "res.cloudinary.com") return "";
 
-  return CLOUDINARY_UPLOAD_PATHS.find((path) => parsedUrl.pathname.includes(path)) || "";
+  return (
+    CLOUDINARY_UPLOAD_PATHS.find((path) => parsedUrl.pathname.includes(path)) ||
+    ""
+  );
 };
 
 const buildCloudinaryDeliveryTransformation = ({ width, quality }) =>
   [
-    "f_auto",
+    `c_limit,w_${normalizeDisplayWidth(width)}`,
     normalizeQualityTransformation(quality),
-    `w_${normalizeDisplayWidth(width)}`,
-    "c_limit"
-  ].join(",");
+    "f_auto",
+  ].join("/");
 
 const isCloudinaryDeliveryTransformationSegment = (segment) => {
   if (!segment || /^v\d+$/.test(segment)) return false;
 
-  return segment.split(",").some((token) =>
-    token === "f_auto" ||
-    token === "c_limit" ||
-    token === "q_auto" ||
-    token.startsWith("q_auto:") ||
-    /^w_\d+$/.test(token)
-  );
+  return segment
+    .split(",")
+    .some(
+      (token) =>
+        token === "f_auto" ||
+        token === "c_limit" ||
+        token === "q_auto" ||
+        token.startsWith("q_auto:") ||
+        /^w_\d+$/.test(token),
+    );
 };
 
 export const getDisplayImageUrl = (url, options = {}) => {
@@ -96,8 +104,13 @@ export const getDisplayImageUrl = (url, options = {}) => {
   if (!uploadPath) return url;
 
   const uploadPathIndex = parsedUrl.pathname.indexOf(uploadPath);
-  const pathBeforeUpload = parsedUrl.pathname.slice(0, uploadPathIndex + uploadPath.length);
-  const pathAfterUpload = parsedUrl.pathname.slice(uploadPathIndex + uploadPath.length);
+  const pathBeforeUpload = parsedUrl.pathname.slice(
+    0,
+    uploadPathIndex + uploadPath.length,
+  );
+  const pathAfterUpload = parsedUrl.pathname.slice(
+    uploadPathIndex + uploadPath.length,
+  );
 
   if (!pathAfterUpload) return url;
 
@@ -107,7 +120,10 @@ export const getDisplayImageUrl = (url, options = {}) => {
   if (pathParts[0] === desiredTransformation) return url;
 
   const assetPathParts = [...pathParts];
-  while (assetPathParts.length > 0 && isCloudinaryDeliveryTransformationSegment(assetPathParts[0])) {
+  while (
+    assetPathParts.length > 0 &&
+    isCloudinaryDeliveryTransformationSegment(assetPathParts[0])
+  ) {
     assetPathParts.shift();
   }
 
@@ -128,9 +144,13 @@ export const getResponsiveImageSrcSet = (url, widths, options = {}) => {
 
   if (!getCloudinaryUploadPath(parsedUrl)) return "";
 
-  const normalizedWidths = [...new Set(widths.map(normalizeDisplayWidth))].sort((a, b) => a - b);
+  const normalizedWidths = [...new Set(widths.map(normalizeDisplayWidth))].sort(
+    (a, b) => a - b,
+  );
 
   return normalizedWidths
-    .map((width) => `${getDisplayImageUrl(url, { ...options, width })} ${width}w`)
+    .map(
+      (width) => `${getDisplayImageUrl(url, { ...options, width })} ${width}w`,
+    )
     .join(", ");
 };
