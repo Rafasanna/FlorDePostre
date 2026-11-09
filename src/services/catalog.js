@@ -18,7 +18,7 @@ async function dataset(key) {
     });
   }
   const data = (await request)[key];
-  if (!Array.isArray(data)) throw new Error("Respuesta de catálogo inválida.");
+  if (key === "cakeRules" ? !data || !Array.isArray(data.cakePriceOptions) || !Array.isArray(data.extraRules) : !Array.isArray(data)) throw new Error("Respuesta de catálogo inválida.");
   return data;
 }
 const source = (key, fn) => () => (usesNeonCatalog ? dataset(key) : fn());
@@ -66,3 +66,4 @@ export const fetchTortaExtrasFromSheet = source(
   "tortaExtras",
   sheets.fetchTortaExtrasFromSheet,
 );
+export const fetchCakeRulesFromCatalog = () => usesNeonCatalog ? dataset("cakeRules") : Promise.resolve(null);

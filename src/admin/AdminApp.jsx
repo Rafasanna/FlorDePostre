@@ -44,8 +44,6 @@ import {
   validateCategory,
 } from "../../shared/catalog.js";
 import {
-  cakePriceOptions,
-  tortaExtras,
   getCakeExtraDisplay,
 } from "../data/tortasData.js";
 import { getEffectivePrice } from "../utils/seasonal.js";
@@ -54,6 +52,7 @@ import {
   getResponsiveImageSrcSet,
 } from "../utils/productImages.js";
 import "./admin.css";
+import SettingsPanel from "./SettingsPanel.jsx";
 const labels = {
   daily: "Menú diario",
   sin_tacc: "Sin TACC",
@@ -63,6 +62,9 @@ const labels = {
 const nav = [
   ["home", "Inicio", Home],
   ["products", "Productos", Package],
+  ["cakes", "Tortas", Flower2],
+  ["sizes", "Tamaños de postres", LayoutGrid],
+  ["campaigns", "Campañas", Star],
   ["categories", "Categorías", LayoutGrid],
   ["settings", "Configuración", Settings],
 ];
@@ -419,8 +421,8 @@ function ProductEditor({ product, catalog, service, onSaved, onClose }) {
                   error={errors.kind}
                   hint={
                     creating
-                      ? "Elegí cómo se vende este producto."
-                      : "No se puede cambiar después de crear el producto."
+                      ? "Elegí cómo se vende y cómo se calcula su precio."
+                      : "Define cómo se calcula el precio. La categoría sí se puede cambiar abajo."
                   }
                 >
                   <select
@@ -1034,7 +1036,9 @@ function CategoryEditor({ category, catalog, service, onClose, onSaved }) {
     </Modal>
   );
 }
-function CakeRules() {
+function CakeRules({ catalog }) {
+  const options = catalog.rules?.cakePriceOptions || [];
+  const extras = catalog.cake.filter((item) => item.dataset === "tortaExtras" && item.data.disponible !== false).map((item) => item.data);
   return (
     <section className="a-card a-rules">
       <h2>Tortas hechas a medida</h2>
@@ -1043,7 +1047,7 @@ function CakeRules() {
         actuales y se presenta para consulta.
       </p>
       <div className="a-rules-grid">
-        {cakePriceOptions.map((o) => (
+        {options.map((o) => (
           <article key={o.id}>
             <h3>
               {o.nombre} · {o.fillings} rellenos
@@ -1066,10 +1070,10 @@ function CakeRules() {
           Base según cobertura, cantidad de rellenos y tamaño + adicionales de
           rellenos + decoración.
         </p>
-        {tortaExtras.map((e) => (
+        {extras.map((e) => (
           <p key={e.id}>
             <b>{e.nombre}</b>:{" "}
-            {getCakeExtraDisplay(e, null, (value) => formatMoney(value * 100))}
+            {getCakeExtraDisplay(e, null, (value) => formatMoney(value * 100), catalog.rules.extraRules)}
           </p>
         ))}
         <p>
@@ -1581,11 +1585,10 @@ export default function AdminApp() {
                       <button
                         className="a-text-button"
                         onClick={() => {
-                          setSection("products");
-                          setRules(true);
+                          setSection("cakes");
                         }}
                       >
-                        Consultar reglas de tortas <ChevronRight size={15} />
+                        Editar tortas <ChevronRight size={15} />
                       </button>
                     </section>
                   </div>
@@ -1629,7 +1632,7 @@ export default function AdminApp() {
                     </Button>
                   </div>
                   {rules ? (
-                    <CakeRules />
+                    <CakeRules catalog={catalog} />
                   ) : (
                     <>
                       <section
@@ -1701,7 +1704,22 @@ export default function AdminApp() {
                           <span>Acciones</span>
                         </div>
                         {visible.map((p) => (
-                          <article className="a-product-row" key={p.id}>
+                          <article
+                            className="a-product-row"
+                            key={p.id}
+                            tabIndex={0}
+                            aria-label={`Abrir ${p.name}`}
+                            onClick={() => setEditor({ product: p })}
+                            onKeyDown={(event) => {
+                              if (
+                                event.key === "Enter" ||
+                                event.key === " "
+                              ) {
+                                event.preventDefault();
+                                setEditor({ product: p });
+                              }
+                            }}
+                          >
                             <div className="a-product-name">
                               <Photo image={p.images[0]?.url} name={p.name} />
                               <span>
@@ -1728,7 +1746,10 @@ export default function AdminApp() {
                             <Button
                               secondary
                               aria-label={`Editar ${p.name}`}
-                              onClick={() => setEditor({ product: p })}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setEditor({ product: p });
+                              }}
                             >
                               Editar <ChevronRight size={14} />
                             </Button>
@@ -1824,6 +1845,9 @@ export default function AdminApp() {
                     En la web actual se conserva su categoría principal.
                   </p>
                 </>
+              )}
+              {["cakes", "sizes", "campaigns"].includes(section) && (
+                <SettingsPanel key={section} kind={section} catalog={catalog} service={service} onSaved={saved} />
               )}
               {section === "settings" && (
                 <>

@@ -11,6 +11,7 @@ import {
   rellenos as fallbackRellenos,
   tortaExtras as fallbackTortaExtras
 } from "../data/tortasData.js";
+import { usesNeonCatalog } from "../services/catalog.js";
 
 function CakeSummary({
   config,
@@ -21,19 +22,20 @@ function CakeSummary({
   tortaSizes = fallbackTortaSizes,
   coberturas = fallbackCoberturas,
   rellenos = fallbackRellenos,
-  tortaExtras = fallbackTortaExtras
+  tortaExtras = fallbackTortaExtras,
+  cakeRules
 }) {
   const safeConfig = config || {};
   const safeCoberturas = Array.isArray(coberturas) ? coberturas : [];
   const safeTortaSizes = Array.isArray(tortaSizes) ? tortaSizes : [];
   const rellenosByDisplayName = new Map(
-    [...fallbackRellenos, ...(Array.isArray(rellenos) ? rellenos : [])]
+    [...(usesNeonCatalog ? [] : fallbackRellenos), ...(Array.isArray(rellenos) ? rellenos : [])]
       .filter(Boolean)
       .map((relleno) => [getCakeOptionDisplayKey(relleno), relleno])
   );
   const safeRellenos = Array.from(rellenosByDisplayName.values());
   const extrasById = new Map(
-    [...fallbackTortaExtras, ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
+    [...(usesNeonCatalog ? [] : fallbackTortaExtras), ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
       .filter(Boolean)
       .map((extra) => [getCakeOptionDisplayKey(extra), extra])
   );
@@ -47,7 +49,7 @@ function CakeSummary({
   const getRellenos = (ids) => ids.map(id => safeRellenos.find(r => r.id === id)).filter(Boolean);
   const getExtras = (ids) => ids.map(id => safeTortaExtras.find(e => e.id === id)).filter(Boolean);
 
-  const cakeOption = getCakePriceOption(safeConfig.cobertura);
+  const cakeOption = getCakePriceOption(safeConfig.cobertura, cakeRules?.cakePriceOptions);
   const cobertura = getCobertura(cakeOption?.coberturaId) || cakeOption;
   const size = getSize(safeConfig.size);
   const rellenosList = getRellenos(selectedRellenos)
@@ -56,9 +58,9 @@ function CakeSummary({
   const rellenoExtrasList = getRellenos(selectedRellenoExtras)
     .filter(isCakeFillingExtra)
     .map((relleno) => enrichCakeFilling(relleno, formatPrice));
-  const sizePrice = getCakeSizePrice(safeConfig.cobertura, size);
+  const sizePrice = getCakeSizePrice(safeConfig.cobertura, size, cakeRules?.cakePriceOptions);
   const cakeBasePrice = Number.isFinite(sizePrice?.price) ? sizePrice.price : 0;
-  const extrasList = getExtras(selectedExtras).map((extra) => enrichCakeExtra(extra, cakeBasePrice, formatPrice));
+  const extrasList = getExtras(selectedExtras).map((extra) => enrichCakeExtra(extra, cakeBasePrice, formatPrice, cakeRules?.extraRules));
   const requiredFillings = cakeOption?.fillings || 0;
   const hasValidFillings = requiredFillings > 0 && rellenosList.length === requiredFillings;
   const rellenosTotal = rellenosList.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);

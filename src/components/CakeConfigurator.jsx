@@ -15,6 +15,7 @@ import {
   tortaExtras as fallbackTortaExtras
 } from "../data/tortasData.js";
 import CakeSummary from "./CakeSummary.jsx";
+import { usesNeonCatalog } from "../services/catalog.js";
 
 const formatPrice = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -44,7 +45,8 @@ function CakeConfigurator({
   tortaSizes = fallbackTortaSizes,
   coberturas = fallbackCoberturas,
   rellenos = fallbackRellenos,
-  tortaExtras = fallbackTortaExtras
+  tortaExtras = fallbackTortaExtras,
+  cakeRules = { cakePriceOptions }
 }) {
   const [step, setStep] = useState(1);
   const [config, setConfig] = useState({
@@ -56,18 +58,19 @@ function CakeConfigurator({
     date: "",
     comments: ""
   });
-  const selectedCakeOption = getCakePriceOption(config.cobertura);
+  const availableOptions = cakeRules.cakePriceOptions.filter((option) => coberturas.some((cover) => cover.id === option.coberturaId));
+  const selectedCakeOption = getCakePriceOption(config.cobertura, availableOptions);
   const requiredFillings = selectedCakeOption?.fillings || 0;
   const availableSizes = tortaSizes
     .map((size) => ({
       ...size,
-      cakePrice: getCakeSizePrice(config.cobertura, size)
+      cakePrice: getCakeSizePrice(config.cobertura, size, availableOptions)
     }))
     .filter((size) => size.cakePrice);
   const selectedSize = tortaSizes.find((size) => size.id === config.size);
-  const selectedCakeBasePrice = getCakeSizePrice(config.cobertura, selectedSize)?.price;
+  const selectedCakeBasePrice = getCakeSizePrice(config.cobertura, selectedSize, availableOptions)?.price;
   const rellenosByDisplayName = new Map(
-    [...fallbackRellenos, ...(Array.isArray(rellenos) ? rellenos : [])]
+    [...(usesNeonCatalog ? [] : fallbackRellenos), ...(Array.isArray(rellenos) ? rellenos : [])]
       .filter(Boolean)
       .map((relleno) => [getCakeOptionDisplayKey(relleno), relleno])
   );
@@ -77,12 +80,12 @@ function CakeConfigurator({
   const displayedRellenoOptions = displayedRellenos.filter((relleno) => !isCakeFillingExtra(relleno));
   const displayedRellenoExtras = displayedRellenos.filter(isCakeFillingExtra);
   const extrasByDisplayName = new Map(
-    [...fallbackTortaExtras, ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
+    [...(usesNeonCatalog ? [] : fallbackTortaExtras), ...(Array.isArray(tortaExtras) ? tortaExtras : [])]
       .filter(Boolean)
       .map((extra) => [getCakeOptionDisplayKey(extra), extra])
   );
   const displayedTortaExtras = Array.from(extrasByDisplayName.values()).map((extra) =>
-    enrichCakeExtra(extra, selectedCakeBasePrice, formatPrice)
+    enrichCakeExtra(extra, selectedCakeBasePrice, formatPrice, cakeRules.extraRules)
   );
 
   const minDate = (() => {
@@ -163,7 +166,7 @@ function CakeConfigurator({
         return { ...prev, rellenosSeleccionados: prev.rellenosSeleccionados.filter(r => r !== id) };
       }
 
-      const currentOption = getCakePriceOption(prev.cobertura);
+      const currentOption = getCakePriceOption(prev.cobertura, availableOptions);
       const maxFillings = currentOption?.fillings || Infinity;
       if (prev.rellenosSeleccionados.length >= maxFillings) return prev;
 
@@ -206,6 +209,7 @@ function CakeConfigurator({
         coberturas={coberturas}
         rellenos={rellenos}
         tortaExtras={tortaExtras}
+        cakeRules={cakeRules}
       />,
       document.body
     );
@@ -230,7 +234,7 @@ function CakeConfigurator({
             <div className="form-group slide-in">
               <label>Elegí la cobertura *</label>
               <div className="options-grid">
-                {cakePriceOptions.map(c => (
+                {availableOptions.map(c => (
                   <button 
                     key={c.id}
                     className={`option-btn ${config.cobertura === c.id ? 'selected' : ''}`}

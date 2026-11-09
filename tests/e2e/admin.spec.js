@@ -48,6 +48,26 @@ async function fillProduct(page, name) {
   await expect(dialog.getByLabel("Stock", { exact: false })).toHaveCount(0);
   return dialog;
 }
+test("demo permite editar reglas de tortas, tamaños de postres y banners", async ({ page }) => {
+  await demo(page);
+  const nav = page.getByRole("navigation", { name: "Administración" });
+  await nav.getByRole("button", { name: "Tortas", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Tortas personalizadas" })).toBeVisible();
+  await page.getByLabel("18 cm · precio final (ARS)").first().fill("39000");
+  await page.getByRole("button", { name: "Guardar cambios" }).first().click();
+  await expect(page.getByRole("status")).toContainText("Cambios guardados");
+  await nav.getByRole("button", { name: "Tamaños de postres" }).click();
+  await page.getByLabel("Porciones").first().fill("12 a 16 porciones");
+  await page.getByRole("button", { name: "Guardar cambios" }).first().click();
+  await expect(page.getByRole("status")).toContainText("Cambios guardados");
+  await nav.getByRole("button", { name: "Campañas" }).click();
+  await page.getByLabel("Texto corto del banner").first().fill("Banner desde admin");
+  await page.getByRole("button", { name: "Guardar cambios" }).first().click();
+  await expect(page.getByRole("status")).toContainText("Cambios guardados");
+  await demo(page);
+  await nav.getByRole("button", { name: "Campañas" }).click();
+  await expect(page.getByLabel("Texto corto del banner").first()).toHaveValue("Banner desde admin");
+});
 test("demo CRUD, errores, búsqueda, filtros, archivo y recuperación", async ({
   page,
 }) => {
@@ -70,7 +90,8 @@ test("demo CRUD, errores, búsqueda, filtros, archivo y recuperación", async ({
     page.getByLabel("Listado de productos").getByRole("article"),
   ).toHaveCount(1);
   await page
-    .getByRole("button", { name: "Editar Prueba dulce única", exact: true })
+    .getByLabel("Listado de productos")
+    .getByRole("article", { name: "Abrir Prueba dulce única", exact: true })
     .click();
   dialog = page.getByRole("region", { name: "Editar producto" });
   await dialog.getByLabel("Precio en pesos (ARS)", { exact: true }).fill("-10");

@@ -8,19 +8,21 @@ import {
   sessionCookie,
   hashToken,
 } from "./security.js";
-import { readCatalog, saveProduct, saveCategory } from "./repository.js";
+import { readCatalog, saveProduct, saveCategory, saveSettings } from "./repository.js";
 import {
   validateProduct,
   validateCategory,
   ValidationError,
 } from "../shared/catalog.js";
 import { uploadImage } from "./cloudinary.js";
+import { validateSettings } from "../shared/settings.js";
 export function createAdminHandler({
   env = process.env,
   getDatabase = database,
   read = readCatalog,
   save = saveProduct,
   saveCat = saveCategory,
+  saveConfig = saveSettings,
   upload = uploadImage,
 } = {}) {
   return async function handler(req, res) {
@@ -79,10 +81,10 @@ export function createAdminHandler({
       const match = route.match(
         /^(products|categories)(?:\/([a-zA-Z0-9._-]+))?$/,
       );
-      if (!match || !["POST", "PUT"].includes(req.method))
+      if ((!match && route !== "settings") || !["POST", "PUT"].includes(req.method))
         fail(404, "No encontramos esa operación.");
       const creating = req.method === "POST";
-      if (creating ? Boolean(match[2]) : !match[2])
+      if (route === "settings" ? req.method !== "PUT" : creating ? Boolean(match[2]) : !match[2])
         fail(405, "Método no permitido.");
       if (!Number.isSafeInteger(body.revision) || body.revision < 0)
         fail(422, "Falta la revisión del catálogo.");
@@ -92,6 +94,11 @@ export function createAdminHandler({
           409,
           "El catálogo cambió en otra sesión. Recargá antes de guardar.",
         );
+      if (route === "settings" && req.method === "PUT") {
+        const settings = validateSettings(body.settings, catalog);
+        const revision = await saveConfig(sql, settings, body.revision, session.id);
+        return res.status(200).json({ ok: true, revision });
+      }
       let revision;
       if (match[1] === "products") {
         const existing = creating

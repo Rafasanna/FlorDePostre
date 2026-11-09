@@ -458,7 +458,8 @@ export const normalizeTortaTamano = (row) => {
     nombre,
     porciones: normalizeText(getCell(row, "Porciones", "porciones")),
     precioBaseEstimado: precioBaseEstimado ?? 0,
-    disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true)
+    disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
+    notas: normalizeText(getCell(row, "Notas", "notas"))
   };
 };
 
@@ -474,7 +475,8 @@ export const normalizeTortaCobertura = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precio: precio ?? 0,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
-    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta"))
+    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta")),
+    notas: normalizeText(getCell(row, "Notas", "notas"))
   };
 };
 
@@ -490,7 +492,8 @@ export const normalizeTortaRelleno = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precioExtra: precioExtra ?? 0,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
-    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta"))
+    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta")),
+    notas: normalizeText(getCell(row, "Notas", "notas"))
   };
 };
 
@@ -506,7 +509,8 @@ export const normalizeTortaExtra = (row) => {
     descripcion: normalizeText(getCell(row, "Descripción", "descripcion")),
     precioExtra: precioExtra ?? 0,
     disponible: parseBoolean(getCell(row, "Disponible", "disponible"), true),
-    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta"))
+    etiqueta: normalizeText(getCell(row, "Etiqueta", "etiqueta")),
+    notas: normalizeText(getCell(row, "Notas", "notas"))
   };
 };
 

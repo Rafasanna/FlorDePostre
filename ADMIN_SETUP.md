@@ -1,6 +1,14 @@
 # Administrador de Flor de Postre
 
-Implementación en `feature/admin-neon-cloudinary`, desde `main` estable `7557dd8`. Sin push, merge, deploy ni cambios de Sheets. Se ejecutaron únicamente las operaciones de Neon de pruebas autorizadas: migración `001_admin_catalog.sql`, alta de la primera administradora e importación verificada del catálogo. El catálogo público sigue usando sus once CSV y sus reglas actuales. El cambio visual solicitado después de la primera etapa mueve el filtro Sin TACC al final, después de Bandejas.
+## Etapa 3 local: tortas, tamaños de postres y campañas
+
+El código de esta rama incorpora editores para las cuatro listas de tortas (coberturas, tamaños, rellenos y extras), la matriz de precios finales por modelo/tamaño, el porcentaje de extras variables, los tamaños globales de postres y las campañas con su banner, colores y fechas. Los precios individuales de cada postre por tamaño ya se editaban dentro del producto. El guardado usa una revisión global, validación de servidor, auditoría y una transacción PostgreSQL. La demo local guarda estos cambios únicamente en el navegador.
+
+La migración `002_editable_settings.sql` se aplicó a Neon de pruebas el 8 de noviembre de 2026, después de una autorización explícita. Se guardó un respaldo privado de las 16 tablas y 551 filas en `.local`, y se verificó su reconstrucción en PostgreSQL local. La comprobación posterior de solo lectura confirmó las versiones 001 y 002, la función nueva y que la revisión del catálogo y los conteos de todas las tablas siguieron iguales. No se aplicó en una base definitiva.
+
+Cuando la tienda usa Neon, `/api/catalog` entrega también `cakeRules`: configurador, resumen y revisión del carrito leen la matriz y los adicionales actuales; una opción desactivada deja de mostrarse y una selección retirada del carrito se invalida. **La tienda pública sigue leyendo Sheets** y no cambia con estas ediciones hasta aprobar el cambio de fuente y el despliegue correspondiente. En modo Sheets conserva su funcionamiento anterior.
+
+Implementación iniciada en `feature/admin-neon-cloudinary`, desde `main` estable `7557dd8`. No se realizaron cambios en Sheets. Se ejecutaron únicamente las operaciones de Neon de pruebas autorizadas: migraciones `001_admin_catalog.sql` y `002_editable_settings.sql`, alta de la primera administradora e importación verificada del catálogo. El catálogo público sigue usando sus once CSV y sus reglas actuales. El cambio visual solicitado después de la primera etapa mueve el filtro Sin TACC al final, después de Bandejas.
 
 ## Etapa 2: configuración guiada de Neon de pruebas
 
@@ -44,9 +52,9 @@ La auditoría completa de los once conjuntos de datos, sus gids y las diferencia
 
 La conexión pooled, el esquema, la primera administradora y el catálogo del Neon de pruebas quedaron verificados. También se validaron por API las credenciales de Cloudinary y el preset firmado `ml_default`, sin subir archivos. Todavía no se verificaron los límites del plan Vercel. Las 25 pruebas de modelo/servidor/importación y las 13 pruebas de navegador pasan; las rutas y cookies de Vercel necesitan revisión en Preview.
 
-Las tortas personalizadas **conservan su matriz y fórmulas actuales**. El panel permite consultarlas, sin editar sus importes genéricamente. SQL e importador respaldan tamaños, coberturas, rellenos, extras, alias y matriz versionada. Faltan decisiones comerciales para habilitar su edición: autoridad de Sheets frente a overrides, rellenos incluidos/adicionales y cómo tratar opciones retiradas que hoy reaparecen desde el respaldo local. Esos cambios deben implementarse juntos en configurador, resumen y revalidación del carrito. La API pública bloquea matrices que difieran del código vigente.
+La matriz y las opciones de tortas ya tienen editores locales en la etapa 3 descrita arriba. La versión heredada de reglas se sigue verificando contra el código; una edición administrativa crea la versión 2 y permite a la tienda Neon leerla. Falta probar el panel real con una edición de prueba y validar el corte de fuente pública.
 
-Campañas existentes se importan y se pueden asignar a productos especiales, con disponibilidad y habilitación separadas. La creación/edición de campañas, del catálogo global de tamaños y de reglas de tortas queda fuera de los formularios habilitados en esta etapa. No se inventan esos valores ni se reemplaza su funcionamiento existente.
+Campañas existentes se importan y se pueden asignar a productos especiales, con disponibilidad y habilitación separadas. La etapa 3 agrega la edición de campañas, tamaños globales y reglas de tortas en el panel; el esquema necesario ya está en la base de pruebas.
 
 ## Tu intervención: orden exacto
 

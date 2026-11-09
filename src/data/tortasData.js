@@ -109,11 +109,11 @@ export const isCakeFillingExtra = (relleno) => {
   return keys.some((key) => CAKE_FILLING_EXTRA_KEYS.has(key));
 };
 
-export const getCakePriceOption = (optionId) =>
-  cakePriceOptions.find((option) => option.id === optionId) || null;
+export const getCakePriceOption = (optionId, options = cakePriceOptions) =>
+  options.find((option) => option.id === optionId) || null;
 
-export const getCakeSizePrice = (optionId, size) => {
-  const option = getCakePriceOption(optionId);
+export const getCakeSizePrice = (optionId, size, options = cakePriceOptions) => {
+  const option = getCakePriceOption(optionId, options);
   if (!option || !size) return null;
 
   const sizeName = typeof size === "string" ? size : size.nombre;
@@ -140,15 +140,17 @@ const EXTRA_PRICE_RULES = [
   { match: ["extra-color", "extra-color-negro-rojo-glitter", "color negro rojo glitter", "color negro, rojo o glitter"], type: "fixed", amount: 10000 }
 ];
 
-export const getCakeExtraRule = (extra) => {
+export const getCakeExtraRule = (extra, rules = EXTRA_PRICE_RULES) => {
   const extraKeys = [extra?.id, extra?.nombre].map(normalizeCakeKey);
-  return EXTRA_PRICE_RULES.find((rule) =>
-    rule.match.map(normalizeCakeKey).some((key) => extraKeys.includes(key))
-  ) || null;
+  const record = rules.find((entry) =>
+    (entry.id && extraKeys.includes(normalizeCakeKey(entry.id))) ||
+    (entry.rule || entry).match?.map(normalizeCakeKey).some((key) => extraKeys.includes(key))
+  );
+  return record?.rule || record || null;
 };
 
-export const getCakeExtraPrice = (extra, cakeBasePrice = 0) => {
-  const rule = getCakeExtraRule(extra);
+export const getCakeExtraPrice = (extra, cakeBasePrice = 0, rules = EXTRA_PRICE_RULES) => {
+  const rule = getCakeExtraRule(extra, rules);
 
   if (rule?.type === "fixed") return rule.amount;
   if (rule?.type === "percent" && Number.isFinite(cakeBasePrice)) {
@@ -159,27 +161,27 @@ export const getCakeExtraPrice = (extra, cakeBasePrice = 0) => {
   return Number.isFinite(extra?.precioExtra) ? extra.precioExtra : 0;
 };
 
-export const getCakeExtraDisplay = (extra, cakeBasePrice = null, formatPrice = (value) => `$${value}`) => {
-  const rule = getCakeExtraRule(extra);
+export const getCakeExtraDisplay = (extra, cakeBasePrice = null, formatPrice = (value) => `$${value}`, rules = EXTRA_PRICE_RULES) => {
+  const rule = getCakeExtraRule(extra, rules);
 
   if (rule?.type === "fixed") return formatPrice(rule.amount);
   if (rule?.type === "from") return `A partir de ${formatPrice(rule.amount)}`;
   if (rule?.type === "percent") {
     if (Number.isFinite(cakeBasePrice)) {
-      return `+25% sobre el valor de la torta (${formatPrice(getCakeExtraPrice(extra, cakeBasePrice))})`;
+      return `+${rule.percent * 100}% sobre el valor de la torta (${formatPrice(getCakeExtraPrice(extra, cakeBasePrice, rules))})`;
     }
 
-    return "+25% sobre el valor de la torta";
+    return `+${rule.percent * 100}% sobre el valor de la torta`;
   }
 
   return Number.isFinite(extra?.precioExtra) && extra.precioExtra > 0 ? formatPrice(extra.precioExtra) : "";
 };
 
-export const enrichCakeExtra = (extra, cakeBasePrice = null, formatPrice) => ({
+export const enrichCakeExtra = (extra, cakeBasePrice = null, formatPrice, rules = EXTRA_PRICE_RULES) => ({
   ...extra,
-  precioCalculado: Number.isFinite(cakeBasePrice) ? getCakeExtraPrice(extra, cakeBasePrice) : 0,
-  precioTexto: getCakeExtraDisplay(extra, cakeBasePrice, formatPrice),
-  priceRule: getCakeExtraRule(extra)?.type || "fixed"
+  precioCalculado: Number.isFinite(cakeBasePrice) ? getCakeExtraPrice(extra, cakeBasePrice, rules) : 0,
+  precioTexto: getCakeExtraDisplay(extra, cakeBasePrice, formatPrice, rules),
+  priceRule: getCakeExtraRule(extra, rules)?.type || "fixed"
 });
 
 export const getCakeFillingPrice = (relleno) =>

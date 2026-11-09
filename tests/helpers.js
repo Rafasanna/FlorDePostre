@@ -8,6 +8,7 @@ export async function localDatabase() {
       "utf8",
     ),
   );
+  await db.exec(await readFile(new URL("../migrations/002_editable_settings.sql", import.meta.url), "utf8"));
   const query = (text, params = []) => {
     let promise;
     return {

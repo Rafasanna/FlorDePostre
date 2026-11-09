@@ -6,9 +6,10 @@ import { WHATSAPP_URL } from "./config.js";
 import { campaigns } from "./data/campaigns.js";
 import { dailyProducts } from "./data/dailyProducts.js";
 import { postresBase } from "./data/postresData.js";
-import { coberturas, enrichCakeExtra, enrichCakeFilling, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
+import { cakePriceOptions, coberturas, enrichCakeExtra, enrichCakeFilling, getCakeExtraRule, getCakeSizePrice, rellenos, tortaExtras, tortaSizes } from "./data/tortasData.js";
 import {
   usesNeonCatalog,
+  fetchCakeRulesFromCatalog,
   fetchCampaignsFromSheet,
   fetchDailyProductsFromSheet,
   fetchPostresConfigFromSheet,
@@ -234,6 +235,7 @@ function App() {
   const [tortaCoberturas, setTortaCoberturas] = useState(() => initialDataset("tortaCoberturas", coberturas));
   const [tortaRellenos, setTortaRellenos] = useState(() => initialDataset("tortaRellenos", rellenos));
   const [tortaExtrasData, setTortaExtrasData] = useState(() => initialDataset("tortaExtras", tortaExtras));
+  const [cakeRules, setCakeRules] = useState(() => usesNeonCatalog ? { cakePriceOptions: [], extraRules: [] } : { version: 1, cakePriceOptions, extraRules: tortaExtras.map((extra) => ({ id: extra.id, rule: getCakeExtraRule(extra) })) });
   const [campaignsData, setCampaignsData] = useState(() => initialDataset("campaigns", campaigns));
   const [specialProducts, setSpecialProducts] = useState(() => initialDataset("specialProducts", []));
   const [isUsingSheetProducts, setIsUsingSheetProducts] = useState(
@@ -256,6 +258,11 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
+    if (usesNeonCatalog) fetchCakeRulesFromCatalog().then((rules) => {
+      if (isMounted) setCakeRules(rules);
+    }).catch(() => {
+      if (isMounted) { setCakeRules({ cakePriceOptions: [], extraRules: [] }); setSheetsNotice("El catálogo no está disponible. Volvé a intentar en unos instantes."); }
+    });
 
     const resources = [
       { key: "menuDiario", label: "menú diario", fetcher: fetchDailyProductsFromSheet, setter: setMenuDiarioProducts, showNoticeOnFallback: true },
@@ -413,23 +420,34 @@ function App() {
     }
 
     if (item.type === "torta") {
+      if (usesNeonCatalog && !tortaTamanos.some((size) => size.id === item.configuracion?.sizeId)) return null;
       const currentSize = tortaTamanos.find((size) => size.id === item.configuracion?.sizeId) || {
         id: item.configuracion?.sizeId,
         nombre: item.configuracion?.sizeName
       };
-      const currentPrice = getCakeSizePrice(item.configuracion?.cakeOptionId, currentSize);
+      const currentPrice = getCakeSizePrice(item.configuracion?.cakeOptionId, currentSize, cakeRules.cakePriceOptions);
+      if (usesNeonCatalog && !tortaCoberturas.some((cover) => cover.id === currentPrice?.option?.coberturaId)) return null;
 
       if (currentPrice) {
+        const currentFilling = (saved) => tortaRellenos.find((entry) => entry.id === saved.id);
+        const currentExtra = (saved) => tortaExtrasData.find((entry) => entry.id === saved.id);
+        const savedFillings = [
+          ...(Array.isArray(item.configuracion?.rellenos) ? item.configuracion.rellenos : []),
+          ...(Array.isArray(item.configuracion?.rellenoExtras) ? item.configuracion.rellenoExtras : []),
+        ];
+        const savedExtras = Array.isArray(item.configuracion?.extras) ? item.configuracion.extras : [];
+        if (usesNeonCatalog && (savedFillings.some((saved) => !currentFilling(saved)) || savedExtras.some((saved) => !currentExtra(saved)))) return null;
         const selectedRellenos = Array.isArray(item.configuracion?.rellenos)
-          ? item.configuracion.rellenos.map((relleno) => enrichCakeFilling(relleno, formatPrice))
+          ? item.configuracion.rellenos.map((relleno) => enrichCakeFilling(usesNeonCatalog ? currentFilling(relleno) : relleno, formatPrice))
           : [];
+        if (usesNeonCatalog && selectedRellenos.length !== currentPrice.option.fillings) return null;
         const rellenosTotal = selectedRellenos.reduce((sum, relleno) => sum + (Number.isFinite(relleno.precioCalculado) ? relleno.precioCalculado : 0), 0);
         const rellenoExtras = Array.isArray(item.configuracion?.rellenoExtras)
-          ? item.configuracion.rellenoExtras.map((extra) => enrichCakeFilling(extra, formatPrice))
+          ? item.configuracion.rellenoExtras.map((extra) => enrichCakeFilling(usesNeonCatalog ? currentFilling(extra) : extra, formatPrice))
           : [];
         const rellenoExtrasTotal = rellenoExtras.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
         const extras = Array.isArray(item.configuracion?.extras)
-          ? item.configuracion.extras.map((extra) => enrichCakeExtra(extra, currentPrice.price, formatPrice))
+          ? item.configuracion.extras.map((extra) => enrichCakeExtra(usesNeonCatalog ? currentExtra(extra) : extra, currentPrice.price, formatPrice, cakeRules.extraRules))
           : [];
         const extrasTotal = extras.reduce((sum, extra) => sum + (Number.isFinite(extra.precioCalculado) ? extra.precioCalculado : 0), 0);
 
@@ -452,13 +470,13 @@ function App() {
         };
       }
 
-      if (!Number.isFinite(item.precio)) return null;
+      if (usesNeonCatalog || !Number.isFinite(item.precio)) return null;
       return item;
     }
 
     if (!Number.isFinite(item.precio)) return null;
     return item;
-  }, [cartCatalog, tortaTamanos]);
+  }, [cartCatalog, tortaTamanos, tortaCoberturas, tortaRellenos, tortaExtrasData, cakeRules]);
 
   const validateCartItems = useCallback((items) => {
     const nextItems = [];
@@ -743,6 +761,7 @@ function App() {
                 coberturas={tortaCoberturas}
                 rellenos={tortaRellenos}
                 tortaExtras={tortaExtrasData}
+                cakeRules={cakeRules}
               />
             }
           />

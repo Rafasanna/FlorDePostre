@@ -243,7 +243,7 @@ export function normalizeSnapshot(files) {
     order,
   }));
   unique(categories, (c) => c.id, "categorías");
-  const sizes = datasets.postresTamanos.map((s) => ({
+  const sizes = datasets.postresTamanos.map((s, order) => ({
     id: s.id,
     name: s.nombre,
     portions: s.porciones,
@@ -251,6 +251,7 @@ export function normalizeSnapshot(files) {
     estimatedPriceCents:
       s.precioEstimado === null ? null : toCents(s.precioEstimado),
     notes: s.notas,
+    order,
   }));
   for (const c of datasets.postresConfig)
     if (

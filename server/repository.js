@@ -38,6 +38,7 @@ export async function readCatalog(sql) {
       active: s.active,
       estimatedPriceCents: numberOrNull(s.estimated_price_cents),
       notes: s.notes,
+      order: s.display_order,
     })),
     campaigns: row.campaigns,
     cake: row.cake,
@@ -92,5 +93,9 @@ export async function saveProduct(sql, product, revision, creating, actor) {
 export async function saveCategory(sql, category, revision, creating, actor) {
   const [r] =
     await sql`SELECT admin_save_category(${JSON.stringify(category)}::jsonb,${revision},${creating},${actor}::uuid) AS revision`;
+  return r.revision;
+}
+export async function saveSettings(sql, settings, revision, actor) {
+  const [r] = await sql`SELECT admin_save_settings(${JSON.stringify(settings)}::jsonb,${revision},${actor}::uuid) AS revision`;
   return r.revision;
 }

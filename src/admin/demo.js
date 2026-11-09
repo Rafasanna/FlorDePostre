@@ -15,6 +15,7 @@ import {
   validateProduct,
   validateCategory,
 } from "../../shared/catalog.js";
+import { validateSettings } from "../../shared/settings.js";
 const key = "florDePostre:admin-demo:v1";
 export function demoAllowed({ enabled, dev, host }) {
   return (
@@ -201,6 +202,11 @@ export function createDemoService(storage) {
         : next.categories.map((x) => (x.id === c.id ? c : x));
       next.revision++;
       return persist(next);
+    },
+    saveSettings: async (settings, revision) => {
+      if (revision !== catalog.revision) throw new Error("El catálogo cambió. Recargá antes de guardar.");
+      const validated = validateSettings(settings, catalog);
+      return persist({ ...catalog, ...validated, cake: Object.entries(validated.cake).flatMap(([dataset, items]) => items.map((data, order) => ({ dataset, id: data.id, data, display_order: order }))), revision: revision + 1 });
     },
     upload: async (file) => ({
       id: `demo-${crypto.randomUUID()}`,

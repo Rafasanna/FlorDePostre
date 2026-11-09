@@ -11,7 +11,7 @@ const tortasCarouselImages = [
   "/images/tortas-carousel/torta-4.jpg"
 ];
 
-function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExtras }) {
+function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExtras, cakeRules }) {
   const sectionRef = useIntersectionObserver();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -129,6 +129,7 @@ function TortasSection({ onAddToCart, tortaSizes, coberturas, rellenos, tortaExt
           coberturas={coberturas}
           rellenos={rellenos}
           tortaExtras={tortaExtras}
+          cakeRules={cakeRules}
         />
       )}
     </section>

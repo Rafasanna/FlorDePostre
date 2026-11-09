@@ -36,6 +36,7 @@ Todas las respuestas privadas son `Cache-Control: private, no-store`. Sin CORS a
 | PUT /api/admin/products/:id | mismo contrato; id y kind inmutables |
 | POST /api/admin/categories | `{category,revision}` |
 | PUT /api/admin/categories/:id | mismo contrato; id inmutable |
+| PUT /api/admin/settings | `{settings,revision}` → guarda tamaños de postres, listas y matriz de tortas, campañas y banners |
 | POST /api/admin/images/upload | `{file: dataURL}` → `{id,url,publicId,alt}`; firma y upload solo servidor |
 | GET /api/catalog | público solo tras habilitar Neon → `{source:'neon',revision,datasets}` |
 
@@ -53,8 +54,8 @@ Variantes: `{sizeId,priceCents,active}`; combinación producto/tamaño única. T
 
 Sheets no pasa por una nueva API mientras es la fuente seleccionada; sus funciones, normalización, caché y fallback se conservan. API Neon no retorna campos de autenticación, auditoría o infraestructura, solo los once datasets públicos. Lee una instantánea en una sentencia; response no-store, frontend fetch cache:no-store. En Neon no se lee/escribe la caché histórica de Sheets ni se usa respaldo estático del catálogo. Poll de 30s y focus refrescan todos los datasets; API fallida no reactiva otra fuente. Tras guardar el panel vuelve a consultar catálogo; no depende de deploy.
 
-Las fórmulas de tortas siguen en código versionado. `pricing_rule_versions` respalda matriz y aliases. La API compara la regla activa con la versión de aplicación y falla cerrada si divergen; la edición de reglas está deshabilitada. La activación inicial necesita completar comparación/importación y resolver cualquier pendiente comercial que altere los registros migrados.
+La versión heredada de reglas de tortas sigue en código y `pricing_rule_versions`; la API compara esa versión con la aplicación y falla cerrada si difiere. El editor crea una versión 2 al guardar reglas, y `/api/catalog` entrega esa matriz en `datasets.cakeRules`. El configurador, el resumen y el carrito usan las reglas recibidas cuando Neon es la fuente; Sheets conserva las reglas locales históricas. La migración 002 crea la función transaccional de guardado y requiere aplicación manual autorizada.
 
 ## Fuera de esta etapa
 
-Sin pedidos persistidos, métricas comerciales, roles adicionales, recuperación automática por correo, editores de campañas/reglas/global de tamaños ni borrado remoto de archivos. Ninguna de estas funciones se simula como integración segura. Primero se valida Preview con servicios de prueba; el corte y el despliegue necesitan autorización.
+Sin pedidos persistidos, métricas comerciales, roles adicionales, recuperación automática por correo ni borrado remoto de archivos. Ninguna de estas funciones se simula como integración segura. El corte de la fuente pública de Sheets a Neon necesita una validación separada.

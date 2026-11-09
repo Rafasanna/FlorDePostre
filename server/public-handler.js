@@ -39,12 +39,14 @@ export function createPublicHandler({
               )
             : v,
         );
-      if (stable(catalog.rules) !== stable(expected))
+      if (catalog.rules?.version === 1 && stable(catalog.rules) !== stable(expected))
         throw new Error("Pricing rules differ");
+      if (catalog.rules?.version !== 1 && (catalog.rules?.version !== 2 || !Array.isArray(catalog.rules.cakePriceOptions) || !Array.isArray(catalog.rules.extraRules)))
+        throw new Error("Invalid pricing rules");
       return res.status(200).json({
         source: "neon",
         revision: catalog.revision,
-        datasets: publicDatasets(catalog),
+        datasets: { ...publicDatasets(catalog), cakeRules: catalog.rules },
       });
     } catch {
       return res.status(503).json({

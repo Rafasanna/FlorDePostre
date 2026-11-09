@@ -56,6 +56,12 @@ export function createRealService(session) {
       );
       return read();
     },
+    saveSettings: async (settings, revision) => {
+      await adminRequest("settings", {
+        method: "PUT", csrfToken, body: { settings, revision },
+      });
+      return read();
+    },
     upload: async (file) =>
       adminRequest("images/upload", {
         method: "POST",

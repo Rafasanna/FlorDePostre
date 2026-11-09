@@ -13,10 +13,10 @@ import { readCatalog } from "../server/repository.js";
 import { passwordHash } from "../server/security.js";
 import { splitSQL, definitions, normalizeSnapshot } from "./catalog-import.js";
 const [command, file] = process.argv.slice(2);
-const write = ["migrate", "import", "create-admin"].includes(command);
-if (!["migrate", "import", "compare", "create-admin"].includes(command)) {
+const write = ["migrate", "upgrade-settings", "import", "create-admin"].includes(command);
+if (!["migrate", "upgrade-settings", "import", "compare", "create-admin"].includes(command)) {
   console.error(
-    "Comandos: migrate | import carpeta-preparada | compare carpeta-preparada | create-admin",
+    "Comandos: migrate | upgrade-settings | import carpeta-preparada | compare carpeta-preparada | create-admin",
   );
   process.exit(1);
 }
@@ -102,6 +102,17 @@ try {
       );
       console.log(`Migración aplicada: ${path}`);
     }
+  }
+  if (command === "upgrade-settings") {
+    const [[state], [already]] = await sql.transaction([
+      sql`SELECT count(*)::integer AS version_count FROM schema_migrations WHERE version='001_admin_catalog'`,
+      sql`SELECT count(*)::integer AS version_count FROM schema_migrations WHERE version='002_editable_settings'`,
+    ], { readOnly: true });
+    if (state.version_count !== 1 || already.version_count !== 0)
+      throw new Error("La base no tiene exactamente la migración 001 pendiente de actualizar.");
+    const source = await readFile(new URL("../migrations/002_editable_settings.sql", import.meta.url), "utf8");
+    await sql.transaction(splitSQL(source).map((statement) => sql.query(statement)));
+    console.log("Migración aplicada: 002_editable_settings.sql");
   }
   if (command === "create-admin") {
     const id = randomUUID(),

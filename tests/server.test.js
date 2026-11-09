@@ -79,7 +79,7 @@ test("migración es SQL PostgreSQL válido y puede ejecutarse otra vez en memori
   );
   await sql.transaction(statements.map((s) => sql.query(s)));
   const [r] = await sql`SELECT count(*)::int AS count FROM schema_migrations`;
-  assert.equal(r.count, 1);
+  assert.equal(r.count, 2);
 });
 test("sin configuración no consulta la base, incluso si se intenta forzar demo en producción", async () => {
   let calls = 0;
