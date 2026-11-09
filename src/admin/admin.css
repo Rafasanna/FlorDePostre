@@ -1853,13 +1853,21 @@
   }
 }
 .a-settings-panel { display: grid; gap: 18px; }
-.a-setting-section { display: grid; gap: 18px; padding: 24px; }
+.a-setting-section { display: grid; gap: 24px; padding: 24px; }
 .a-setting-section > p { margin-top: -10px; }
 .a-setting-item { display: grid; gap: 14px; padding: 18px 0; border-top: 1px solid var(--a-line); }
-.a-setting-grid, .a-matrix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: end; }
+.a-model-card { gap: 20px; margin-top: 8px; padding: 26px; border: 1px solid #ead9d8; border-left: 5px solid #d9a9b8; border-radius: 18px; background: #fffaf9; box-shadow: 0 8px 24px rgb(88 53 58 / 5%); }
+.a-model-heading { display: grid; gap: 4px; padding-bottom: 16px; border-bottom: 1px solid #ead9d8; }
+.a-model-heading > span { color: #976b78; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.a-model-heading h3 { font-size: 24px; }
+.a-model-heading h3 small { color: #785f62; font-family: var(--font-sans); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.a-setting-grid, .a-matrix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; align-items: start; }
+.a-matrix-grid { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.a-matrix-grid > div { display: grid; align-content: start; gap: 12px; padding: 14px; border: 1px solid #eee4df; border-radius: 12px; background: #fff; }
+.a-option-card { margin-top: 4px; padding: 20px; border: 1px solid var(--a-line); border-radius: 14px; background: #fffdfb; }
 .a-setting-field { display: grid; gap: 6px; font-size: 12px; font-weight: 650; color: var(--a-ink); }
 .a-setting-field input, .a-setting-field select, .a-setting-field textarea { width: 100%; min-height: 39px; }
 .a-setting-field input[type="color"] { padding: 3px; }
 .a-setting-item .a-check { align-self: center; margin-top: 18px; }
 .a-setting-actions { display: flex; justify-content: flex-end; padding: 8px 0 28px; }
-@media (max-width: 700px) { .a-setting-section { padding: 18px; } .a-settings-panel .a-page-title { align-items: flex-start; gap: 14px; } }
+@media (max-width: 700px) { .a-setting-section { padding: 18px; } .a-model-card { padding: 18px; } .a-model-heading h3 { font-size: 21px; } .a-settings-panel .a-page-title { align-items: flex-start; gap: 14px; } }

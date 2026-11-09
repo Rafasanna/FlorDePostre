@@ -112,7 +112,11 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
     {error && <p className="a-notice a-error" role="alert">{error}</p>}
     {kind === "cakes" && <>
       <section className="a-card a-setting-section"><div className="a-section-head"><h2>Modelos y precios finales</h2><button className="a-btn a-secondary" type="button" onClick={() => setDraft((previous) => ({ ...previous, rules: { ...previous.rules, cakePriceOptions: [...previous.rules.cakePriceOptions, { id: newId("modelo"), coberturaId: previous.cake.tortaCoberturas[0]?.id || "", nombre: "", descripcion: "", fillings: 2, sizes: [] }] } }))}><Plus size={15}/> Agregar modelo</button></div><p>Estos son los importes que paga la clienta según cobertura, cantidad de rellenos y tamaño. Un tamaño sin precio no aparece en ese modelo.</p>
-        {draft.rules.cakePriceOptions.map((option, index) => <article className="a-setting-item" key={option.id}>
+        {draft.rules.cakePriceOptions.map((option, index) => <article className="a-setting-item a-model-card" key={option.id}>
+          <div className="a-model-heading">
+            <span>Modelo {index + 1}</span>
+            <h3>{option.nombre || "Modelo nuevo"} <small>· {option.fillings} rellenos</small></h3>
+          </div>
           <div className="a-setting-grid">
             <SettingField label="Nombre"><input value={option.nombre} onChange={(e) => changeOption(index, "nombre", e.target.value)}/></SettingField>
             <SettingField label="Cobertura"><select value={option.coberturaId} onChange={(e) => changeOption(index, "coberturaId", e.target.value)}>{draft.cake.tortaCoberturas.map((cover) => <option key={cover.id} value={cover.id}>{cover.nombre || cover.id}</option>)}</select></SettingField>
@@ -129,7 +133,7 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
         </article>)}
       </section>
       {cakeGroups.map(([group, title, priceField]) => <section className="a-card a-setting-section" key={group}><div className="a-section-head"><div><h2>{title}</h2><p>{group === "tortaTamanos" ? "El precio base estimado es informativo; los importes finales están arriba." : group === "tortaExtras" ? "Se muestra el precio que cobra el configurador. Pisos falsos se cobra como porcentaje del precio base." : ""}</p></div><button className="a-btn a-secondary" type="button" onClick={() => addCake(group)}><Plus size={15}/> Agregar</button></div>
-        {draft.cake[group].map((item, index) => <article className="a-setting-item" key={item.id}><div className="a-setting-grid">
+        {draft.cake[group].map((item, index) => <article className={`a-setting-item ${group === "tortaRellenos" ? "a-option-card" : ""}`} key={item.id}><div className="a-setting-grid">
           <SettingField label="Nombre"><input value={item.nombre} onChange={(e) => changeCake(group, index, "nombre", e.target.value)}/></SettingField>
           {group === "tortaTamanos" && <SettingField label="Porciones"><input value={item.porciones ?? ""} onChange={(e) => changeCake(group, index, "porciones", e.target.value)}/></SettingField>}
           {group === "tortaExtras" && extraRule(item.id)?.type === "percent" ? <SettingField label="Porcentaje sobre la torta"><input type="number" min="0" max="100" step="0.01" value={(extraRule(item.id)?.percent ?? 0) * 100} onChange={(e) => changePercent(item.id, Number(e.target.value))}/></SettingField> : <SettingField label={group === "tortaTamanos" ? "Precio base estimado (ARS)" : "Precio extra (ARS)"}><input type="number" min="0" step="0.01" value={group === "tortaExtras" && extraRule(item.id)?.type === "fixed" ? extraRule(item.id).amount : item[priceField] ?? 0} onChange={(e) => changeCake(group, index, priceField, Number(e.target.value))}/></SettingField>}
