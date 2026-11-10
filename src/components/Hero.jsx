@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { INSTAGRAM_URL } from "../config.js";
 import BrandMark from "./BrandMark.jsx";
+import { isSummerSeason } from "../../shared/summer.js";
 
-const carouselImages = [
+const regularCarouselImages = [
   "/images/home-carousel/home-1.jpg",
   "/images/home-carousel/home-2.jpg",
   "/images/home-carousel/home-3.jpg",
@@ -17,12 +18,23 @@ const carouselImages = [
   "/images/home-carousel/home-12.jpg",
   "/images/home-carousel/home-13.jpg",
   "/images/home-carousel/home-14.jpg",
-  "/images/home-carousel/home-15.jpg"
+  "/images/home-carousel/home-15.jpg",
 ];
+const summerCarouselImages = [
+  ["/images/verano-ensalada.jpg", "Ensaladas frescas de Flor de Postre"],
+  ["/images/verano-sandwiches.jpg", "Sándwiches de miga de Flor de Postre"],
+  ["/images/verano-tarta.jpg", "Tarta casera de Flor de Postre"],
+  ["/images/verano-matera.jpg", "Bandeja matera de Flor de Postre"],
+];
+const carouselImages = isSummerSeason()
+  ? summerCarouselImages.map(([src]) => src)
+  : regularCarouselImages;
 
 function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [preloadedImageIndexes, setPreloadedImageIndexes] = useState(() => new Set([0]));
+  const [preloadedImageIndexes, setPreloadedImageIndexes] = useState(
+    () => new Set([0]),
+  );
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,45 +77,67 @@ function Hero() {
           <div className="hero-intro">
             <span className="eyebrow">Menú </span>
             <h1>Flor de Postre</h1>
-            <p>Pastelería, desayunos y momentos dulces para compartir</p>
+            <p>
+              {isSummerSeason()
+                ? "Pedí tu opción favorita para el verano"
+                : "Pastelería, desayunos y momentos dulces para compartir"}
+            </p>
           </div>
           <div className="hero-actions">
-            <a className="primary-button" href="#menu-diario">Ver el menú</a>
+            <a className="primary-button" href="#menu-diario">
+              {isSummerSeason() ? "Ver opciones de verano" : "Ver el menú"}
+            </a>
           </div>
         </div>
 
         <div className="hero-visual" aria-label="Pasteleria Flor de Postre">
           {carouselImages.map((src, index) => {
-            if (!preloadedImageIndexes.has(index) && index !== currentImageIndex) return null;
+            if (
+              !preloadedImageIndexes.has(index) &&
+              index !== currentImageIndex
+            )
+              return null;
 
             return (
               <img
                 key={src}
                 className="hero-main-img"
                 src={src}
-                alt="Alfajores artesanales de Flor de Postre"
+                alt={
+                  isSummerSeason()
+                    ? summerCarouselImages[index][1]
+                    : "Alfajores artesanales de Flor de Postre"
+                }
                 loading={index === 0 ? "eager" : "lazy"}
                 fetchPriority={index === currentImageIndex ? "high" : "low"}
                 decoding="async"
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   top: 0,
                   left: 0,
                   opacity: index === currentImageIndex ? 1 : 0,
-                  transform: index === currentImageIndex ? 'scale(1)' : 'scale(1.018)',
-                  transition: 'opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1), transform 1.5s cubic-bezier(0.22, 1, 0.36, 1)',
-                  zIndex: index === currentImageIndex ? 1 : 0
+                  transform:
+                    index === currentImageIndex ? "scale(1)" : "scale(1.018)",
+                  transition:
+                    "opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1), transform 1.5s cubic-bezier(0.22, 1, 0.36, 1)",
+                  zIndex: index === currentImageIndex ? 1 : 0,
                 }}
               />
             );
           })}
-          <a className="hero-card mini-logo" href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram @flordepostre.ok" style={{ zIndex: 10 }}>
+          <a
+            className="hero-card mini-logo"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram @flordepostre.ok"
+            style={{ zIndex: 10 }}
+          >
             <BrandMark variant="circle" />
             <span>@flordepostre.ok</span>
           </a>
         </div>
       </div>
-
     </header>
   );
 }

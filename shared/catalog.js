@@ -1,3 +1,5 @@
+import { getSummerRank, isSummerProduct } from "./summer.js";
+
 // Contrato compartido: importable por navegador y servidor, sin dependencias privadas.
 export const KINDS = ["daily", "sin_tacc", "postre", "special"];
 export class ValidationError extends Error {
@@ -293,6 +295,7 @@ export function filterProducts(
               (status === "active" && p.active) ||
               (status === "inactive" && !p.active) ||
               (status === "featured" && p.featured) ||
+              (status === "summer" && isSummerProduct(p)) ||
               (status === "reserved" && p.reserved))),
     )
     .sort((a, b) =>
@@ -301,6 +304,8 @@ export function filterProducts(
         : sort === "price"
           ? (a.priceCents ?? Math.min(...a.variants.map((v) => v.priceCents))) -
             (b.priceCents ?? Math.min(...b.variants.map((v) => v.priceCents)))
-          : a.order - b.order || a.name.localeCompare(b.name, "es"),
+          : getSummerRank(a) - getSummerRank(b) ||
+            a.order - b.order ||
+            a.name.localeCompare(b.name, "es"),
     );
 }

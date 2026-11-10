@@ -43,10 +43,9 @@ import {
   validateProduct,
   validateCategory,
 } from "../../shared/catalog.js";
-import {
-  getCakeExtraDisplay,
-} from "../data/tortasData.js";
+import { getCakeExtraDisplay } from "../data/tortasData.js";
 import { getEffectivePrice } from "../utils/seasonal.js";
+import { isSummerProduct, isSummerSeason } from "../../shared/summer.js";
 import {
   getDisplayImageUrl,
   getResponsiveImageSrcSet,
@@ -610,9 +609,17 @@ function ProductEditor({ product, catalog, service, onSaved, onClose }) {
                   </section>
                 )}
                 <Field
-                  label="Posición en la tienda"
+                  label={
+                    isSummerProduct(p)
+                      ? "Posición fuera de verano"
+                      : "Posición en la tienda"
+                  }
                   error={errors.order}
-                  hint="Define en qué orden se muestra. Los números más bajos aparecen primero."
+                  hint={
+                    isSummerProduct(p)
+                      ? "Este producto aparece primero durante la temporada de verano. Fuera de ella, el número define su posición."
+                      : "Los números más bajos aparecen primero dentro del resto del catálogo."
+                  }
                 >
                   <input
                     type="number"
@@ -1038,7 +1045,12 @@ function CategoryEditor({ category, catalog, service, onClose, onSaved }) {
 }
 function CakeRules({ catalog }) {
   const options = catalog.rules?.cakePriceOptions || [];
-  const extras = catalog.cake.filter((item) => item.dataset === "tortaExtras" && item.data.disponible !== false).map((item) => item.data);
+  const extras = catalog.cake
+    .filter(
+      (item) =>
+        item.dataset === "tortaExtras" && item.data.disponible !== false,
+    )
+    .map((item) => item.data);
   return (
     <section className="a-card a-rules">
       <h2>Tortas hechas a medida</h2>
@@ -1073,7 +1085,12 @@ function CakeRules({ catalog }) {
         {extras.map((e) => (
           <p key={e.id}>
             <b>{e.nombre}</b>:{" "}
-            {getCakeExtraDisplay(e, null, (value) => formatMoney(value * 100), catalog.rules.extraRules)}
+            {getCakeExtraDisplay(
+              e,
+              null,
+              (value) => formatMoney(value * 100),
+              catalog.rules.extraRules,
+            )}
           </p>
         ))}
         <p>
@@ -1670,6 +1687,7 @@ export default function AdminApp() {
                             active: "Activos",
                             inactive: "Inactivos",
                             featured: "Destacados",
+                            ...(isSummerSeason() ? { summer: "Verano" } : {}),
                             reserved: "Reservados",
                             archived: "Archivados",
                           }).map(([id, label]) => (
@@ -1711,10 +1729,7 @@ export default function AdminApp() {
                             aria-label={`Abrir ${p.name}`}
                             onClick={() => setEditor({ product: p })}
                             onKeyDown={(event) => {
-                              if (
-                                event.key === "Enter" ||
-                                event.key === " "
-                              ) {
+                              if (event.key === "Enter" || event.key === " ") {
                                 event.preventDefault();
                                 setEditor({ product: p });
                               }
@@ -1729,7 +1744,10 @@ export default function AdminApp() {
                                     <Star className="a-star" size={14} />
                                   )}
                                 </b>
-                                <small>{labels[p.kind]}</small>
+                                <small>
+                                  {labels[p.kind]}
+                                  {isSummerProduct(p) ? " · Verano" : ""}
+                                </small>
                               </span>
                             </div>
                             <span className="a-product-category">
@@ -1847,7 +1865,13 @@ export default function AdminApp() {
                 </>
               )}
               {["cakes", "sizes", "campaigns"].includes(section) && (
-                <SettingsPanel key={section} kind={section} catalog={catalog} service={service} onSaved={saved} />
+                <SettingsPanel
+                  key={section}
+                  kind={section}
+                  catalog={catalog}
+                  service={service}
+                  onSaved={saved}
+                />
               )}
               {section === "settings" && (
                 <>

@@ -24,6 +24,7 @@ import {
   getResponsiveImageSrcSet,
 } from "../src/utils/productImages.js";
 import { publicDatasets } from "../shared/public-catalog.js";
+import { getSummerRank, isSummerSeason } from "../shared/summer.js";
 import * as sheets from "../src/services/googleSheets.js";
 import {
   normalizeSnapshot,
@@ -106,6 +107,35 @@ test("buscar sin acentos, filtrar y ordenar, sin incluir archivados", () => {
   assert.equal(
     sorted[0].name,
     [...sorted].sort((a, b) => a.name.localeCompare(b.name, "es"))[0].name,
+  );
+});
+test("la selección de verano prioriza productos existentes y respeta la temporada", () => {
+  const november = new Date(2026, 10, 10);
+  const july = new Date(2026, 6, 10);
+  assert.equal(isSummerSeason(november), true);
+  assert.equal(isSummerSeason(july), false);
+  assert.equal(
+    getSummerRank({ id: "ensalada-dia", kind: "daily" }, november),
+    0,
+  );
+  assert.equal(
+    getSummerRank(
+      { id: "baguette-nueva", name: "Baguette de pollo", kind: "daily" },
+      november,
+    ),
+    5.5,
+  );
+  assert.equal(
+    getSummerRank({ id: "ensalada-dia", kind: "postre" }, november),
+    Infinity,
+  );
+  assert.equal(
+    getSummerRank({ id: "ensalada-dia", kind: "daily" }, july),
+    Infinity,
+  );
+  assert.equal(
+    getSummerRank({ id: "alfajor-santafesino", kind: "daily" }, november),
+    Infinity,
   );
 });
 test("demo persiste, activa, desactiva, archiva, recupera y bloquea IDs duplicados", async () => {

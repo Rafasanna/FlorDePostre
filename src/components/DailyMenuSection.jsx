@@ -5,7 +5,12 @@ import CategoryFilter from "./CategoryFilter.jsx";
 import ProductCard from "./ProductCard.jsx";
 import ProductSkeleton from "./ProductSkeleton.jsx";
 import { useIntersectionObserver } from "../hooks/useIntersectionObserver.js";
-import { getFeaturedProducts, getVisibleProducts } from "../utils/seasonal.js";
+import { getVisibleProducts } from "../utils/seasonal.js";
+import {
+  getSummerRank,
+  isSummerProduct,
+  isSummerSeason,
+} from "../../shared/summer.js";
 
 function DailyMenuSection({
   cart,
@@ -16,29 +21,58 @@ function DailyMenuSection({
   categoryRequest,
   products = dailyProducts,
   isUsingSheetProducts = false,
-  sheetsNotice = ""
+  sheetsNotice = "",
 }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [showAllProducts, setShowAllProducts] = useState(false);
   const menuProducts = products;
   const sectionRef = useIntersectionObserver();
-  const visibleCatalog = useMemo(() => getVisibleProducts(menuProducts), [menuProducts]);
-  const featuredProducts = useMemo(() => getFeaturedProducts(menuProducts).slice(0, 4), [menuProducts]);
+  const visibleCatalog = useMemo(
+    () =>
+      getVisibleProducts(menuProducts).sort(
+        (a, b) =>
+          getSummerRank(a) - getSummerRank(b) ||
+          Number(b.destacado) - Number(a.destacado),
+      ),
+    [menuProducts],
+  );
+  const summerProducts = useMemo(
+    () => visibleCatalog.filter((product) => isSummerProduct(product)),
+    [visibleCatalog],
+  );
   const specialProducts = campaign?.productosEspeciales || [];
   const baseCategories = useMemo(() => {
-    if (!isUsingSheetProducts) return categories;
+    if (!isUsingSheetProducts)
+      return isSummerSeason()
+        ? ["Todos", "Verano", ...categories.slice(1)]
+        : categories;
 
     const sheetCategories = menuProducts
       .map((product) => product.categoria)
-      .filter((category) => category && category !== "Todos" && category !== "Sin TACC");
-    const knownCategories = categories.filter((category) => sheetCategories.includes(category));
-    const newCategories = sheetCategories.filter((category) => !categories.includes(category));
+      .filter(
+        (category) =>
+          category && category !== "Todos" && category !== "Sin TACC",
+      );
+    const knownCategories = categories.filter((category) =>
+      sheetCategories.includes(category),
+    );
+    const newCategories = sheetCategories.filter(
+      (category) => !categories.includes(category),
+    );
 
-    return ["Todos", ...new Set([...knownCategories, ...newCategories]), "Sin TACC"];
-  }, [isUsingSheetProducts, menuProducts]);
+    return [
+      "Todos",
+      ...(isSummerSeason() && summerProducts.length ? ["Verano"] : []),
+      ...new Set([...knownCategories, ...newCategories]),
+      "Sin TACC",
+    ];
+  }, [isUsingSheetProducts, menuProducts, summerProducts.length]);
   const menuCategories = useMemo(
-    () => (specialProducts.length > 0 ? ["Especial", ...baseCategories] : baseCategories),
-    [baseCategories, specialProducts.length]
+    () =>
+      specialProducts.length > 0
+        ? ["Especial", ...baseCategories]
+        : baseCategories,
+    [baseCategories, specialProducts.length],
   );
 
   useEffect(() => {
@@ -50,38 +84,26 @@ function DailyMenuSection({
 
   const categoryProducts = useMemo(() => {
     if (activeCategory === "Especial") return specialProducts;
+    if (activeCategory === "Verano") return summerProducts;
     if (activeCategory === "Todos") return visibleCatalog;
     if (activeCategory === "Sin TACC") {
-      return visibleCatalog.filter((product) => product.sinTacc || product.categoria === "Sin TACC");
+      return visibleCatalog.filter(
+        (product) => product.sinTacc || product.categoria === "Sin TACC",
+      );
     }
-    return visibleCatalog.filter((product) => product.categoria === activeCategory);
-  }, [activeCategory, specialProducts, visibleCatalog]);
+    return visibleCatalog.filter(
+      (product) => product.categoria === activeCategory,
+    );
+  }, [activeCategory, specialProducts, summerProducts, visibleCatalog]);
 
   const visibleProducts = useMemo(() => {
     if (activeCategory !== "Todos" || showAllProducts) return categoryProducts;
     return categoryProducts.slice(0, 8);
   }, [activeCategory, categoryProducts, showAllProducts]);
 
-  const unifiedProducts = useMemo(() => {
-    if (activeCategory !== "Todos") return visibleProducts;
-
-    const featured = visibleCatalog.filter((p) => p.destacado);
-    const rest = visibleCatalog.filter((p) => !p.destacado);
-    const allUnified = [...featured, ...rest];
-
-    if (showAllProducts) {
-      return allUnified;
-    } else {
-      return allUnified.slice(0, 8);
-    }
-  }, [activeCategory, visibleCatalog, visibleProducts, showAllProducts]);
-
   const hasHiddenProducts = useMemo(() => {
-    if (activeCategory === "Todos") {
-      return visibleCatalog.length > unifiedProducts.length;
-    }
     return categoryProducts.length > visibleProducts.length;
-  }, [activeCategory, visibleCatalog.length, unifiedProducts.length, categoryProducts.length, visibleProducts.length]);
+  }, [categoryProducts.length, visibleProducts.length]);
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
@@ -89,13 +111,16 @@ function DailyMenuSection({
 
     const grid = document.querySelector(".products-grid");
     if (grid) {
-      const headerHeight = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--header-height")
-      ) || 90;
-      
+      const headerHeight =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--header-height",
+          ),
+        ) || 90;
+
       const filter = document.querySelector(".category-filter");
       const filterHeight = filter ? filter.getBoundingClientRect().height : 0;
-      
+
       const totalOffset = headerHeight + filterHeight;
       const gridPosition = grid.getBoundingClientRect().top + window.scrollY;
       const targetScroll = gridPosition - totalOffset;
@@ -103,21 +128,27 @@ function DailyMenuSection({
       if (window.scrollY > targetScroll) {
         window.scrollTo({
           top: targetScroll,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       }
     }
   };
 
-  const sinTaccMapsUrl = "https://www.google.com/maps/search/?api=1&query=Sarmiento%20y%20Rep%C3%BAblica%20de%20Chile%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
+  const sinTaccMapsUrl =
+    "https://www.google.com/maps/search/?api=1&query=Sarmiento%20y%20Rep%C3%BAblica%20de%20Chile%2C%20Concepci%C3%B3n%20del%20Uruguay%2C%20Entre%20R%C3%ADos%2C%20Argentina";
 
   return (
-    <section className="section page-section reveal-fade" id="menu-diario" ref={sectionRef}>
+    <section
+      className="section page-section reveal-fade"
+      id="menu-diario"
+      ref={sectionRef}
+    >
       <div className="section-heading">
         <span>Menú diario</span>
         <h2>Para tu mesa dulce, desayuno o merienda</h2>
         <p>
-          Seleccioná productos de stock diario, revisá el resumen y enviá el pedido por WhatsApp.
+          Seleccioná productos de stock diario, revisá el resumen y enviá el
+          pedido por WhatsApp.
         </p>
         {sheetsNotice && <p className="help-text">{sheetsNotice}</p>}
       </div>
@@ -133,18 +164,24 @@ function DailyMenuSection({
           <div>
             <h3>Flor de Postre Sin TACC</h3>
             <p>
-              En el local contamos con algunos productos seleccionados de nuestra marca exclusiva
-              para celíacos Flor de Postre Sin TACC.
+              En el local contamos con algunos productos seleccionados de
+              nuestra marca exclusiva para celíacos Flor de Postre Sin TACC.
             </p>
             <p>
-              Para más variedad y opciones, nuestro local libre de gluten está ubicado en{" "}
+              Para más variedad y opciones, nuestro local libre de gluten está
+              ubicado en{" "}
               <a href={sinTaccMapsUrl} target="_blank" rel="noreferrer">
                 Sarmiento y República de Chile
               </a>
               .
             </p>
           </div>
-          <a className="sin-tacc-location-link" href={sinTaccMapsUrl} target="_blank" rel="noreferrer">
+          <a
+            className="sin-tacc-location-link"
+            href={sinTaccMapsUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
             <MapPin size={17} />
             Ver ubicación
           </a>
@@ -154,7 +191,7 @@ function DailyMenuSection({
       <div className="products-grid" key={activeCategory} aria-live="polite">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => <ProductSkeleton key={i} />)
-          : unifiedProducts.map((product) => (
+          : visibleProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -167,12 +204,15 @@ function DailyMenuSection({
 
       {!isLoading && hasHiddenProducts && (
         <div className="see-more-wrap">
-          <button className="see-more-button" type="button" onClick={() => setShowAllProducts(true)}>
+          <button
+            className="see-more-button"
+            type="button"
+            onClick={() => setShowAllProducts(true)}
+          >
             Ver más productos
           </button>
         </div>
       )}
-
     </section>
   );
 }
