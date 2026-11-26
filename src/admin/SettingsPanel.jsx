@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, Save } from "lucide-react";
 import { moneyInputToCents } from "../../shared/catalog.js";
 import { validateSettings, breakfastPriceOf } from "../../shared/settings.js";
@@ -12,17 +12,20 @@ const cakeGroups = [
 ];
 const money = (cents) => cents == null ? "" : String(cents / 100);
 const newId = (prefix) => `${prefix}-${Date.now().toString(36)}`;
+function makeCampaignDraft(item) {
+  return {
+    ...structuredClone(item),
+    bannerText: item.bannerText ?? "", descripcion: item.descripcion ?? "", decoracion: item.decoracion ?? "", notas: item.notas ?? "",
+    colors: { fondo: "#faeeee", texto: "#392a2f", acento: "#b76575", badge: "#fff6f3", ...item.colors },
+    evento: item.evento ?? item.titulo ?? "", titulo: item.titulo ?? item.evento ?? "",
+    active: Boolean(item.active ?? item.activa), fechaInicio: item.fechaInicio ?? null, fechaFin: item.fechaFin ?? null,
+  };
+}
 function makeDraft(catalog) {
   return {
     sizes: catalog.sizes.map((item, order) => ({ ...structuredClone(item), order: item.order ?? order })),
     cake: Object.fromEntries(cakeGroups.map(([key]) => [key, catalog.cake.filter((item) => item.dataset === key).map((item) => ({ ...structuredClone(item.data), disponible: item.data.disponible !== false }))])),
-    campaigns: catalog.campaigns.map((item) => ({
-      ...structuredClone(item),
-      bannerText: item.bannerText ?? "", descripcion: item.descripcion ?? "", decoracion: item.decoracion ?? "", notas: item.notas ?? "",
-      colors: { fondo: "#faeeee", texto: "#392a2f", acento: "#b76575", badge: "#fff6f3", ...item.colors },
-      evento: item.evento ?? item.titulo ?? "", titulo: item.titulo ?? item.evento ?? "",
-      active: Boolean(item.active ?? item.activa), fechaInicio: item.fechaInicio ?? null, fechaFin: item.fechaFin ?? null,
-    })),
+    campaigns: catalog.campaigns.map(makeCampaignDraft),
     rules: { ...structuredClone(catalog.rules), breakfastPrice: breakfastPriceOf(catalog.rules) },
   };
 }
@@ -31,20 +34,22 @@ function SettingField({ label, children }) {
   return <label className="a-setting-field"><span>{label}</span>{children}</label>;
 }
 
-function campaignStatus(campaign) {
+function campaignStatus(campaign, hasChanges) {
   if (!campaign.active) return { label: "Desactivada", kind: "off" };
   const now = new Date();
   const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
   if (campaign.fechaInicio && campaign.fechaFin && campaign.fechaInicio > campaign.fechaFin) return { label: "Revisá las fechas", kind: "off" };
   if (campaign.fechaInicio && today < campaign.fechaInicio) return { label: "Programada", kind: "scheduled" };
   if (campaign.fechaFin && today > campaign.fechaFin) return { label: "Finalizada", kind: "off" };
-  return { label: "Se mostraría hoy", kind: "live" };
+  return { label: hasChanges ? "Se mostraría hoy" : "Visible hoy", kind: "live" };
 }
 
 export default function SettingsPanel({ catalog, service, onSaved, kind }) {
   const [draft, setDraft] = useState(() => makeDraft(catalog));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [saveFeedback, setSaveFeedback] = useState(null);
+  const savedCampaigns = useMemo(() => new Map(catalog.campaigns.map((item) => { const campaign = makeCampaignDraft(item); return [campaign.id, campaign]; })), [catalog.campaigns]);
   const set = (next) => setDraft(next);
   const changeCake = (group, index, field, value) => {
     setDraft((previous) => {
@@ -77,15 +82,22 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
   const changeSize = (index, field, value) => setDraft((previous) => {
     const next = structuredClone(previous); next.sizes[index][field] = value; return next;
   });
-  const changeCampaign = (index, field, value) => setDraft((previous) => {
-    const next = structuredClone(previous);
-    if (field === "active" && value) next.campaigns.forEach((item) => { item.active = false; });
-    const campaign = next.campaigns[index];
-    if (field === "titulo" && !catalog.campaigns.some((item) => item.id === campaign.id) && (!campaign.evento || campaign.evento === campaign.titulo)) campaign.evento = value;
-    next.campaigns[index][field] = value;
-    if (field === "bannerText") next.campaigns[index].descripcion = value;
-    return next;
-  });
+  const changeCampaign = (index, field, value) => {
+    setSaveFeedback(null);
+    setDraft((previous) => {
+      const next = structuredClone(previous);
+      if (field === "active" && value) next.campaigns.forEach((item) => { item.active = false; });
+      const campaign = next.campaigns[index];
+      if (field === "titulo" && !catalog.campaigns.some((item) => item.id === campaign.id) && (!campaign.evento || campaign.evento === campaign.titulo)) campaign.evento = value;
+      next.campaigns[index][field] = value;
+      if (field === "bannerText") next.campaigns[index].descripcion = value;
+      return next;
+    });
+  };
+  const changeCampaignColor = (index, color, value) => {
+    setSaveFeedback(null);
+    setDraft((previous) => { const next = structuredClone(previous); next.campaigns[index].colors[color] = value; return next; });
+  };
   const changeOption = (index, field, value) => setDraft((previous) => {
     const next = structuredClone(previous); next.rules.cakePriceOptions[index][field] = value; return next;
   });
@@ -105,16 +117,20 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
     else option.sizes.push({ nombre: sizeName, price: Number(value), porciones: draft.cake.tortaTamanos.find((size) => size.nombre === sizeName)?.porciones || "Porciones a confirmar" });
     return next;
   });
-  const save = async () => {
+  const save = async (campaignId = null) => {
     setError("");
+    setSaveFeedback(null);
     setSaving(true);
     try {
       validateSettings(draft, catalog);
       const next = await service.saveSettings(draft, catalog.revision);
       onSaved(next);
       setDraft(makeDraft(next));
+      if (campaignId) setSaveFeedback({ campaignId, kind: "success", message: "Cambios guardados. Revisá la barra en el inicio de la tienda." });
     } catch (e) {
-      setError(e.errors ? Object.values(e.errors)[0] : e.message);
+      const message = e.errors ? Object.values(e.errors)[0] : e.message;
+      setError(message);
+      if (campaignId) setSaveFeedback({ campaignId, kind: "error", message });
     } finally { setSaving(false); }
   };
   return <div className="a-settings-panel">
@@ -122,8 +138,8 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
       <span className="a-eyebrow">CONFIGURACIÓN DEL CATÁLOGO</span>
       <h1>{kind === "cakes" ? "Tortas personalizadas" : kind === "sizes" ? "Tamaños de postres" : kind === "breakfast" ? "Desayunos a domicilio" : "Campañas y banners"}</h1>
       <p>{kind === "cakes" ? "Editá opciones, disponibilidad y precios del configurador." : kind === "sizes" ? "Estos tamaños se usan al configurar el precio de cada postre." : kind === "breakfast" ? "Actualizá el precio de la propuesta estándar que se muestra en la web." : "Editá la franja que aparece debajo del menú en la página de inicio."}</p>
-    </div><button className="a-btn" type="button" onClick={save} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>
-    {error && <p className="a-notice a-error" role="alert">{error}</p>}
+    </div>{kind !== "campaigns" && <button className="a-btn" type="button" onClick={() => save()} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button>}</div>
+    {error && kind !== "campaigns" && <p className="a-notice a-error" role="alert">{error}</p>}
     {kind === "cakes" && <>
       <section className="a-card a-setting-section"><div className="a-section-head"><h2>Modelos y precios finales</h2><button className="a-btn a-secondary" type="button" onClick={() => setDraft((previous) => ({ ...previous, rules: { ...previous.rules, cakePriceOptions: [...previous.rules.cakePriceOptions, { id: newId("modelo"), coberturaId: previous.cake.tortaCoberturas[0]?.id || "", nombre: "", descripcion: "", fillings: 2, sizes: [] }] } }))}><Plus size={15}/> Agregar modelo</button></div><p>Estos son los importes que paga la clienta según cobertura, cantidad de rellenos y tamaño. Un tamaño sin precio no aparece en ese modelo.</p>
         {draft.rules.cakePriceOptions.map((option, index) => <article className="a-setting-item a-model-card" key={option.id}>
@@ -170,16 +186,18 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
     </section>}
     {kind === "campaigns" && <section className="a-card a-setting-section a-campaign-section"><div className="a-section-head"><div><h2>Campañas</h2><p>La campaña activada aparece como una barra debajo del menú, solo en el inicio y durante las fechas indicadas. Los cambios se publican al guardar.</p></div><button className="a-btn a-secondary" type="button" onClick={() => set({ ...draft, campaigns: [...draft.campaigns, { id: newId("campana"), evento: "", titulo: "", bannerText: "", descripcion: "", decoracion: "", notas: "", active: false, activa: false, fechaInicio: null, fechaFin: null, colors: { fondo: "#faeeee", texto: "#392a2f", acento: "#b76575", badge: "#fff6f3" } }] })}><Plus size={15}/> Agregar campaña</button></div>
       {draft.campaigns.map((campaign, index) => {
-        const status = campaignStatus(campaign);
+        const savedCampaign = savedCampaigns.get(campaign.id);
+        const hasChanges = !savedCampaign || JSON.stringify(campaign) !== JSON.stringify(savedCampaign);
+        const status = campaignStatus(campaign, hasChanges);
         return <article className="a-campaign-card" key={campaign.id} aria-labelledby={`campaign-heading-${campaign.id}`}>
           <div className="a-campaign-heading">
             <div><span className="a-campaign-number">Campaña {index + 1}</span><h3 id={`campaign-heading-${campaign.id}`}>{campaign.titulo || "Campaña nueva"}</h3></div>
-            <span className={`a-campaign-status a-campaign-status-${status.kind}`}>{status.label}</span>
+            <div className="a-campaign-badges"><span className={`a-campaign-status a-campaign-status-${status.kind}`}>{status.label}</span>{hasChanges && <span className="a-campaign-status a-campaign-status-unsaved">Sin guardar</span>}</div>
           </div>
-          <div className="a-campaign-preview"><span className="a-campaign-preview-label">Así se vería la barra en la tienda</span><div inert><CampaignBanner campaign={{ ...campaign, titulo: campaign.titulo || "Título de la barra", bannerText: campaign.bannerText || campaign.descripcion || "Mensaje de la barra" }} /></div></div>
+          <div className="a-campaign-preview"><span className="a-campaign-preview-label">Así se vería la barra en la tienda</span><div inert><CampaignBanner campaign={{ ...campaign, titulo: campaign.titulo || "Título de la barra" }} /></div></div>
           <div className="a-campaign-fields"><h4>Lo que aparece en la barra</h4><p>Escribí el título y el mensaje. Vas a ver los cambios arriba antes de guardar.</p>
             <SettingField label="Título de la barra"><input value={campaign.titulo} onChange={(e) => changeCampaign(index, "titulo", e.target.value)}/></SettingField>
-            <SettingField label="Mensaje de la barra"><input value={campaign.bannerText || campaign.descripcion} onChange={(e) => changeCampaign(index, "bannerText", e.target.value)}/></SettingField>
+            <SettingField label="Mensaje de la barra (opcional)"><input value={campaign.bannerText || campaign.descripcion} onChange={(e) => changeCampaign(index, "bannerText", e.target.value)}/></SettingField>
             <SettingField label="Ícono de la barra (opcional)"><input value={campaign.decoracion} onChange={(e) => changeCampaign(index, "decoracion", e.target.value)}/></SettingField>
           </div>
           <div className="a-campaign-fields"><h4>Productos especiales</h4><p>Al crear la campaña, este nombre se completa con el título. Podés cambiarlo para vincular productos del mismo evento. No aparece en la barra.</p>
@@ -188,10 +206,14 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
           <div className="a-campaign-fields"><h4>Publicación</h4><p>Solo una campaña puede estar activada a la vez. Si dejás las fechas vacías, se muestra mientras esté activada.</p>
             <div className="a-setting-grid"><SettingField label="Fecha inicio"><input type="date" value={campaign.fechaInicio ?? ""} onChange={(e) => changeCampaign(index, "fechaInicio", e.target.value || null)}/></SettingField><SettingField label="Fecha fin"><input type="date" value={campaign.fechaFin ?? ""} onChange={(e) => changeCampaign(index, "fechaFin", e.target.value || null)}/></SettingField><label className="a-check"><input type="checkbox" checked={campaign.active} onChange={(e) => changeCampaign(index, "active", e.target.checked)}/> Activar campaña</label></div>
           </div>
-          <div className="a-campaign-fields"><h4>Colores de la barra</h4><div className="a-setting-grid">{[["fondo", "Fondo"], ["texto", "Texto"], ["acento", "Bordes"], ["badge", "Fondo del ícono"]].map(([color, label]) => <SettingField key={color} label={label}><input type="color" value={campaign.colors[color]} onChange={(e) => setDraft((previous) => { const next = structuredClone(previous); next.campaigns[index].colors[color] = e.target.value; return next; })}/></SettingField>)}</div></div>
+          <div className="a-campaign-fields"><h4>Colores de la barra</h4><div className="a-setting-grid">{[["fondo", "Fondo"], ["texto", "Texto"], ["acento", "Bordes"], ["badge", "Fondo del ícono"]].map(([color, label]) => <SettingField key={color} label={label}><input type="color" value={campaign.colors[color]} onChange={(e) => changeCampaignColor(index, color, e.target.value)}/></SettingField>)}</div></div>
+          {(hasChanges || saveFeedback?.campaignId === campaign.id) && <div className="a-campaign-actions">
+            {saveFeedback?.campaignId === campaign.id ? <span className={saveFeedback.kind === "error" ? "a-error" : "a-campaign-saved"} role={saveFeedback.kind === "error" ? "alert" : undefined}>{saveFeedback.message}</span> : <span>Estos cambios todavía no aparecen en la tienda.</span>}
+            {hasChanges && <button className="a-btn" type="button" onClick={() => save(campaign.id)} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button>}
+          </div>}
         </article>;
       })}
     </section>}
-    <div className="a-setting-actions"><button className="a-btn" type="button" onClick={save} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>
+    {kind !== "campaigns" && <div className="a-setting-actions"><button className="a-btn" type="button" onClick={() => save()} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>}
   </div>;
 }

@@ -1888,11 +1888,13 @@
 }
 .a-campaign-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
 .a-campaign-heading h3 { margin-top: 4px; overflow-wrap: anywhere; }
+.a-campaign-badges { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 7px; }
 .a-campaign-number, .a-campaign-preview-label { color: #8c6270; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .a-campaign-status { flex: 0 0 auto; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
 .a-campaign-status-live { background: #e5efdf; color: #435638; }
 .a-campaign-status-scheduled { background: #fff0d7; color: #76501f; }
 .a-campaign-status-off { background: #f0e8e7; color: #6b5550; }
+.a-campaign-status-unsaved { background: #fff0d7; color: #76501f; }
 .a-campaign-preview { display: grid; gap: 8px; min-width: 0; }
 .a-campaign-preview > div { overflow: hidden; border-radius: 12px; }
 .a-campaign-preview .campaign-banner {
@@ -1909,10 +1911,15 @@
 .a-campaign-fields h4 { margin: 0; color: var(--a-ink); font-size: 14px; }
 .a-campaign-fields p { margin: -6px 0 0; font-size: 12px; line-height: 1.5; }
 .a-campaign-card .a-check { align-self: end; min-height: 39px; font-size: 13px; font-weight: 650; }
+.a-campaign-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 18px; border-top: 1px solid #ead9d8; }
+.a-campaign-actions > span { color: #76501f; font-size: 13px; font-weight: 650; }
+.a-campaign-actions .a-campaign-saved { color: #435638; }
+.a-campaign-actions .a-btn { flex: 0 0 auto; }
 @media (max-width: 700px) {
   .a-campaign-section > .a-section-head { align-items: flex-start; flex-direction: column; }
   .a-campaign-card { gap: 18px; padding: 18px; }
   .a-campaign-heading { align-items: flex-start; flex-wrap: wrap; }
   .a-campaign-heading h3 { font-size: 21px; }
   .a-campaign-preview .campaign-banner { align-items: flex-start; gap: 7px; }
+  .a-campaign-actions { align-items: stretch; flex-direction: column; }
 }

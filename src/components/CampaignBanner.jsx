@@ -2,6 +2,7 @@ import { CAMPAIGN_COLOR_FALLBACKS } from "../theme.js";
 
 function CampaignBanner({ campaign, onOpenSpecial }) {
   if (!campaign) return null;
+  const message = (campaign.bannerText || campaign.descripcion || "").trim();
 
   const colors = {
     ...CAMPAIGN_COLOR_FALLBACKS,
@@ -28,8 +29,7 @@ function CampaignBanner({ campaign, onOpenSpecial }) {
         <span aria-hidden="true">{campaign.decoracion || "🇦🇷"}</span>
         <p>
           <strong>{campaign.titulo}</strong>
-          <span aria-hidden="true">•</span>
-          {campaign.bannerText || campaign.descripcion}
+          {message && <><span aria-hidden="true">•</span>{message}</>}
         </p>
       </div>
       {campaign.textoBoton && campaign.linkBoton && (

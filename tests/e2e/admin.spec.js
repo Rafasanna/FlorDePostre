@@ -61,14 +61,14 @@ test("demo permite editar reglas de tortas, tamaños de postres y banners", asyn
   await page.getByRole("button", { name: "Guardar cambios" }).first().click();
   await expect(page.getByRole("status")).toContainText("Cambios guardados");
   await nav.getByRole("button", { name: "Campañas" }).click();
-  await expect(page.getByLabel("Mensaje de la barra").first()).toHaveValue("sabores patrios disponibles por tiempo limitado");
-  await page.getByLabel("Mensaje de la barra").first().fill("Banner desde admin");
+  await expect(page.getByLabel("Mensaje de la barra (opcional)").first()).toHaveValue("sabores patrios disponibles por tiempo limitado");
+  await page.getByLabel("Mensaje de la barra (opcional)").first().fill("Banner desde admin");
   await expect(page.locator(".a-campaign-preview .campaign-banner").first()).toContainText("Banner desde admin");
   await page.getByRole("button", { name: "Guardar cambios" }).first().click();
   await expect(page.getByRole("status")).toContainText("Cambios guardados");
   await demo(page);
   await nav.getByRole("button", { name: "Campañas" }).click();
-  await expect(page.getByLabel("Mensaje de la barra").first()).toHaveValue("Banner desde admin");
+  await expect(page.getByLabel("Mensaje de la barra (opcional)").first()).toHaveValue("Banner desde admin");
 });
 test("demo CRUD, errores, búsqueda, filtros, archivo y recuperación", async ({
   page,

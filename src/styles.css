@@ -2788,7 +2788,7 @@ h1 {
   padding: 5px clamp(18px, 5vw, 68px);
   position: fixed;
   right: 0;
-  top: 90px;
+  top: var(--header-height, 90px);
   z-index: 900;
 }
 
@@ -4359,7 +4359,7 @@ body::before { display: none; }
   .footer { gap: 24px; padding: 36px 20px 88px; }
   .footer-links { justify-content: center; flex-direction: row; flex-wrap: wrap; gap: 12px; }
   .footer-links a { flex: 0 0 auto; width: auto; }
-  .campaign-banner { top: 60px; }
+  .campaign-banner { top: var(--header-height, 60px); }
   .home-floating-cart { display: none; }
 }
 
