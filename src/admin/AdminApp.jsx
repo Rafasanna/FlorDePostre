@@ -1354,7 +1354,6 @@ export default function AdminApp() {
     <div className="admin-root a-layout">
       <aside className="a-sidebar">
         <Logo />
-        <span className="a-sidebar-caption">El taller de Flor</span>
         <nav aria-label="Administración">
           {nav.map(([id, label, Icon]) => (
             <button
