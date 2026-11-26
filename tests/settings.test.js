@@ -36,6 +36,7 @@ test("configuración editable guarda tortas, tamaños y banners con revisión; A
     settings.cake.tortaExtras.find((item) => item.id === "extra-imprimible").precioExtra = 6000;
     settings.rules.extraRules.find((item) => item.id === "extra-imprimible").rule.amount = 6000;
     settings.campaigns[0].bannerText = "Banner nuevo";
+    settings.rules.breakfastPrice = 34000;
     settings.rules.cakePriceOptions.find((item) => item.id === "buttercream-2-rellenos").sizes.find((item) => item.nombre === "18 cm").price = 60000;
     const validated = validateSettings(settings, catalog);
     const env = { ADMIN_ENABLED: "true", ADMIN_WRITES_ENABLED: "true", DATABASE_URL: "local-test-only", APP_ORIGIN: "http://localhost:4190", SESSION_SECRET: "test-only-secret-".repeat(4) };
@@ -55,5 +56,7 @@ test("configuración editable guarda tortas, tamaños y banners con revisión; A
     assert.equal(publicResponse.body.datasets.cakeRules.cakePriceOptions.find((item) => item.id === "buttercream-2-rellenos").sizes[0].price, 60000);
     assert.equal(getCakeExtraPrice({ id: "extra-imprimible", precioExtra: 100 }, 60000, publicResponse.body.datasets.cakeRules.extraRules), 6000);
     assert.equal(publicResponse.body.datasets.campaigns[0].bannerText, "Banner nuevo");
+    assert.equal(publicResponse.body.datasets.cakeRules.breakfastPrice, 34000);
+    assert.throws(() => validateSettings({ ...settings, rules: { ...settings.rules, breakfastPrice: 0 } }, catalog), /Revisá|inválid|Validation/);
   } finally { await db.close(); }
 });

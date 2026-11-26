@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Save } from "lucide-react";
 import { moneyInputToCents } from "../../shared/catalog.js";
-import { validateSettings } from "../../shared/settings.js";
+import { validateSettings, breakfastPriceOf } from "../../shared/settings.js";
 
 const cakeGroups = [
   ["tortaCoberturas", "Coberturas", "precio"],
@@ -22,7 +22,7 @@ function makeDraft(catalog) {
       evento: item.evento ?? item.titulo ?? "", titulo: item.titulo ?? item.evento ?? "",
       active: Boolean(item.active ?? item.activa), fechaInicio: item.fechaInicio ?? null, fechaFin: item.fechaFin ?? null,
     })),
-    rules: structuredClone(catalog.rules),
+    rules: { ...structuredClone(catalog.rules), breakfastPrice: breakfastPriceOf(catalog.rules) },
   };
 }
 
@@ -106,8 +106,8 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
   return <div className="a-settings-panel">
     <div className="a-page-title"><div>
       <span className="a-eyebrow">CONFIGURACIÓN DEL CATÁLOGO</span>
-      <h1>{kind === "cakes" ? "Tortas personalizadas" : kind === "sizes" ? "Tamaños de postres" : "Campañas y banners"}</h1>
-      <p>{kind === "cakes" ? "Editá opciones, disponibilidad y precios del configurador." : kind === "sizes" ? "Estos tamaños se usan al configurar el precio de cada postre." : "Definí el contenido y las fechas del banner de la tienda."}</p>
+      <h1>{kind === "cakes" ? "Tortas personalizadas" : kind === "sizes" ? "Tamaños de postres" : kind === "breakfast" ? "Desayunos a domicilio" : "Campañas y banners"}</h1>
+      <p>{kind === "cakes" ? "Editá opciones, disponibilidad y precios del configurador." : kind === "sizes" ? "Estos tamaños se usan al configurar el precio de cada postre." : kind === "breakfast" ? "Actualizá el precio de la propuesta estándar que se muestra en la web." : "Definí el contenido y las fechas del banner de la tienda."}</p>
     </div><button className="a-btn" type="button" onClick={save} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>
     {error && <p className="a-notice a-error" role="alert">{error}</p>}
     {kind === "cakes" && <>
@@ -141,6 +141,9 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
         </div><SettingField label="Descripción"><input value={item.descripcion ?? ""} onChange={(e) => changeCake(group, index, "descripcion", e.target.value)}/></SettingField><SettingField label="Notas internas"><input value={item.notas ?? ""} onChange={(e) => changeCake(group, index, "notas", e.target.value)}/></SettingField></article>)}
       </section>)}
     </>}
+    {kind === "breakfast" && <section className="a-card a-setting-section"><div className="a-section-head"><div><h2>Propuesta estándar</h2><p>El detalle de lo que incluye se mantiene igual. El precio se muestra como “+ envío” y también se usa en el mensaje de WhatsApp.</p></div></div>
+      <article className="a-setting-item"><div className="a-setting-grid"><SettingField label="Precio del desayuno (ARS)"><input type="number" min="1" step="1" inputMode="numeric" value={draft.rules.breakfastPrice ?? ""} onChange={(e) => setDraft((previous) => ({ ...previous, rules: { ...previous.rules, breakfastPrice: e.target.value === "" ? undefined : Number(e.target.value) } }))}/></SettingField></div></article>
+    </section>}
     {kind === "sizes" && <section className="a-card a-setting-section"><div className="a-section-head"><div><h2>Tamaños disponibles</h2><p>Los precios de venta de cada postre se editan dentro del producto.</p></div><button className="a-btn a-secondary" type="button" onClick={() => set({ ...draft, sizes: [...draft.sizes, { id: newId("postre-size"), name: "", portions: "", active: false, estimatedPriceCents: null, notes: "", order: draft.sizes.length }] })}><Plus size={15}/> Agregar</button></div>
       {draft.sizes.map((size, index) => <article className="a-setting-item a-model-card" key={size.id}>
         <div className="a-model-heading">

@@ -33,6 +33,7 @@ import {
   EyeOff,
   Save,
   LoaderCircle,
+  Coffee,
 } from "lucide-react";
 import { demoAllowed, createDemoService } from "./demo.js";
 import { adminRequest, createRealService } from "./client.js";
@@ -64,6 +65,7 @@ const nav = [
   ["cakes", "Tortas", Flower2],
   ["sizes", "Tamaños de postres", LayoutGrid],
   ["campaigns", "Campañas", Star],
+  ["breakfast", "Desayunos", Coffee],
   ["categories", "Categorías", LayoutGrid],
   ["settings", "Configuración", Settings],
 ];
@@ -1864,7 +1866,7 @@ export default function AdminApp() {
                   </p>
                 </>
               )}
-              {["cakes", "sizes", "campaigns"].includes(section) && (
+              {["cakes", "sizes", "campaigns", "breakfast"].includes(section) && (
                 <SettingsPanel
                   key={section}
                   kind={section}

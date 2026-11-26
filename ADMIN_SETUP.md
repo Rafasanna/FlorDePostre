@@ -1,12 +1,48 @@
 # Administrador de Flor de Postre
 
+## Estado actual (26 de noviembre de 2026)
+
+- **El administrador está en uso en producción.** `https://flordepostre.com.ar/api/catalog` responde `"source":"neon"` (revisión 102 al 22/11/2026), por lo que en Vercel Production están activos `CATALOG_SOURCE=neon` y `CATALOG_NEON_APPROVED=true`, y la tienda pública lee el catálogo desde Neon.
+- **Google Sheets ya no es la fuente de la web.** Los cambios en las planillas no se publican; todo se edita desde `/admin`. Las URLs `VITE_SHEET_*` quedan solo como respaldo histórico.
+- **Pendiente de confirmar:** a qué proyecto de Neon apunta el `DATABASE_URL` de Production en Vercel. Si es `flor-de-postre-pruebas`, esa base contiene el catálogo real y debe tratarse como producción: sin pruebas, sin borrar datos y con respaldo verificado.
+- **Pendiente de probar:** una subida real de foto con Cloudinary desde el panel en producción.
+- Las secciones siguientes son el registro histórico de la implementación; donde dicen que la tienda sigue en Sheets, describen el estado previo al corte.
+
+## Cambiar la contraseña de una administradora
+
+No hay pantalla ni comando de CLI para esto: se genera el hash en local y se actualiza la base desde el SQL Editor de Neon. La contraseña nunca se escribe en el comando, en archivos ni en mensajes.
+
+1. Generar el hash en la carpeta del proyecto (zsh, macOS). Pide la contraseña sin mostrarla; mínimo 14 caracteres:
+
+   ```sh
+   read -s "ADMIN_PASSWORD?Nueva contraseña: "; echo
+   ADMIN_PASSWORD="$ADMIN_PASSWORD" node --input-type=module -e 'import { passwordHash } from "./server/security.js"; const p = process.env.ADMIN_PASSWORD || ""; if (p.length < 14) { console.error("Mínimo 14 caracteres"); process.exit(1); } console.log(await passwordHash(p));'
+   unset ADMIN_PASSWORD
+   ```
+
+   Imprime una línea `scrypt$...` (el hash, no la contraseña).
+
+2. En Neon, abrir el proyecto y la rama que usa Production (el host debe coincidir con el `DATABASE_URL` de Vercel Production) y ejecutar en el SQL Editor, reemplazando el hash y el correo:
+
+   ```sql
+   BEGIN;
+   UPDATE admins SET password_hash = 'scrypt$PEGAR_HASH' WHERE email = 'correo@ejemplo.com';
+   DELETE FROM admin_sessions WHERE admin_id = (SELECT id FROM admins WHERE email = 'correo@ejemplo.com');
+   INSERT INTO audit_log(admin_id, action) SELECT id, 'admin.password_reset' FROM admins WHERE email = 'correo@ejemplo.com';
+   COMMIT;
+   ```
+
+   El `UPDATE` debe afectar exactamente 1 fila; si afecta 0, el correo no coincide (se guarda en minúsculas) y hay que ejecutar `ROLLBACK`. Borrar las sesiones cierra cualquier sesión abierta con la contraseña anterior.
+
+3. Probar el login en `https://flordepostre.com.ar/admin` y comunicar la contraseña nueva solo por un canal privado.
+
 ## Etapa 3 local: tortas, tamaños de postres y campañas
 
 El código de esta rama incorpora editores para las cuatro listas de tortas (coberturas, tamaños, rellenos y extras), la matriz de precios finales por modelo/tamaño, el porcentaje de extras variables, los tamaños globales de postres y las campañas con su banner, colores y fechas. Los precios individuales de cada postre por tamaño ya se editaban dentro del producto. El guardado usa una revisión global, validación de servidor, auditoría y una transacción PostgreSQL. La demo local guarda estos cambios únicamente en el navegador.
 
 La migración `002_editable_settings.sql` se aplicó a Neon de pruebas el 8 de noviembre de 2026, después de una autorización explícita. Se guardó un respaldo privado de las 16 tablas y 551 filas en `.local`, y se verificó su reconstrucción en PostgreSQL local. La comprobación posterior de solo lectura confirmó las versiones 001 y 002, la función nueva y que la revisión del catálogo y los conteos de todas las tablas siguieron iguales. No se aplicó en una base definitiva.
 
-Cuando la tienda usa Neon, `/api/catalog` entrega también `cakeRules`: configurador, resumen y revisión del carrito leen la matriz y los adicionales actuales; una opción desactivada deja de mostrarse y una selección retirada del carrito se invalida. **La tienda pública sigue leyendo Sheets** y no cambia con estas ediciones hasta aprobar el cambio de fuente y el despliegue correspondiente. En modo Sheets conserva su funcionamiento anterior.
+Cuando la tienda usa Neon, `/api/catalog` entrega también `cakeRules`: configurador, resumen y revisión del carrito leen la matriz y los adicionales actuales; una opción desactivada deja de mostrarse y una selección retirada del carrito se invalida. En el momento de esta etapa la tienda pública seguía leyendo Sheets; el corte a Neon ya se hizo (ver "Estado actual"). En modo Sheets conserva su funcionamiento anterior.
 
 Implementación iniciada en `feature/admin-neon-cloudinary`, desde `main` estable `7557dd8`. No se realizaron cambios en Sheets. Se ejecutaron únicamente las operaciones de Neon de pruebas autorizadas: migraciones `001_admin_catalog.sql` y `002_editable_settings.sql`, alta de la primera administradora e importación verificada del catálogo. El catálogo público sigue usando sus once CSV y sus reglas actuales. El cambio visual solicitado después de la primera etapa mueve el filtro Sin TACC al final, después de Bandejas.
 

@@ -33,6 +33,7 @@ import PostresSection from "./components/PostresSection.jsx";
 import TortasSection from "./components/TortasSection.jsx";
 import CateringSection from "./components/CateringSection.jsx";
 import BreakfastSection from "./components/BreakfastSection.jsx";
+import { breakfastPriceOf } from "../shared/settings.js";
 import AboutSection from "./components/AboutSection.jsx";
 import CartDrawer from "./components/CartDrawer.jsx";
 import Footer from "./components/Footer.jsx";
@@ -751,7 +752,7 @@ function App() {
           />
           <Route path="/como-pedir" element={<ComoPedirPage />} />
           <Route path="/catering" element={<CateringSection cateringHref={cateringHref} />} />
-          <Route path="/desayunos" element={<BreakfastSection />} />
+          <Route path="/desayunos" element={<BreakfastSection price={cakeRules?.version ? breakfastPriceOf(cakeRules) : null} formatPrice={formatPrice} />} />
           <Route
             path="/tortas-personalizadas"
             element={

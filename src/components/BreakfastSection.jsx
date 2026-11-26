@@ -21,8 +21,9 @@ const notes = [
   "Si querés modificar algo, lo charlamos por WhatsApp."
 ];
 
-function BreakfastSection() {
+function BreakfastSection({ price = null, formatPrice = (value) => `$${value}` }) {
   const sectionRef = useIntersectionObserver();
+  const priceLabel = price == null ? null : `${formatPrice(price)} + envío`;
 
   return (
     <section className="catering-page section page-section reveal-fade" id="desayunos" ref={sectionRef}>
@@ -48,14 +49,18 @@ function BreakfastSection() {
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <a
-            className="breakfast-price"
-            href={makeWhatsappHref("Hola! Quiero consultar por el desayuno de $31.500 + envío.")}
-            target="_blank"
-            rel="noreferrer"
-          >
-            $31.500 + envío
-          </a>
+          {priceLabel ? (
+            <a
+              className="breakfast-price"
+              href={makeWhatsappHref(`Hola! Quiero consultar por el desayuno de ${priceLabel}.`)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {priceLabel}
+            </a>
+          ) : (
+            <span className="breakfast-price" aria-busy="true">Cargando precio…</span>
+          )}
         </div>
 
         <div className="catering-personalize-note">

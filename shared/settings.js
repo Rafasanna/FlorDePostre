@@ -6,6 +6,8 @@ const optionalText = (value, max = 500) => typeof value === "string" && value.le
 const pesos = (value, allowZero = true) => Number.isFinite(value) && value >= (allowZero ? 0 : 0.01) && moneyOK(Math.round(value * 100), allowZero) && Math.abs(value * 100 - Math.round(value * 100)) < 0.000001;
 const date = (value) => value === null || (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T12:00:00Z`)) && new Date(`${value}T12:00:00Z`).toISOString().slice(0, 10) === value);
 const fields = ["tortaTamanos", "tortaCoberturas", "tortaRellenos", "tortaExtras"];
+export const DEFAULT_BREAKFAST_PRICE = 31500;
+export const breakfastPriceOf = (rules) => (Number.isFinite(rules?.breakfastPrice) ? rules.breakfastPrice : DEFAULT_BREAKFAST_PRICE);
 
 export function validateSettings(input, catalog) {
   const errors = {};
@@ -48,11 +50,12 @@ export function validateSettings(input, catalog) {
     const rule = entry?.rule || entry;
     return !idOK(entry?.id) || !input.cake?.tortaExtras?.some((extra) => extra.id === entry.id) || !Array.isArray(rule?.match) || !["fixed", "percent", "from"].includes(rule?.type) || (rule.type === "percent" ? !Number.isFinite(rule.percent) || rule.percent < 0 || rule.percent > 1 : !pesos(rule.amount ?? 0));
   })) errors.extraRules = "Reglas de adicionales inválidas.";
+  if (rules?.breakfastPrice !== undefined && (!pesos(rules.breakfastPrice, false) || rules.breakfastPrice > 10000000)) errors.breakfastPrice = "Ingresá un precio de desayuno válido.";
   if (Object.keys(errors).length) throw new ValidationError(errors);
   return {
     sizes: input.sizes.map((s) => ({ id: s.id, name: s.name.trim(), portions: s.portions, notes: s.notes, active: s.active, estimatedPriceCents: s.estimatedPriceCents, order: s.order })),
     cake: Object.fromEntries(fields.map((key) => [key, input.cake[key].map((item) => ({ ...item, nombre: item.nombre.trim() }))])),
     campaigns: input.campaigns.map((c) => ({ id: c.id, evento: c.evento.trim(), titulo: c.titulo.trim(), bannerText: c.bannerText, descripcion: c.descripcion, decoracion: c.decoracion, notas: c.notas, colors: c.colors, active: c.active, activa: c.active, fechaInicio: c.fechaInicio, fechaFin: c.fechaFin, color: c.color ?? "", temaVisual: c.temaVisual ?? "rose", textoBoton: c.textoBoton ?? "", linkBoton: c.linkBoton ?? "", productosEspeciales: [] })),
-    rules: { version: 2, cakePriceOptions: rules.cakePriceOptions, extraRules: rules.extraRules },
+    rules: { version: 2, cakePriceOptions: rules.cakePriceOptions, extraRules: rules.extraRules, breakfastPrice: rules.breakfastPrice ?? breakfastPriceOf(catalog.rules) },
   };
 }
