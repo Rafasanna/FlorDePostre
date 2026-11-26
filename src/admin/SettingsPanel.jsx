@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Plus, Save } from "lucide-react";
 import { moneyInputToCents } from "../../shared/catalog.js";
 import { validateSettings, breakfastPriceOf } from "../../shared/settings.js";
+import CampaignBanner from "../components/CampaignBanner.jsx";
 
 const cakeGroups = [
   ["tortaCoberturas", "Coberturas", "precio"],
@@ -28,6 +29,16 @@ function makeDraft(catalog) {
 
 function SettingField({ label, children }) {
   return <label className="a-setting-field"><span>{label}</span>{children}</label>;
+}
+
+function campaignStatus(campaign) {
+  if (!campaign.active) return { label: "Desactivada", kind: "off" };
+  const now = new Date();
+  const today = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, "0"), String(now.getDate()).padStart(2, "0")].join("-");
+  if (campaign.fechaInicio && campaign.fechaFin && campaign.fechaInicio > campaign.fechaFin) return { label: "Revisá las fechas", kind: "off" };
+  if (campaign.fechaInicio && today < campaign.fechaInicio) return { label: "Programada", kind: "scheduled" };
+  if (campaign.fechaFin && today > campaign.fechaFin) return { label: "Finalizada", kind: "off" };
+  return { label: "Se mostraría hoy", kind: "live" };
 }
 
 export default function SettingsPanel({ catalog, service, onSaved, kind }) {
@@ -69,7 +80,10 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
   const changeCampaign = (index, field, value) => setDraft((previous) => {
     const next = structuredClone(previous);
     if (field === "active" && value) next.campaigns.forEach((item) => { item.active = false; });
+    const campaign = next.campaigns[index];
+    if (field === "titulo" && !catalog.campaigns.some((item) => item.id === campaign.id) && (!campaign.evento || campaign.evento === campaign.titulo)) campaign.evento = value;
     next.campaigns[index][field] = value;
+    if (field === "bannerText") next.campaigns[index].descripcion = value;
     return next;
   });
   const changeOption = (index, field, value) => setDraft((previous) => {
@@ -107,7 +121,7 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
     <div className="a-page-title"><div>
       <span className="a-eyebrow">CONFIGURACIÓN DEL CATÁLOGO</span>
       <h1>{kind === "cakes" ? "Tortas personalizadas" : kind === "sizes" ? "Tamaños de postres" : kind === "breakfast" ? "Desayunos a domicilio" : "Campañas y banners"}</h1>
-      <p>{kind === "cakes" ? "Editá opciones, disponibilidad y precios del configurador." : kind === "sizes" ? "Estos tamaños se usan al configurar el precio de cada postre." : kind === "breakfast" ? "Actualizá el precio de la propuesta estándar que se muestra en la web." : "Definí el contenido y las fechas del banner de la tienda."}</p>
+      <p>{kind === "cakes" ? "Editá opciones, disponibilidad y precios del configurador." : kind === "sizes" ? "Estos tamaños se usan al configurar el precio de cada postre." : kind === "breakfast" ? "Actualizá el precio de la propuesta estándar que se muestra en la web." : "Editá la franja que aparece debajo del menú en la página de inicio."}</p>
     </div><button className="a-btn" type="button" onClick={save} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>
     {error && <p className="a-notice a-error" role="alert">{error}</p>}
     {kind === "cakes" && <>
@@ -154,12 +168,29 @@ export default function SettingsPanel({ catalog, service, onSaved, kind }) {
         <SettingField label="Notas"><input value={size.notes} onChange={(e) => changeSize(index, "notes", e.target.value)}/></SettingField>
       </article>)}
     </section>}
-    {kind === "campaigns" && <section className="a-card a-setting-section"><div className="a-section-head"><div><h2>Campañas</h2><p>Solo una campaña puede estar activa. Las fechas también controlan cuándo se muestra.</p></div><button className="a-btn a-secondary" type="button" onClick={() => set({ ...draft, campaigns: [...draft.campaigns, { id: newId("campana"), evento: "", titulo: "", bannerText: "", descripcion: "", decoracion: "", notas: "", active: false, activa: false, fechaInicio: null, fechaFin: null, colors: { fondo: "#faeeee", texto: "#392a2f", acento: "#b76575", badge: "#fff6f3" } }] })}><Plus size={15}/> Agregar</button></div>
-      {draft.campaigns.map((campaign, index) => <article className="a-setting-item" key={campaign.id}><div className="a-setting-grid"><SettingField label="Evento"><input value={campaign.evento} onChange={(e) => changeCampaign(index, "evento", e.target.value)}/></SettingField><SettingField label="Título visible"><input value={campaign.titulo} onChange={(e) => changeCampaign(index, "titulo", e.target.value)}/></SettingField><label className="a-check"><input type="checkbox" checked={campaign.active} onChange={(e) => changeCampaign(index, "active", e.target.checked)}/> Activa</label></div>
-        <div className="a-setting-grid"><SettingField label="Fecha inicio"><input type="date" value={campaign.fechaInicio ?? ""} onChange={(e) => changeCampaign(index, "fechaInicio", e.target.value || null)}/></SettingField><SettingField label="Fecha fin"><input type="date" value={campaign.fechaFin ?? ""} onChange={(e) => changeCampaign(index, "fechaFin", e.target.value || null)}/></SettingField><SettingField label="Decoración"><input value={campaign.decoracion} onChange={(e) => changeCampaign(index, "decoracion", e.target.value)}/></SettingField></div>
-        <SettingField label="Texto corto del banner"><input value={campaign.bannerText} onChange={(e) => changeCampaign(index, "bannerText", e.target.value)}/></SettingField><SettingField label="Descripción"><textarea value={campaign.descripcion} onChange={(e) => changeCampaign(index, "descripcion", e.target.value)}/></SettingField><SettingField label="Notas internas"><input value={campaign.notas} onChange={(e) => changeCampaign(index, "notas", e.target.value)}/></SettingField>
-        <div className="a-setting-grid">{["fondo", "texto", "acento", "badge"].map((color) => <SettingField key={color} label={`Color ${color}`}><input type="color" value={campaign.colors[color]} onChange={(e) => setDraft((previous) => { const next = structuredClone(previous); next.campaigns[index].colors[color] = e.target.value; return next; })}/></SettingField>)}</div>
-      </article>)}
+    {kind === "campaigns" && <section className="a-card a-setting-section a-campaign-section"><div className="a-section-head"><div><h2>Campañas</h2><p>La campaña activada aparece como una barra debajo del menú, solo en el inicio y durante las fechas indicadas. Los cambios se publican al guardar.</p></div><button className="a-btn a-secondary" type="button" onClick={() => set({ ...draft, campaigns: [...draft.campaigns, { id: newId("campana"), evento: "", titulo: "", bannerText: "", descripcion: "", decoracion: "", notas: "", active: false, activa: false, fechaInicio: null, fechaFin: null, colors: { fondo: "#faeeee", texto: "#392a2f", acento: "#b76575", badge: "#fff6f3" } }] })}><Plus size={15}/> Agregar campaña</button></div>
+      {draft.campaigns.map((campaign, index) => {
+        const status = campaignStatus(campaign);
+        return <article className="a-campaign-card" key={campaign.id} aria-labelledby={`campaign-heading-${campaign.id}`}>
+          <div className="a-campaign-heading">
+            <div><span className="a-campaign-number">Campaña {index + 1}</span><h3 id={`campaign-heading-${campaign.id}`}>{campaign.titulo || "Campaña nueva"}</h3></div>
+            <span className={`a-campaign-status a-campaign-status-${status.kind}`}>{status.label}</span>
+          </div>
+          <div className="a-campaign-preview"><span className="a-campaign-preview-label">Así se vería la barra en la tienda</span><div inert><CampaignBanner campaign={{ ...campaign, titulo: campaign.titulo || "Título de la barra", bannerText: campaign.bannerText || campaign.descripcion || "Mensaje de la barra" }} /></div></div>
+          <div className="a-campaign-fields"><h4>Lo que aparece en la barra</h4><p>Escribí el título y el mensaje. Vas a ver los cambios arriba antes de guardar.</p>
+            <SettingField label="Título de la barra"><input value={campaign.titulo} onChange={(e) => changeCampaign(index, "titulo", e.target.value)}/></SettingField>
+            <SettingField label="Mensaje de la barra"><input value={campaign.bannerText || campaign.descripcion} onChange={(e) => changeCampaign(index, "bannerText", e.target.value)}/></SettingField>
+            <SettingField label="Ícono de la barra (opcional)"><input value={campaign.decoracion} onChange={(e) => changeCampaign(index, "decoracion", e.target.value)}/></SettingField>
+          </div>
+          <div className="a-campaign-fields"><h4>Productos especiales</h4><p>Al crear la campaña, este nombre se completa con el título. Podés cambiarlo para vincular productos del mismo evento. No aparece en la barra.</p>
+            <SettingField label="Nombre del evento"><input value={campaign.evento} onChange={(e) => changeCampaign(index, "evento", e.target.value)}/></SettingField>
+          </div>
+          <div className="a-campaign-fields"><h4>Publicación</h4><p>Solo una campaña puede estar activada a la vez. Si dejás las fechas vacías, se muestra mientras esté activada.</p>
+            <div className="a-setting-grid"><SettingField label="Fecha inicio"><input type="date" value={campaign.fechaInicio ?? ""} onChange={(e) => changeCampaign(index, "fechaInicio", e.target.value || null)}/></SettingField><SettingField label="Fecha fin"><input type="date" value={campaign.fechaFin ?? ""} onChange={(e) => changeCampaign(index, "fechaFin", e.target.value || null)}/></SettingField><label className="a-check"><input type="checkbox" checked={campaign.active} onChange={(e) => changeCampaign(index, "active", e.target.checked)}/> Activar campaña</label></div>
+          </div>
+          <div className="a-campaign-fields"><h4>Colores de la barra</h4><div className="a-setting-grid">{[["fondo", "Fondo"], ["texto", "Texto"], ["acento", "Bordes"], ["badge", "Fondo del ícono"]].map(([color, label]) => <SettingField key={color} label={label}><input type="color" value={campaign.colors[color]} onChange={(e) => setDraft((previous) => { const next = structuredClone(previous); next.campaigns[index].colors[color] = e.target.value; return next; })}/></SettingField>)}</div></div>
+        </article>;
+      })}
     </section>}
     <div className="a-setting-actions"><button className="a-btn" type="button" onClick={save} disabled={saving || !service.writesEnabled}><Save size={16}/>{saving ? "Guardando…" : "Guardar cambios"}</button></div>
   </div>;
